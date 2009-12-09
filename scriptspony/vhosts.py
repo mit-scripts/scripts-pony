@@ -50,9 +50,14 @@ def set_path(locker,vhost,path):
                       ldap.SCOPE_ONELEVEL,
                       '(&(objectClass=apacheConfig)(apacheServerName=%s))'%(ldap.dn.escape_dn_chars(vhost)),['apacheDocumentRoot'],False)
     apacheVhostName = res[0][0]
-    conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
     web_scriptsPath = get_web_scripts_path(locker,path)
-    conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
+    try:
+        conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
+        conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
+    except Exception e:
+        zwrite(vhost,"%s got %s trying to set %s to %s for the %s locker."
+               % (current_user(),e,vhost,path,locker))
+        raise
     # TODO: Check path existance and warn if we know the web_scripts path
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
