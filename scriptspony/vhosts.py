@@ -78,22 +78,6 @@ def request_vhost(locker,hostname,path):
             raise UserError("'%s' has too many dots for a mit.edu hostname."
                             % hostname)
         # stella
-        # Send manual mail for this case
-        fromaddr = "%s@mit.edu" % current_user()
-        toaddr = "scripts-pony@mit.edu"
-        msg = MIMEText("""%s wants %s to point to %s in the %s locker.
-
-(The vhost is already configured.)
-
-Sincerely,
-~Scripts Pony""" % (fromaddr,hostname,path,locker))
-        msg['Subject'] = "%s hostname request" % hostname
-        msg['From'] = fromaddr
-        msg['To'] = toaddr
-        s = smtplib.SMTP()
-        s.connect()
-        s.sendmail(fromaddr,[toaddr],msg.as_string())
-        s.quit()
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
     else:
         reqtype='external'
@@ -135,6 +119,8 @@ Sincerely,
         raise
     else:
         zwrite(hostname,logmessage)
+        if reqtype == 'moira':
+            sendmail(locker,hostname,path)
         return message
 
 def validate_path(path):
@@ -159,3 +145,20 @@ class UserError(Exception):
 def zwrite(hostname,logmessage):
     zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","xavetest","-i",
                                "pony","-s",hostname,"-m",logmessage])
+def sendmail(locker,hostname,path):
+    # Send manual mail for this case
+    fromaddr = "%s@mit.edu" % current_user()
+    toaddr = "scripts-pony@mit.edu"
+    msg = MIMEText("""%s wants %s to point to %s in the %s locker.
+
+(The vhost is already configured.)
+
+Sincerely,
+~Scripts Pony""" % (fromaddr,hostname,path,locker))
+    msg['Subject'] = "%s hostname request" % hostname
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
+    s = smtplib.SMTP()
+    s.connect()
+    s.sendmail(fromaddr,[toaddr],msg.as_string())
+    s.quit()
