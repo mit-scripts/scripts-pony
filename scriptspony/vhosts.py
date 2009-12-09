@@ -80,7 +80,7 @@ def request_vhost(locker,hostname,path):
         # stella
         # Send manual mail for this case
         fromaddr = "%s@mit.edu" % current_user()
-        toaddr = "xavid@mit.edu"
+        toaddr = "scripts-pony@mit.edu"
         msg = MIMEText("""%s wants %s to point to %s in the %s locker.
 
 (The vhost is already configured.)
