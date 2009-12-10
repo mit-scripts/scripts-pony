@@ -54,7 +54,7 @@ def set_path(locker,vhost,path):
     try:
         conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
         conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
-    except Exception e:
+    except Exception,e:
         zwrite(vhost,"%s got %s trying to set %s to %s for the %s locker."
                % (current_user(),e,vhost,path,locker))
         raise
@@ -119,8 +119,8 @@ def request_vhost(locker,hostname,path):
                                      ('scriptsVhostAlias',[alias] if alias else []),
                                      ('scriptsVhostAccount',[account]),
                                      ('scriptsVhostDirectory',[path])])
-    except:
-        zwrite(hostname,logmessage + "; but it failed.")
+    except Exception,e:
+        zwrite(hostname,logmessage + "; but it failed: " + e)
         raise
     else:
         zwrite(hostname,logmessage)
