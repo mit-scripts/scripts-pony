@@ -1,8 +1,8 @@
 <%inherit file="scriptspony.templates.master"/>
 
-<h3>Hostnames for the ${locker} locker</h3>
-
 %if hosts is not None:
+  <h3>Hostnames for the ${locker} locker</h3>
+
   <p>
     <table border="1">
       <tr><th>Hostname</th><th>Path</th></tr>
