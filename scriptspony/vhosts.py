@@ -37,8 +37,10 @@ def get_path(locker,hostname):
 def set_path(locker,vhost,path):
     """Sets the path of an existing vhost owned by the locker."""
     validate_path(path)
-    if vhost != locker+'.scripts.mit.edu':
+    if vhost == locker+'.scripts.mit.edu':
         raise UserError("You cannot reconfigure "+vhost+"!")
+    if is_host_reified(vhost):
+        raise UserError("The host '%s' has special configuration; email scripts@mit.edu to make changes to it.")
     if path.endswith('/'):
         path = path[:-1]
     path = path.encode('utf-8')
@@ -143,6 +145,9 @@ def get_web_scripts_path(locker,path):
 def get_uid_gid(locker):
     p = pwd.getpwnam(locker)
     return (p.pw_uid,p.pw_gid)
+
+def is_host_reified(hostname):
+    return ("namevhost %s " % hostname) in subprocess.Popen(["/usr/sbin/httpd","-S"],stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()[0]
 
 class UserError(Exception):
     pass
