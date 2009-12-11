@@ -11,7 +11,7 @@
           <tr>
 	    <td>${host}</td><td>${path}</td>
 	    %if host not in (locker+'.scripts.mit.edu',):
-	      <td><a href="${tg.url('edit/'+locker+'/'+host)}">edit</a></td>
+	      <td><a href="${tg.url('/edit/'+locker+'/'+host)}">edit</a></td>
 	    %endif
           </tr>
 	</form>
