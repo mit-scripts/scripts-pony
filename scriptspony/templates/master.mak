@@ -31,15 +31,37 @@ def set_port(url,port):
 %>
 
 <%def name="head()">
+    <%
+    pink = request.cookies.get('pink',auth.current_user() in ('geofft','jhamrick','mitchb'))
+    %>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
-    %if 'P' in pylons.request.application_url or auth.current_user() in ('geofft','jhamrick','mitchb'):
+    %if pink:
       <link rel="stylesheet" href="http://${scriptshost}/ponies.css" type="text/css" />
     %else:
       <link rel="stylesheet" href="http://${scriptshost}/style.css" type="text/css" />
     %endif
     <link rel="stylesheet" href="http://${scriptshost}/server.css" type="text/css" />
     <title>${self.title()}</title>
+    <script type="text/javascript">
+      var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
+      document.onkeydown = function (e) {
+        kkeys.push(e.keyCode);
+        var idx = kkeys.toString().indexOf( konami );
+        if (idx >= 0 && idx != kkeys.toString().length - konami.length) {
+          kkeys = [];
+          rainbow();
+        }
+      };
+      function rainbow () {
+%if pink:
+        document.cookie = "pink=";
+%else:
+        document.cookie = "pink=yay";
+%endif
+        window.location.reload()
+      }
+    </script>
 </%def>
 
 <%def name="title()">Scripts Pony</%def>
