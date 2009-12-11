@@ -49,7 +49,7 @@ class RootController(BaseController):
     @expose('scriptspony.templates.edit')
     def edit(self,locker,hostname,path=None):
         if vhosts.is_host_reified(hostname):
-            flash("The host '%s' has special configuration; email scripts@mit.edu to make changes to it.")
+            flash("The host '%s' has special configuration; email scripts@mit.edu to make changes to it." % hostname)
             redirect('/index/'+locker)
         if path is not None:
             try:
