@@ -7,6 +7,8 @@ from socket import gethostname
 from scriptspony import auth
 import os
 
+scriptshost = gethostname()
+
 def set_port(url,port):
     if port == 80:
         portbit = ""
@@ -32,11 +34,11 @@ def set_port(url,port):
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
     %if 'P' in pylons.request.application_url or auth.current_user() in ('geofft','jhamrick','mitchb'):
-      <link rel="stylesheet" href="http://scripts.mit.edu/ponies.css" type="text/css" />
+      <link rel="stylesheet" href="http://${scriptshost}/ponies.css" type="text/css" />
     %else:
-      <link rel="stylesheet" href="http://scripts.mit.edu/style.css" type="text/css" />
+      <link rel="stylesheet" href="http://${scriptshost}/style.css" type="text/css" />
     %endif
-    <link rel="stylesheet" href="http://scripts.mit.edu/server.css" type="text/css" />
+    <link rel="stylesheet" href="http://${scriptshost}/server.css" type="text/css" />
     <title>${self.title()}</title>
 </%def>
 
@@ -51,7 +53,7 @@ def set_port(url,port):
 	<div id="outer">
 			<div id="masthead">
 
-				<h1 id="header"><a rel="home" href="http://scripts.mit.edu/">${self.title()}</a></h1>
+				<h1 id="header"><a rel="home" href="http://pony.scripts.mit.edu/">${self.title()}</a></h1>
 				<h2 id="tagline">MIT SIPB Script Services for Athena</h2>
 			</div>
 			<div id="hmenu">
@@ -88,7 +90,7 @@ tg_flash = tg.flash_obj.render('flash', use_js=False)
 
 <center>&copy; 2004-2009, the SIPB scripts.mit.edu project.<br>These pages may be reused under either the <a href="/nolink/81/">GFDL 1.2</a> or <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/">CC-BY-SA 3.0</a>.<br>Questions? Contact <a href="mailto:scripts@mit.edu">scripts@mit.edu</a>.<br><br>
 
-You are currently connected to ${gethostname()}.
+You are currently connected to ${scriptshost}.
 
 				</div>
 <div id="menu">
