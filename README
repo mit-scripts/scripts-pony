@@ -1,6 +1,6 @@
 === Install ===
 
-To install your own instance of scripts-pony, make a symbolic link
+To install your own instance of Scripts Pony, make a symbolic link
 from somewhere in your web_scripts directory to here, and make sure
 that daemon.scripts can read everything here and write the data
 directory.
@@ -8,6 +8,10 @@ directory.
 ln -s "$(pwd)/web_scripts" ~/web_scripts/pony
 fsr sa . daemon.scripts read
 fsr sa data daemon.scripts write
+
+Pony will try to use your username+scripts-pony database on
+sql.mit.edu.  Go to sql.mit.edu and create this database, and
+be sure the login info in your ~/.my.conf is accurate.
 
 === Authentication and Authorization ===
 
