@@ -1,0 +1,27 @@
+=== Authentication and Authorization ===
+
+Scripts Pony's LDAP user needs the following ACI on
+ou=VirtualHosts,dc=scripts,dc=mit,dc=edu in order to make changes in
+LDAP:
+
+(version 3.0;acl "pony";allow (add,write) userdn="ldap:///uid=pony.scripts.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu";)
+
+Pony's cert, Private/pony-cert.pem probably needs to be mapped to
+allow authentication to the pony user.  To do this, you'll need
+something like the following in /etc/dirsrv/config/certmap.conf:
+
+certmap Scripts		C=US, ST=Massachusetts, O=scripts.mit.edu, CN=scripts.mit.edu CA/emailAddress=scripts@mit.edu
+Scripts:DNComps		dc
+Scripts:FilterComps	cn
+
+This assumes that the certificate's subject looks like:
+
+Subject: C=US, ST=Massachusetts, L=Cambridge, O=scripts.mit.edu, CN=pony.scripts.mit.edu/emailAddress=scripts-pony@mit.edu
+
+And the user in LDAP looks like:
+
+dn: uid=pony.scripts.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu
+uid: pony.scripts.mit.edu
+cn: pony.scripts.mit.edu
+objectClass: account
+objectClass: top
