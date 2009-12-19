@@ -1,3 +1,14 @@
+=== Install ===
+
+To install your own instance of scripts-pony, make a symbolic link
+from somewhere in your web_scripts directory to here, and make sure
+that daemon.scripts can read everything here and write the data
+directory.
+
+ln -s "$(pwd)/web_scripts" ~/web_scripts/pony
+fsr sa . daemon.scripts read
+fsr sa data daemon.scripts write
+
 === Authentication and Authorization ===
 
 Scripts Pony's LDAP user needs the following ACI on
