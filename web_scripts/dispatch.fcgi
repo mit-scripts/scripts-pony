@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
+import os,sys
+
+webappdir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/..')
+
 import site
-site.addsitedir('/mit/pony/Scripts/turbogears/ScriptsPony')
+site.addsitedir(webappdir)
 
 __requires__='ScriptsPony'
 import pkg_resources
@@ -34,7 +38,7 @@ if __name__ == '__main__':
     try:
         # Load the WSGI application from the config file
         from paste.deploy import loadapp
-        wsgi_app = loadapp('config:/mit/pony/Scripts/turbogears/ScriptsPony/development.ini')
+        wsgi_app = loadapp('config:'+webappdir+'/development.ini')
         
         RestartingServer(wsgi_app,restart_file).run()
     except Exception,e:
