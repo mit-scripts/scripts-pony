@@ -27,7 +27,7 @@ something like the following in /etc/dirsrv/config/certmap.conf:
 
 certmap Scripts		C=US, ST=Massachusetts, O=scripts.mit.edu, CN=scripts.mit.edu CA/emailAddress=scripts@mit.edu
 Scripts:DNComps		dc
-Scripts:FilterComps	cn
+Scripts:FilterComps	uid
 
 This assumes that the certificate's subject looks like:
 
@@ -37,6 +37,5 @@ And the user in LDAP looks like:
 
 dn: uid=pony.scripts.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu
 uid: pony.scripts.mit.edu
-cn: pony.scripts.mit.edu
 objectClass: account
 objectClass: top
