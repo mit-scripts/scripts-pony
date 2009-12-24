@@ -40,11 +40,14 @@ class RootController(BaseController):
         user = auth.current_user()
         # Find or create the associated user info object.
         # TODO: is there a find_or_create sqlalchemy method?
-        try:
-            user_info = DBSession.query(UserInfo).filter(UserInfo.user==user).one()
-        except NoResultFound:
-            user_info = UserInfo(user)
-            DBSession.add(user_info)
+        if user:
+            try:
+                user_info = DBSession.query(UserInfo).filter(UserInfo.user==user).one()
+            except NoResultFound:
+                user_info = UserInfo(user)
+                DBSession.add(user_info)
+        else:
+            user_info = None
 
         if user is not None:
             if locker is None:
