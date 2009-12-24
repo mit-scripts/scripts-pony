@@ -2,6 +2,4 @@
  * Check stella info with PyMoira before sending mail for *.mit.edu
    * Package PyMoira into an rpm and get installed on scripts servers
      * Package libmoira into an rpm and get installed on scripts servers
- * Store lockers a user has switched to in SQL and display links to them
-   by the "switch lockers" field.
  * Deal with the new vhost reification system.
