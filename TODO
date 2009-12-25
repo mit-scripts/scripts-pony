@@ -3,3 +3,13 @@
    * Package PyMoira into an rpm and get installed on scripts servers
      * Package libmoira into an rpm and get installed on scripts servers
  * Deal with the new vhost reification system.
+ * Semi-automatic mode:
+     We have an admin queue.  When a *.mit.edu vhost is requested, an
+     email to jweiss is composed and put in the queue; a scripts
+     team member can click a button to send it, or edit it in place.
+     A cron job periodically resolves hostnames where the email's been
+     sent and emails the original user when the vhost is active.
+   * I want to use mail scripts to parse jweiss's responses for 
+     "done mod DNS", but this doesn't actually do anything useful.
+     Though possibly we do want jweiss's responses to go to the pony
+     admin queue and not RT.
