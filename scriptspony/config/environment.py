@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """WSGI environment setup for ScriptsPony."""
 
-import os
+import getpass
 
 from scriptspony.config.app_cfg import base_config
 
@@ -13,7 +13,7 @@ tg_load_environment = base_config.make_load_environment()
 def load_environment(global_conf,app_conf):
     ## Hack to make our sqlalchemy config depend on scripts user
     url = ('mysql://sql.mit.edu/%s+scripts-pony?read_default_file=~/.my.cnf'
-           % os.getenv('USER'))
+           % getpass.getuser())
     global_conf['sqlalchemy.url'] = app_conf['sqlalchemy.url'] = url
     print "Overriding sqlalchemy.url to: %s" % url
     tg_load_environment(global_conf,app_conf)

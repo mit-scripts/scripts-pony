@@ -6,7 +6,10 @@ from pylons.i18n import ugettext as _, lazy_ugettext as l_
 
 from scriptspony.lib.base import BaseController
 from scriptspony.model import DBSession, metadata
+from scriptspony.model.user import UserInfo
 from scriptspony.controllers.error import ErrorController
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from .. import auth,vhosts
 
@@ -35,6 +38,17 @@ class RootController(BaseController):
         """Handle the front-page."""
         hosts = None
         user = auth.current_user()
+        # Find or create the associated user info object.
+        # TODO: is there a find_or_create sqlalchemy method?
+        if user:
+            try:
+                user_info = DBSession.query(UserInfo).filter(UserInfo.user==user).one()
+            except NoResultFound:
+                user_info = UserInfo(user)
+                DBSession.add(user_info)
+        else:
+            user_info = None
+
         if user is not None:
             if locker is None:
                 locker = user
@@ -43,8 +57,19 @@ class RootController(BaseController):
                 hosts.sort(key=lambda k:k[0])
             except auth.AuthError:
                 flash("You do not have permission to administer the '%s' locker."%locker)
+                # User has been deauthorized from this locker
+                if locker in user_info.lockers:
+                    user_info.lockers.remove(locker)
+                    DBSession.add(user_info)
                 return self.index()
-        return dict(hosts=hosts, locker=locker)
+            else:
+                # Append locker to the list in user_info if it's not there
+                if not locker in user_info.lockers:
+                    user_info.lockers.append(locker)
+                    user_info.lockers.sort()
+                    DBSession.add(user_info)
+                    flash('New locker "%s" recorded.' % locker)
+        return dict(hosts=hosts, locker=locker, user_info=user_info)
 
     @expose('scriptspony.templates.edit')
     def edit(self,locker,hostname,path=None):
