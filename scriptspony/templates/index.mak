@@ -27,22 +27,24 @@
     <a href="${tg.url('/new/'+locker)}">Request a new hostname</a> for the ${locker} locker
 
 <hr />
-  <p> You can choose a different locker that you've already managed: </p>
-  <ul>
-  %for l in user_info.lockers:
-  <li>
-  %if l == locker:
-  <b>${l}</b>
-  %else:
-  <a href="${tg.url('/index', locker=l)}">${l | h}</a>
+  <p> You can switch to managing a different locker: </p>
+  %if len(user_info.lockers) > 1:
+    <ul>
+    %for l in user_info.lockers:
+    <li>
+    %if l == locker:
+    <b>${l}</b>
+    %else:
+    <a href="${tg.url('/index', locker=l)}">${l | h}</a>
+    %endif
+    </li>
+    %endfor
+    </ul>
   %endif
-  </li>
-  %endfor
-  </ul>
 
   </p>
   <form action="${tg.url('/index')}">
-   Or switch to managing the <input type="text" name="locker" value="${locker}" /> locker
+   Switch to managing the <input type="text" name="locker" value="${locker}" /> locker
     <input type="submit" value="Switch" />
   </form>
 %else:

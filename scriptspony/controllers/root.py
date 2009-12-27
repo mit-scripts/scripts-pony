@@ -68,7 +68,7 @@ class RootController(BaseController):
                     user_info.lockers.append(locker)
                     user_info.lockers.sort()
                     DBSession.add(user_info)
-                    flash('New locker "%s" recorded.' % locker)
+                    flash('You can administer the "%s" locker.' % locker)
         return dict(hosts=hosts, locker=locker, user_info=user_info)
 
     @expose('scriptspony.templates.edit')
