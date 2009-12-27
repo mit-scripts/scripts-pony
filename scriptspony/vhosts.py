@@ -1,6 +1,6 @@
 import ldap
 import re
-import socket,subprocess,os.path,pwd
+import socket,subprocess,os,pwd
 import smtplib
 from email.mime.text import MIMEText
 
@@ -8,8 +8,12 @@ from .auth import sensitive,current_user
 
 def connect():
     global conn
-    conn = ldap.open('localhost')
-    conn.simple_bind_s(who, cred)
+    conn = ldap.initialize('ldaps://localhost')
+    # Only try to get the certificate if we have one
+    #if os.path.exists("~/Private/pony-cert.pem"):
+    #    conn.set_option(ldap.OPT_X_TLS_CERTFILE,'~/Private/pony-cert.pem')
+    #    conn.set_option(ldap.OPT_X_TLS_KEYFILE,'~/Private/key.pem')
+    conn.simple_bind_s()
 
 @sensitive
 def list_vhosts(locker):
