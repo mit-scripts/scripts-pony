@@ -24,6 +24,7 @@ def first_name():
         return None
 
 def can_admin(locker):
+    """Return true if the authentiated user can admin the named locker."""
     admof = subprocess.Popen(["/usr/local/bin/admof","-noauth",locker,current_user()],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out,err = admof.communicate()
     if admof.returncode not in (33, 1):
@@ -37,6 +38,9 @@ LOCKER_PATTERN = re.compile(r'^(?:\w[\w.-]*\w|\w)$')
 
 @decorator
 def sensitive(func, locker,*args,**kw):
+    """Wrap a function that takes a locker as the first argument
+    such that it throws an AuthError unless the authenticated
+    user can admin that locker."""
     if not can_admin(locker):
         raise AuthError("You cannot administer the '%s' locker!"%locker)
     elif not LOCKER_PATTERN.search(locker):

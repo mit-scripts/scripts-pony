@@ -8,7 +8,7 @@ from .auth import sensitive,current_user
 
 def connect():
     global conn
-    conn = ldap.initialize('ldaps://localhost')
+    conn = ldap.initialize('ldap://localhost')
     # Only try to get the certificate if we have one
     #if os.path.exists("~/Private/pony-cert.pem"):
     #    conn.set_option(ldap.OPT_X_TLS_CERTFILE,'~/Private/pony-cert.pem')
@@ -72,6 +72,10 @@ HOSTNAME_PATTERN = re.compile(r'^[\w-]+(?:[.][\w-]+)+$')
 
 @sensitive
 def request_vhost(locker,hostname,path):
+    """Request hostname as a vhost for the given locker and path.
+
+    Throws a UserError if the request is invalid, otherwise returns
+    a human-readable status message and sends a zephyr."""
     locker = locker.encode('utf-8')
     hostname = hostname.lower().encode('utf-8')
     path = path.encode('utf-8')
@@ -135,6 +139,7 @@ def request_vhost(locker,hostname,path):
         return message
 
 def validate_path(path):
+    """Throw a UserError if path is not valid for a vhost path."""
     if (not path.startswith('/')
         and '..' not in path.split('/')
         and '.' not in path.split('/')
@@ -144,22 +149,27 @@ def validate_path(path):
         raise UserError("'%s' is not a valid path." % path)
 
 def get_web_scripts_path(locker,path):
+    """Return the web_scripts filesystem path for a given locker and vhost path."""
     return os.path.realpath('/mit/'+locker+'/web_scripts/'+path)
 
 def get_uid_gid(locker):
+    """Get the scripts uid and gid for a locker."""
     p = pwd.getpwnam(locker)
     return (p.pw_uid,p.pw_gid)
 
 def is_host_reified(hostname):
+    """Return true if the given hostname is reified."""
     return ("namevhost %s " % hostname) in subprocess.Popen(["/usr/sbin/httpd","-S"],stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()[0]
 
 class UserError(Exception):
     pass
 
 def zwrite(hostname,logmessage):
+    """Zephyr about the given hostname with the given message."""
     zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","xavetest","-i",
                                "pony","-s",hostname,"-m",logmessage])
 def sendmail(locker,hostname,path):
+    """Send mail for MIT vhost requests."""
     # Send manual mail for this case
     fromaddr = "%s@mit.edu" % current_user()
     toaddr = "scripts-pony@mit.edu"
