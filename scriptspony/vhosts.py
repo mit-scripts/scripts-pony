@@ -37,7 +37,7 @@ def list_vhosts(locker):
 
 @sensitive
 def get_path(locker,hostname):
-    """Return a the path for the given locker.
+    """Return a the path for the given hostname.
 
     The directory is relative to web_scripts or Scripts/*/"""
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
@@ -187,7 +187,7 @@ def sendmail(locker,hostname,path):
     """Send mail for MIT vhost requests."""
     # Send manual mail for this case
     fromaddr = "%s@mit.edu" % current_user()
-    toaddr = "scripts-pony@mit.edu"
+    toaddr = "scripts@mit.edu"
     msg = MIMEText("""%s wants %s to point to %s in the %s locker.
 
 (The vhost is already configured.)
