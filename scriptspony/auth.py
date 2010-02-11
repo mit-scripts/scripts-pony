@@ -64,4 +64,5 @@ class ScriptsAuthMiddleware(object):
     def __call__(self, environ, start_response):
         state.username = environ.get('REMOTE_USER',None)
         state.name = environ.get('SSL_CLIENT_S_DN_CN','')
+        keytab.auth()
         return self.app(environ,start_response)
