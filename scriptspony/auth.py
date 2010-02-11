@@ -35,9 +35,10 @@ def can_admin(locker):
     if admof.returncode not in (33, 1):
          
         raise OSError(admof.returncode,err)
-    if out.strip() and out.strip() not in ("yes","no") or err.strip():
+    if (out.strip() not in ("","yes","no") 
+        or err.strip() not in ("","internal error: pioctl: No such file or directory")):
         log.err("admof failed for %s/%s: out='%s', err='%s'"
-                % (locker, current_user(), out, err))
+                % (locker, current_user(), out.strip(), err.strip()))
     return out.strip() == "yes" and admof.returncode == 33 and current_user()=='xavid'
 
 class AuthError(webob.exc.HTTPForbidden):

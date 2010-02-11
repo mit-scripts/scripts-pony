@@ -19,6 +19,7 @@ def connect():
         conn.simple_bind_s()
 
 @sensitive
+@log.exceptions
 def list_vhosts(locker):
     """Return a list of (vhost,directory) for the given locker.
 
@@ -31,6 +32,7 @@ def list_vhosts(locker):
 
 
 @sensitive
+@log.exceptions
 def get_path(locker,hostname):
     """Return a the path for the given hostname.
 
@@ -41,6 +43,7 @@ def get_path(locker,hostname):
     return res[0][1]['scriptsVhostDirectory'][0]
 
 @sensitive
+@log.exceptions
 def set_path(locker,vhost,path):
     """Sets the path of an existing vhost owned by the locker."""
     validate_path(path)
@@ -61,16 +64,12 @@ def set_path(locker,vhost,path):
                       ldap.filter.filter_format('(&(objectClass=apacheConfig)(apacheServerName=%s))',[vhost]),['apacheDocumentRoot'],False)
     apacheVhostName = res[0][0]
     web_scriptsPath = get_web_scripts_path(locker,path)
-    try:
-        conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
-        conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
-    except Exception,e:
-        log.err("%s got '%s' trying to set '%s' to '%s' for the %s locker."
-               % (current_user(),e,vhost,path,locker))
-        raise
-    else:
-        log.info("%s set path for vhost '%s' to '%s' for the %s locker."
-               % (current_user(),e,vhost,path,locker))
+
+    conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
+    conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
+
+    log.info("%s set path for vhost '%s' to '%s' for the %s locker."
+             % (current_user(),vhost,path,locker))
     # TODO: Check path existance and warn if we know the web_scripts path
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
@@ -78,6 +77,7 @@ def set_path(locker,vhost,path):
 HOSTNAME_PATTERN = re.compile(r'^[\w-]+(?:[.][\w-]+)+$')
 
 @sensitive
+@log.exceptions
 def request_vhost(locker,hostname,path):
     """Request hostname as a vhost for the given locker and path.
 
@@ -131,26 +131,23 @@ def request_vhost(locker,hostname,path):
     account = ldap.filter.filter_format('uid=%s,ou=People,dc=scripts,dc=mit,dc=edu',[locker])
     logmessage = "%s requested %s for locker '%s' path '%s" % (
         current_user(), hostname, locker,path)
-    try:
-        conn.add_s(apacheServerName,[('objectClass',['apacheConfig','top']),
-                                     ('apacheServerName',[hostname]),
-                                     ('apacheServerAlias',[alias] if alias else []),
-                                     ('apacheDocumentRoot',[web_scriptsPath]),
-                                     ('apacheSuexecUid',[str(uid)]),
-                                     ('apacheSuexecGid',[str(gid)])])
-        conn.add_s(scriptsVhostName,[('objectClass',['scriptsVhost','top']),
-                                     ('scriptsVhostName',[hostname]),
-                                     ('scriptsVhostAlias',[alias] if alias else []),
-                                     ('scriptsVhostAccount',[account]),
-                                     ('scriptsVhostDirectory',[path])])
-    except Exception,e:
-        log.err(logmessage + "; but it failed: " + e)
-        raise
-    else:
-        log.info(logmessage)
-        if reqtype == 'moira':
-            sendmail(locker,hostname,path)
-        return message
+
+    conn.add_s(apacheServerName,[('objectClass',['apacheConfig','top']),
+                                 ('apacheServerName',[hostname]),
+                                 ('apacheServerAlias',[alias] if alias else []),
+                                 ('apacheDocumentRoot',[web_scriptsPath]),
+                                 ('apacheSuexecUid',[str(uid)]),
+                                 ('apacheSuexecGid',[str(gid)])])
+    conn.add_s(scriptsVhostName,[('objectClass',['scriptsVhost','top']),
+                                 ('scriptsVhostName',[hostname]),
+                                 ('scriptsVhostAlias',[alias] if alias else []),
+                                 ('scriptsVhostAccount',[account]),
+                                 ('scriptsVhostDirectory',[path])])
+
+    log.info(logmessage)
+    if reqtype == 'moira':
+        sendmail(locker,hostname,path)
+    return message
 
 def validate_path(path):
     """Throw a UserError if path is not valid for a vhost path."""
@@ -175,7 +172,7 @@ def is_host_reified(hostname):
     """Return true if the given hostname is reified."""
     return ("namevhost %s " % hostname) in subprocess.Popen(["/usr/sbin/httpd","-S"],stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()[0]
 
-class UserError(Exception):
+class UserError(log.ExpectedException):
     pass
 
 def sendmail(locker,hostname,path):

@@ -1,3 +1,4 @@
+ * Get user's homedir from LDAP.
  * Check stella info with PyMoira before sending mail for *.mit.edu
    * Package PyMoira into an rpm and get installed on scripts servers
      * Package libmoira into an rpm and get installed on scripts servers
