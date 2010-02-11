@@ -10,12 +10,7 @@ from . import keytab
 state = threading.local()
 
 def current_user():
-    ending = '@MIT.EDU'
-    uname = state.email
-    if uname is None or not uname.endswith(ending):
-        return None
-    else:
-        return uname[:-len(ending)]
+    return state.username
 
 def first_name():
     fullname = state.name
@@ -58,6 +53,6 @@ class ScriptsAuthMiddleware(object):
     def __init__(self, app):
         self.app = app
     def __call__(self, environ, start_response):
-        state.email = environ.get('SSL_CLIENT_S_DN_Email',None)
+        state.username = environ.get('REMOTE_USER',None)
         state.name = environ.get('SSL_CLIENT_S_DN_CN','')
         return self.app(environ,start_response)

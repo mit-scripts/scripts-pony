@@ -16,3 +16,6 @@ RewriteRule ^(?:dev/)?(.*)$ public/$1 [L]
 
 # Use FCGI for everything else
 RewriteRule ^(.*)$ dispatch\.fcgi/$1 [L]
+
+AuthType SSLCert
+Require valid-user
