@@ -1,4 +1,4 @@
-import ldap, ldap.sasl
+import ldap, ldap.sasl, ldap.filter
 import re
 import socket,subprocess,os,pwd
 from syslog import syslog,LOG_ERR
@@ -28,7 +28,7 @@ def list_vhosts(locker):
     The directory is relative to web_scripts or Scripts/*/"""
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
-                      '(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))'%ldap.dn.escape_dn_chars(locker),['scriptsVhostName','scriptsVhostDirectory'])
+                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))',[locker]),['scriptsVhostName','scriptsVhostDirectory'])
     return [(m['scriptsVhostName'][0],m['scriptsVhostDirectory'][0])
             for i,m in res]
 
@@ -40,7 +40,7 @@ def get_path(locker,hostname):
     The directory is relative to web_scripts or Scripts/*/"""
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
-                      '(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))'%(ldap.dn.escape_dn_chars(locker),ldap.dn.escape_dn_chars(hostname)),['scriptsVhostDirectory'])
+                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))',[locker,hostname]),['scriptsVhostDirectory'])
     return res[0][1]['scriptsVhostDirectory'][0]
 
 @sensitive
@@ -57,11 +57,11 @@ def set_path(locker,vhost,path):
     locker = locker.encode('utf-8')
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
-                      '(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))'%(ldap.dn.escape_dn_chars(locker),ldap.dn.escape_dn_chars(vhost)),['scriptsVhostDirectory'],False)
+                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))',[locker,vhost]),['scriptsVhostDirectory'],False)
     scriptsVhostName = res[0][0]
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
-                      '(&(objectClass=apacheConfig)(apacheServerName=%s))'%(ldap.dn.escape_dn_chars(vhost)),['apacheDocumentRoot'],False)
+                      ldap.filter.filter_format('(&(objectClass=apacheConfig)(apacheServerName=%s))',[vhost]),['apacheDocumentRoot'],False)
     apacheVhostName = res[0][0]
     web_scriptsPath = get_web_scripts_path(locker,path)
     try:
@@ -119,19 +119,19 @@ def request_vhost(locker,hostname,path):
     # Actually create the vhost
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
-                      '(&(objectClass=scriptsVhost)(scriptsVhostName=%s))'%(ldap.dn.escape_dn_chars(hostname)),['scriptsVhostDirectory'],False)
+                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostName=%s))',[hostname]),['scriptsVhostDirectory'],False)
     if len(res) != 0:
         raise UserError("'%s' is already a hostname on scripts.mit.edu."
                         % hostname)
-    scriptsVhostName = "scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu" % ldap.dn.escape_dn_chars(hostname)
-    apacheServerName = "apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu" % ldap.dn.escape_dn_chars(hostname)
+    scriptsVhostName = ldap.filter.filter_format("scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
+    apacheServerName = ldap.filter.filter_format("apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
     if hostname.endswith('.mit.edu'):
         alias = hostname[:-len('.mit.edu')]
     else:
         alias = None
     web_scriptsPath = get_web_scripts_path(locker,path)
     uid,gid = get_uid_gid(locker)
-    account = 'uid=%s,ou=People,dc=scripts,dc=mit,dc=edu' % ldap.dn.escape_dn_chars(locker)
+    account = ldap.filter.filter_format('uid=%s,ou=People,dc=scripts,dc=mit,dc=edu',[locker])
     logmessage = "%s requested %s for locker '%s' path '%s" % (
         current_user(), hostname, locker,path)
     try:
