@@ -36,6 +36,7 @@ class RootController(BaseController):
     @expose('scriptspony.templates.index')
     def index(self,locker=None):
         """Handle the front-page."""
+        olocker = locker
         hosts = None
         user = auth.current_user()
         # Find or create the associated user info object.
@@ -55,13 +56,16 @@ class RootController(BaseController):
             try:
                 hosts = vhosts.list_vhosts(locker)
                 hosts.sort(key=lambda k:k[0])
-            except auth.AuthError:
-                flash("You do not have permission to administer the '%s' locker."%locker)
+            except auth.AuthError,e:
+                flash(e.message)
                 # User has been deauthorized from this locker
                 if locker in user_info.lockers:
                     user_info.lockers.remove(locker)
                     DBSession.add(user_info)
-                return self.index()
+                if olocker is not None:
+                    return self.index()
+                else:
+                    return dict(hosts={},locker=locker,user_info=user_info)
             else:
                 # Append locker to the list in user_info if it's not there
                 if not locker in user_info.lockers:
@@ -78,11 +82,11 @@ class RootController(BaseController):
             redirect('/index/'+locker)
         if path is not None:
             try:
-                message = vhosts.set_path(locker,hostname,path)
+                vhosts.set_path(locker,hostname,path)
             except vhosts.UserError,e:
                 flash(e.message)
             else:
-                flash(message)
+                flash("Host '%s' reconfigured."%hostname)
                 redirect('/index/'+locker)
         else:
             path=vhosts.get_path(locker,hostname)
@@ -93,7 +97,11 @@ class RootController(BaseController):
     def new(self,locker,hostname='',path=''):
         if hostname:
             try:
-                vhosts.request_vhost(locker,hostname,path)
+                status = vhosts.request_vhost(locker,hostname,path)
             except vhosts.UserError,e:
                 flash(e.message)
+            else:
+                flash(status)
+                redirect('/index/'+locker)
+
         return dict(locker=locker,hostname=hostname,path=path)

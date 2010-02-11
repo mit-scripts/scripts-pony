@@ -1,9 +1,15 @@
+=== Checking Out ===
+
+You can get your own clone of Scripts Pony by doing
+"git clone /mit/pony/scripts-pony.git".  Doing this in 
+~/Scripts/turbogears/ is mildly recommended.
+
 === Install ===
 
 To install your own instance of Scripts Pony, make a symbolic link
-from somewhere in your web_scripts directory to here, and make sure
-that daemon.scripts can read everything here and write the data
-directory.
+from somewhere in your web_scripts directory to your checkout of
+Scripts Pony, and make sure that daemon.scripts can read everything
+in your checkout and write the data directory.
 
 ln -s "$(pwd)/web_scripts" ~/web_scripts/pony
 fsr sa . daemon.scripts read
@@ -15,27 +21,19 @@ be sure the login info in your ~/.my.conf is accurate.
 
 === Authentication and Authorization ===
 
+Scripts Pony authenticates with ~/Private/scripts-pony.keytab,
+if that exists.  If not, it uses no authentication (but can still
+do reads).
+
 Scripts Pony's LDAP user needs the following ACI on
 ou=VirtualHosts,dc=scripts,dc=mit,dc=edu in order to make changes in
 LDAP:
 
-(version 3.0;acl "pony";allow (add,write) userdn="ldap:///uid=pony.scripts.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu";)
+(version 3.0;acl "pony";allow (add,write) userdn="ldap:///uid=daemon/scripts-pony.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu";)
 
-Pony's cert, Private/pony-cert.pem probably needs to be mapped to
-allow authentication to the pony user.  To do this, you'll need
-something like the following in /etc/dirsrv/config/certmap.conf:
+This assumes that the user in LDAP looks like:
 
-certmap Scripts		C=US, ST=Massachusetts, O=scripts.mit.edu, CN=scripts.mit.edu CA/emailAddress=scripts@mit.edu
-Scripts:DNComps		dc
-Scripts:FilterComps	uid
-
-This assumes that the certificate's subject looks like:
-
-Subject: C=US, ST=Massachusetts, L=Cambridge, O=scripts.mit.edu, CN=pony.scripts.mit.edu/emailAddress=scripts-pony@mit.edu
-
-And the user in LDAP looks like:
-
-dn: uid=pony.scripts.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu
-uid: pony.scripts.mit.edu
+dn: uid=daemon/scripts-pony.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu
+uid: daemon/scropts-pony.mit.edu
 objectClass: account
 objectClass: top

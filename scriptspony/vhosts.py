@@ -1,4 +1,4 @@
-import ldap
+import ldap, ldap.sasl
 import re
 import socket,subprocess,os,pwd
 import smtplib
@@ -6,14 +6,19 @@ from email.mime.text import MIMEText
 
 from .auth import sensitive,current_user
 
+KEYTAB_FILE = os.path.expanduser("~/Private/scripts-pony.keytab")
+
 def connect():
     global conn
     conn = ldap.initialize('ldap://localhost')
-    # Only try to get the certificate if we have one
-    #if os.path.exists("~/Private/pony-cert.pem"):
-    #    conn.set_option(ldap.OPT_X_TLS_CERTFILE,'~/Private/pony-cert.pem')
-    #    conn.set_option(ldap.OPT_X_TLS_KEYFILE,'~/Private/key.pem')
-    conn.simple_bind_s()
+    # Only try to use the keytab if we have one
+    if os.path.exists(KEYTAB_FILE):
+        subprocess.Popen(['/usr/kerberos/bin/kinit','daemon/scripts-pony.mit.edu','-k','-t',
+                          KEYTAB_FILE]).wait()
+        auth = ldap.sasl.gssapi()
+        conn.sasl_interactive_bind_s('',auth)
+    else:
+        conn.simple_bind_s()
 
 @sensitive
 def list_vhosts(locker):
@@ -48,6 +53,7 @@ def set_path(locker,vhost,path):
     if path.endswith('/'):
         path = path[:-1]
     path = path.encode('utf-8')
+    locker = locker.encode('utf-8')
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
                       '(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))'%(ldap.dn.escape_dn_chars(locker),ldap.dn.escape_dn_chars(vhost)),['scriptsVhostDirectory'],False)
@@ -61,7 +67,7 @@ def set_path(locker,vhost,path):
         conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
         conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
     except Exception,e:
-        zwrite(vhost,"%s got %s trying to set %s to %s for the %s locker."
+        zwrite(vhost,"%s got '%s' trying to set %s to %s for the %s locker."
                % (current_user(),e,vhost,path,locker))
         raise
     # TODO: Check path existance and warn if we know the web_scripts path
@@ -82,7 +88,7 @@ def request_vhost(locker,hostname,path):
     validate_path(path)
     if not HOSTNAME_PATTERN.search(hostname):
         raise UserError("'%s' is not a valid hostname." % hostname)
-    message = "The hostname %s is now configured." % hostname
+    message = "The hostname '%s' is now configured." % hostname
     if hostname.endswith(".scripts.mit.edu"):
         reqtype = 'subscripts'
         if not hostname.endswith("."+locker+".scripts.mit.edu"):
@@ -96,9 +102,16 @@ def request_vhost(locker,hostname,path):
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
     else:
         reqtype='external'
-        if (socket.gethostbyname(hostname+'.')
-            != socket.gethostbyname("scripts-vhosts.mit.edu")):
-            raise UserError("'%s' does not point at scripts-vhosts.")
+        failed = False
+        try:
+            if (socket.gethostbyname(hostname+'.')
+                != socket.gethostbyname("scripts-vhosts.mit.edu.")):
+                failed=True
+        except socket.gaierror:
+            failed=True
+        if failed:
+            raise UserError("'%s' does not point at scripts-vhosts."
+                            %hostname)
     # Actually create the vhost
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,

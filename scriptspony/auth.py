@@ -29,7 +29,7 @@ def can_admin(locker):
     out,err = admof.communicate()
     if admof.returncode not in (33, 1):
         raise OSError(admof.returncode,err)
-    return out.strip() == "yes" and admof.returncode == 33
+    return out.strip() == "yes" and admof.returncode == 33 and current_user()=='xavid'
 
 class AuthError(webob.exc.HTTPForbidden):
     pass
