@@ -5,6 +5,8 @@ import re
 
 import webob.exc
 
+from . import keytab
+
 state = threading.local()
 
 def current_user():
@@ -25,7 +27,11 @@ def first_name():
 
 def can_admin(locker):
     """Return true if the authentiated user can admin the named locker."""
-    admof = subprocess.Popen(["/usr/local/bin/admof","-noauth",locker,current_user()],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    cmd = ["/usr/local/bin/admof"]
+    if not keytab.exists():
+        cmd.append('-noauth')
+    cmd += [locker,current_user()]
+    admof = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out,err = admof.communicate()
     if admof.returncode not in (33, 1):
         raise OSError(admof.returncode,err)

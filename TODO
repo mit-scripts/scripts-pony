@@ -1,4 +1,6 @@
- * Get LDAP auth working
+ * Security fixes:
+   * Use ldap.filter.filter_format instead of escaping things.
+   * Use REMOTE_USER.
  * Check stella info with PyMoira before sending mail for *.mit.edu
    * Package PyMoira into an rpm and get installed on scripts servers
      * Package libmoira into an rpm and get installed on scripts servers

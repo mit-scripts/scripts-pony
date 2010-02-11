@@ -6,18 +6,16 @@ import smtplib
 from email.mime.text import MIMEText
 
 from .auth import sensitive,current_user
+from . import keytab
 
 LOG_AUTHPRIV = 10<<3
-
-KEYTAB_FILE = os.path.expanduser("~/Private/scripts-pony.keytab")
 
 def connect():
     global conn
     conn = ldap.initialize('ldap://localhost')
     # Only try to use the keytab if we have one
-    if os.path.exists(KEYTAB_FILE):
-        subprocess.Popen(['/usr/kerberos/bin/kinit','daemon/scripts-pony.mit.edu','-k','-t',
-                          KEYTAB_FILE]).wait()
+    if keytab.exists():
+        keytab.auth()
         auth = ldap.sasl.gssapi()
         conn.sasl_interactive_bind_s('',auth)
     else:
