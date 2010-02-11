@@ -1,14 +1,11 @@
 import ldap, ldap.sasl, ldap.filter
 import re
 import socket,subprocess,os,pwd
-from syslog import syslog,LOG_ERR
 import smtplib
 from email.mime.text import MIMEText
 
 from .auth import sensitive,current_user
-from . import keytab
-
-LOG_AUTHPRIV = 10<<3
+from . import keytab, log
 
 def connect():
     global conn
@@ -68,11 +65,11 @@ def set_path(locker,vhost,path):
         conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
         conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
     except Exception,e:
-        syslog(LOG_ERR|LOG_AUTHPRIV, "%s got '%s' trying to set '%s' to '%s' for the %s locker."
+        log.err("%s got '%s' trying to set '%s' to '%s' for the %s locker."
                % (current_user(),e,vhost,path,locker))
         raise
     else:
-        syslog(LOG_AUTHPRIV, "%s set path for vhost '%s' to '%s' for the %s locker."
+        log.info("%s set path for vhost '%s' to '%s' for the %s locker."
                % (current_user(),e,vhost,path,locker))
     # TODO: Check path existance and warn if we know the web_scripts path
     #       doesn't exist
@@ -147,10 +144,10 @@ def request_vhost(locker,hostname,path):
                                      ('scriptsVhostAccount',[account]),
                                      ('scriptsVhostDirectory',[path])])
     except Exception,e:
-        syslog(LOG_ERR|LOG_AUTHPRIV,logmessage + "; but it failed: " + e)
+        log.err(logmessage + "; but it failed: " + e)
         raise
     else:
-        syslog(LOG_AUTHPRIV,logmessage)
+        log.info(logmessage)
         if reqtype == 'moira':
             sendmail(locker,hostname,path)
         return message

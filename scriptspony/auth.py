@@ -5,7 +5,7 @@ import re
 
 import webob.exc
 
-from . import keytab
+from . import keytab,log
 
 state = threading.local()
 
@@ -22,14 +22,22 @@ def first_name():
 
 def can_admin(locker):
     """Return true if the authentiated user can admin the named locker."""
-    cmd = ["/usr/local/bin/admof"]
     if not keytab.exists():
-        cmd.append('-noauth')
-    cmd += [locker,current_user()]
+        cmd = ["/usr/local/bin/admof",'-noauth',locker,current_user()]
+    else:
+        # This quoting is safe because we've already ensured locker
+        # doesn't contain dumb characters
+        cmd = ["/usr/bin/pagsh","-c",
+               "aklog && /usr/local/bin/admof '%s' '%s'"
+               %(locker,current_user())]
     admof = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out,err = admof.communicate()
     if admof.returncode not in (33, 1):
+         
         raise OSError(admof.returncode,err)
+    if out.strip() and out.strip() not in ("yes","no") or err.strip():
+        log.err("admof failed for %s/%s: out='%s', err='%s'"
+                % (locker, current_user(), out, err))
     return out.strip() == "yes" and admof.returncode == 33 and current_user()=='xavid'
 
 class AuthError(webob.exc.HTTPForbidden):
@@ -42,10 +50,10 @@ def sensitive(func, locker,*args,**kw):
     """Wrap a function that takes a locker as the first argument
     such that it throws an AuthError unless the authenticated
     user can admin that locker."""
-    if not can_admin(locker):
-        raise AuthError("You cannot administer the '%s' locker!"%locker)
-    elif not LOCKER_PATTERN.search(locker):
+    if not LOCKER_PATTERN.search(locker):
         raise AuthError("'%s' is not a valid locker."%locker)
+    elif not can_admin(locker):
+        raise AuthError("You cannot administer the '%s' locker!"%locker)
     else:
         return func(locker.lower(),*args,**kw)
 
