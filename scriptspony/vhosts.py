@@ -159,18 +159,24 @@ def validate_path(path):
     else:
         raise UserError("'%s' is not a valid path." % path)
 
+@log.exceptions
 def get_web_scripts_path(locker,path):
     """Return the web_scripts filesystem path for a given locker and vhost path."""
-    return os.path.realpath('/mit/'+locker+'/web_scripts/'+path)
+    return os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],path)
 
 def get_uid_gid(locker):
     """Get the scripts uid and gid for a locker."""
     p = pwd.getpwnam(locker)
     return (p.pw_uid,p.pw_gid)
 
+@log.exceptions
 def is_host_reified(hostname):
     """Return true if the given hostname is reified."""
-    return ("namevhost %s " % hostname) in subprocess.Popen(["/usr/sbin/httpd","-S"],stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()[0]
+    httpd = subprocess.Popen(["/usr/sbin/httpd","-S"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    out,err = httpd.communicate()
+    if httpd.returncode != 0:
+        log.err("Pony: httpd -S returned %d!" % httpd.returncode)
+    return ("namevhost %s " % hostname) in out
 
 class UserError(log.ExpectedException):
     pass
