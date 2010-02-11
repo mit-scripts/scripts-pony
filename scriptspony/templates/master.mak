@@ -101,9 +101,9 @@ def set_port(url,port):
 tg_flash = tg.flash_obj.render('flash', use_js=False)
 %>
 %if tg_flash:
-  <h2 id="status_block" class="flash">
+  <h4 id="status_block" class="flash">
     ${tg_flash|n}
-  </h2> 
+  </h4> 
 %endif
 
       ${next.body()}
