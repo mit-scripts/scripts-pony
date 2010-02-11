@@ -129,7 +129,7 @@ def request_vhost(locker,hostname,path):
     web_scriptsPath = get_web_scripts_path(locker,path)
     uid,gid = get_uid_gid(locker)
     account = ldap.filter.filter_format('uid=%s,ou=People,dc=scripts,dc=mit,dc=edu',[locker])
-    logmessage = "%s requested %s for locker '%s' path '%s" % (
+    logmessage = "%s requested %s for locker '%s' path '%s'" % (
         current_user(), hostname, locker,path)
 
     conn.add_s(apacheServerName,[('objectClass',['apacheConfig','top']),
