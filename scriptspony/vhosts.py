@@ -1,10 +1,13 @@
 import ldap, ldap.sasl
 import re
 import socket,subprocess,os,pwd
+from syslog import syslog,LOG_ERR
 import smtplib
 from email.mime.text import MIMEText
 
 from .auth import sensitive,current_user
+
+LOG_AUTHPRIV = 10<<3
 
 KEYTAB_FILE = os.path.expanduser("~/Private/scripts-pony.keytab")
 
@@ -67,9 +70,12 @@ def set_path(locker,vhost,path):
         conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
         conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
     except Exception,e:
-        zwrite(vhost,"%s got '%s' trying to set %s to %s for the %s locker."
+        syslog(LOG_ERR|LOG_AUTHPRIV, "%s got '%s' trying to set '%s' to '%s' for the %s locker."
                % (current_user(),e,vhost,path,locker))
         raise
+    else:
+        syslog(LOG_AUTHPRIV, "%s set path for vhost '%s' to '%s' for the %s locker."
+               % (current_user(),e,vhost,path,locker))
     # TODO: Check path existance and warn if we know the web_scripts path
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
@@ -128,8 +134,8 @@ def request_vhost(locker,hostname,path):
     web_scriptsPath = get_web_scripts_path(locker,path)
     uid,gid = get_uid_gid(locker)
     account = 'uid=%s,ou=People,dc=scripts,dc=mit,dc=edu' % ldap.dn.escape_dn_chars(locker)
-    logmessage = "%s requested %s for locker %s" % (
-        current_user(), hostname, locker)
+    logmessage = "%s requested %s for locker '%s' path '%s" % (
+        current_user(), hostname, locker,path)
     try:
         conn.add_s(apacheServerName,[('objectClass',['apacheConfig','top']),
                                      ('apacheServerName',[hostname]),
@@ -143,10 +149,10 @@ def request_vhost(locker,hostname,path):
                                      ('scriptsVhostAccount',[account]),
                                      ('scriptsVhostDirectory',[path])])
     except Exception,e:
-        zwrite(hostname,logmessage + "; but it failed: " + e)
+        syslog(LOG_ERR|LOG_AUTHPRIV,logmessage + "; but it failed: " + e)
         raise
     else:
-        zwrite(hostname,logmessage)
+        syslog(LOG_AUTHPRIV,logmessage)
         if reqtype == 'moira':
             sendmail(locker,hostname,path)
         return message
@@ -177,10 +183,6 @@ def is_host_reified(hostname):
 class UserError(Exception):
     pass
 
-def zwrite(hostname,logmessage):
-    """Zephyr about the given hostname with the given message."""
-    zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","xavetest","-i",
-                               "pony","-s",hostname,"-m",logmessage])
 def sendmail(locker,hostname,path):
     """Send mail for MIT vhost requests."""
     # Send manual mail for this case
