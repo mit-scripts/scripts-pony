@@ -190,12 +190,31 @@ def sendmail(locker,hostname,path):
     # Send manual mail for this case
     fromaddr = "%s@mit.edu" % current_user()
     toaddr = "scripts@mit.edu"
-    msg = MIMEText("""%s wants %s to point to %s in the %s locker.
+    msg = MIMEText("""%(user)s wants %(host)s to point to %(path)s in the %(locker)s locker.  Here's how to request it:
 
-(The vhost is already configured inLDAP, but the hostname needs to be requested.)
+1) Check to make sure that it's free by running "stella %(short)s"
+
+2) If it's free, send jweiss an email along the lines of below.  If
+not, but %(user)s is the owner or contact, ask them what they want
+done with the IP it's currently attached to.  If the hostname is owned
+by someone else, tell the user that the hostname's not available and
+ask them if they want another one.
+
+===
+Hi Jonathon,
+
+At your convenience, please make %(short)s an alias of scripts-vhosts.
+
+stella scripts-vhosts -a %(short)s
+
+Thanks!
+===
+
+(The vhost is already configured in LDAP, but the hostname needs to be requested.)
 
 Sincerely,
-~Scripts Pony""" % (fromaddr,hostname,path,locker))
+~Scripts Pony""" % dict(user=fromaddr,host=hostname,path=path,locker=locker,
+                        short=hostname[:-len('.mit.edu')]))
     msg['Subject'] = "%s hostname request" % hostname
     msg['From'] = fromaddr
     msg['To'] = toaddr

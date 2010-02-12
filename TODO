@@ -1,3 +1,5 @@
+ * Display aliases, and figure out what the right logic is for adding
+   aliases for non-MIT hostnames.
  * Check stella info with PyMoira before sending mail for *.mit.edu
    * Package PyMoira into an rpm and get installed on scripts servers
      * Package libmoira into an rpm and get installed on scripts servers
