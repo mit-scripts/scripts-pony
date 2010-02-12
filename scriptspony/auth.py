@@ -66,7 +66,9 @@ class ScriptsAuthMiddleware(object):
         self.app = app
     def __call__(self, environ, start_response):
         state.username = environ.get('REMOTE_USER',None)
-        state.https = environ.get('HTTPS',False)
+        # We don't use SERVER_PORT because that lies and says 443 for
+        # some reason
+        state.https = environ.get('HTTP_HOST','').endswith(':444')
         state.name = environ.get('SSL_CLIENT_S_DN_CN','')
         keytab.auth()
         return self.app(environ,start_response)
