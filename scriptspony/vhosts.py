@@ -40,7 +40,11 @@ def get_path(locker,hostname):
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
                       ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))',[locker,hostname]),['scriptsVhostDirectory'])
-    return res[0][1]['scriptsVhostDirectory'][0]
+    try:
+        return res[0][1]['scriptsVhostDirectory'][0]
+    except IndexError:
+        raise UserError("The hostname '%s' does not exist for the '%s' locker."
+                        % (hostname,locker))
 
 @sensitive
 @log.exceptions

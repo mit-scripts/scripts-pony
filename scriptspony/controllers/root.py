@@ -91,7 +91,11 @@ class RootController(BaseController):
                 flash("Host '%s' reconfigured."%hostname)
                 redirect('/index/'+locker)
         else:
-            path=vhosts.get_path(locker,hostname)
+            try:
+                path=vhosts.get_path(locker,hostname)
+            except vhosts.UserError,e:
+                flash(e.message)
+                redirect('/index/'+locker)
         return dict(locker=locker, hostname=hostname,
                     path=path)
 
