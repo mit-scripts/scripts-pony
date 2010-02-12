@@ -10,6 +10,13 @@ from . import keytab,log
 
 state = threading.local()
 
+def html(s):
+    return '<html>'+s
+# Monkeypatch to prevent webflash from escaping HTML conditionally
+import webflash
+html_escape = webflash.html_escape
+webflash.html_escape = lambda s: s[len('<html>'):] if s.startswith('<html>') else html_escape(s)
+
 def current_user():
     return state.username
 
@@ -61,7 +68,7 @@ def sensitive(func, locker,*args,**kw):
         try:
             pwd.getpwnam(locker)
         except KeyError:
-            raise AuthError("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%locker)
+            raise AuthError(html("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%locker))
         if not can_admin(locker):
             raise AuthError("You cannot administer the '%s' locker!"%locker)
         else:
