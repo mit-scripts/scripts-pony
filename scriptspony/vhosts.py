@@ -190,6 +190,7 @@ def sendmail(locker,hostname,path):
     # Send manual mail for this case
     fromaddr = "%s@mit.edu" % current_user()
     toaddr = "scripts@mit.edu"
+    short = hostname[:-len('.mit.edu')]
     msg = MIMEText("""%(user)s wants %(host)s to point to %(path)s in the %(locker)s locker.  Here's how to request it:
 
 1) Check to make sure that it's free by running "stella %(short)s"
@@ -214,8 +215,8 @@ Thanks!
 
 Sincerely,
 ~Scripts Pony""" % dict(user=fromaddr,host=hostname,path=path,locker=locker,
-                        short=hostname[:-len('.mit.edu')]))
-    msg['Subject'] = "%s hostname request" % hostname
+                        short=short))
+    msg['Subject'] = "scripts-vhosts CNAME request: %s" % short
     msg['From'] = fromaddr
     msg['To'] = toaddr
     s = smtplib.SMTP()
