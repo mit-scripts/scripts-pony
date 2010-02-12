@@ -192,7 +192,7 @@ def sendmail(locker,hostname,path):
     toaddr = "scripts@mit.edu"
     msg = MIMEText("""%s wants %s to point to %s in the %s locker.
 
-(The vhost is already configured.)
+(The vhost is already configured inLDAP, but the hostname needs to be requested.)
 
 Sincerely,
 ~Scripts Pony""" % (fromaddr,hostname,path,locker))
