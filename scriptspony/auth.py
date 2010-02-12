@@ -12,6 +12,9 @@ state = threading.local()
 def current_user():
     return state.username
 
+def is_https():
+    return state.https
+
 def first_name():
     fullname = state.name
     bits = fullname.split()
@@ -63,6 +66,7 @@ class ScriptsAuthMiddleware(object):
         self.app = app
     def __call__(self, environ, start_response):
         state.username = environ.get('REMOTE_USER',None)
+        state.https = environ.get('HTTPS',False)
         state.name = environ.get('SSL_CLIENT_S_DN_CN','')
         keytab.auth()
         return self.app(environ,start_response)

@@ -19,3 +19,5 @@ RewriteRule ^(.*)$ dispatch\.fcgi/$1 [L]
 
 AuthType SSLCert
 Require valid-user
+AuthSSLCertAuthoritative off
+AuthOptional on

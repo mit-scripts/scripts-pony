@@ -47,6 +47,11 @@
    Switch to managing the <input type="text" name="locker" value="${locker}" /> locker
     <input type="submit" value="Switch" />
   </form>
+%elif https:
+  <p>You don't seem to be presenting a valid certificate.  You may
+    wish to consult
+    the <a href="http://ist.mit.edu/services/certificates/wizard">IS&amp;T
+    Certificate Help Wizard</a>.</p> 
 %else:
   <p>Scripts Pony!  This useful tool lets you configure all the
   hostnames you use for scripts.mit.edu websites.  Log in with your MIT

@@ -39,6 +39,7 @@ class RootController(BaseController):
         olocker = locker
         hosts = None
         user = auth.current_user()
+        https = auth.is_https()
         # Find or create the associated user info object.
         # TODO: is there a find_or_create sqlalchemy method?
         if user:
@@ -73,7 +74,8 @@ class RootController(BaseController):
                     user_info.lockers.sort()
                     DBSession.add(user_info)
                     flash('You can administer the "%s" locker.' % locker)
-        return dict(hosts=hosts, locker=locker, user_info=user_info)
+        return dict(hosts=hosts, locker=locker, user_info=user_info,
+                    https=https)
 
     @expose('scriptspony.templates.edit')
     def edit(self,locker,hostname,path=None):
