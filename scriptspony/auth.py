@@ -39,7 +39,7 @@ def can_admin(locker):
         or err.strip() not in ("","internal error: pioctl: No such file or directory")):
         log.err("admof failed for %s/%s: out='%s', err='%s'"
                 % (locker, current_user(), out.strip(), err.strip()))
-    return out.strip() == "yes" and admof.returncode == 33 and current_user()=='xavid'
+    return out.strip() == "yes" and admof.returncode == 33
 
 class AuthError(webob.exc.HTTPForbidden):
     pass

@@ -32,7 +32,7 @@ def set_port(url,port):
 
 <%def name="head()">
     <%
-    pink = request.cookies.get('pink',auth.current_user() in ('geofft','jhamrick','mitchb'))
+    pink = request.cookies.get('pink',auth.current_user() in ('geofft','mitchb'))
     %>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
