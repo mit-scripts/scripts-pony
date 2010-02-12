@@ -6,6 +6,7 @@ import pylons
 from socket import gethostname
 from scriptspony import auth
 import os
+from datetime import datetime
 
 scriptshost = gethostname()
 
@@ -76,7 +77,7 @@ def set_port(url,port):
 			<div id="masthead">
 
 				<h1 id="header"><a rel="home" href="http://pony.scripts.mit.edu/">${self.title()}</a></h1>
-				<h2 id="tagline">MIT SIPB Script Services for Athena</h2>
+				<h2 id="tagline">Manage Hostnames for scripts.mit.edu</h2>
 			</div>
 			<div id="hmenu">
 				<div id="hnav">
@@ -110,7 +111,7 @@ tg_flash = tg.flash_obj.render('flash', use_js=False)
 
 <p>&nbsp;</p>
 
-<center>&copy; 2004-2009, the SIPB scripts.mit.edu project.<br>These pages may be reused under either the <a href="/nolink/81/">GFDL 1.2</a> or <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/">CC-BY-SA 3.0</a>.<br>Questions? Contact <a href="mailto:scripts@mit.edu">scripts@mit.edu</a>.<br><br>
+<center>&copy; 2009-${datetime.now().year}, the SIPB scripts.mit.edu project.<br>These pages may be reused under either the <a href="/nolink/81/">GFDL 1.2</a> or <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/">CC-BY-SA 3.0</a>.<br>Questions? Contact <a href="mailto:scripts@mit.edu">scripts@mit.edu</a>.<br><br>
 
 You are currently connected to ${scriptshost}.
 
@@ -118,20 +119,9 @@ You are currently connected to ${scriptshost}.
 <div id="menu">
 					<div id="nav">
 
-<form method="get" action="http://scripts.mit.edu/">
-<p>Search<br /><input type="text" name="q" value="" size="15" /></p>
-</form>
 <h2>Contact</h2>
 Feel free to contact us with any questions, comments, or suggestions.
 <ul><li><a href="mailto:scripts@mit.edu">scripts@mit.edu</a></li>
-</ul>
-
-<h2>Feeds</h2>
-Stay informed about the latest updates and features to the scripts service.
-<ul>
-<li>RSS: <a href="http://scripts.mit.edu/rss/?section=news" title="RSS Feed">Blog</a> | <a href="http://scripts.mit.edu/rss/?section=FAQ" title="RSS Feed">FAQ</a> | <a href="http://scripts.mit.edu/rss/" title="RSS Feed">All</a></li>
-
-<li>Atom: <a href="http://scripts.mit.edu/atom/?section=news" title="Atom Feed">Blog</a> | <a href="http://scripts.mit.edu/atom/?section=FAQ" title="Atom Feed">FAQ</a> | <a href="http://scripts.mit.edu/atom/" title="Atom Feed">All</a></li>
 </ul>
 
 <a class="nobutt" href="http://scripts.mit.edu/faq/45/"><img src="http://scripts.mit.edu/media/powered_by-trans.gif" alt="powered by scripts.mit.edu"/></a>
