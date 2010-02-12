@@ -9,7 +9,7 @@
       %for host,path in hosts:
         <form method="post">
           <tr>
-            <td>${host}</td><td><small style="color:grey">~/web_scripts/</small>${path}</td>
+            <td>${host}</td><td><small style="color:grey">/mit/${locker}/web_scripts/</small>${path}</td>
             %if host not in (locker+'.scripts.mit.edu',):
               <td><a href="${tg.url('/edit/'+locker+'/'+host)}">edit</a></td>
             %endif
@@ -53,7 +53,9 @@
     the <a href="http://ist.mit.edu/services/certificates/wizard">IS&amp;T
     Certificate Help Wizard</a>.</p> 
 %else:
-  <p>Scripts Pony!  This useful tool lets you configure all the
-  hostnames you use for scripts.mit.edu websites.  Log in with your MIT
+  <p>Welcome to Scripts Pony!  This useful tool lets you configure all the
+  hostnames you use with the 
+  <a href="http://scripts.mit.edu/">scripts.mit.edu</a> hosting service.  
+  Log in with your MIT
   certificates above.</p>
 %endif

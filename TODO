@@ -12,3 +12,4 @@
      "done mod DNS", but this doesn't actually do anything useful.
      Though possibly we do want jweiss's responses to go to the pony
      admin queue and not RT.
+ * On error, go back where you were instead of punting to /index
