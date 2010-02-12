@@ -10,7 +10,7 @@ from socket import gethostbyname
   <ul>
     <li>Locker: ${locker}</li>
     <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
-    <li>Path: <input type="text" name="path" value="${path}" /></li>
+    <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
   </ul>
   <input type="submit" value="Request Hostname" />
 </form>
