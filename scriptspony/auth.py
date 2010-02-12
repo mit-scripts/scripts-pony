@@ -1,6 +1,7 @@
 import subprocess
 import threading
 from decorator import decorator
+import pwd
 import re
 
 import webob.exc
@@ -31,7 +32,7 @@ def can_admin(locker):
         # This quoting is safe because we've already ensured locker
         # doesn't contain dumb characters
         cmd = ["/usr/bin/pagsh","-c",
-               "aklog && /usr/local/bin/admof '%s' '%s'"
+               "aklog athena sipb zone && /usr/local/bin/admof '%s' '%s'"
                %(locker,current_user())]
     admof = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out,err = admof.communicate()
@@ -56,10 +57,15 @@ def sensitive(func, locker,*args,**kw):
     user can admin that locker."""
     if not LOCKER_PATTERN.search(locker):
         raise AuthError("'%s' is not a valid locker."%locker)
-    elif not can_admin(locker):
-        raise AuthError("You cannot administer the '%s' locker!"%locker)
     else:
-        return func(locker.lower(),*args,**kw)
+        try:
+            pwd.getpwnam(locker)
+        except KeyError:
+            raise AuthError("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%locker)
+        if not can_admin(locker):
+            raise AuthError("You cannot administer the '%s' locker!"%locker)
+        else:
+            return func(locker.lower(),*args,**kw)
 
 class ScriptsAuthMiddleware(object):
     def __init__(self, app):
