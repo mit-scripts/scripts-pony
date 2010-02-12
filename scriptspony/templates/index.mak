@@ -9,7 +9,7 @@
       %for host,path in hosts:
         <form method="post">
           <tr>
-            <td>${host}</td><td>${path}</td>
+            <td>${host}</td><td><small style="color:grey">~/web_scripts/</small>${path}</td>
             %if host not in (locker+'.scripts.mit.edu',):
               <td><a href="${tg.url('/edit/'+locker+'/'+host)}">edit</a></td>
             %endif
@@ -20,8 +20,8 @@
     
     Paths are relative to the top directory for the 
     appropriate service; for example, 
-    <tt>/mit/${locker}/web_scripts/</tt> for web scripts or 
-    <tt>/mit/${locker}/Scripts/svn/</tt> for Subversion.
+    <tt>/mit/${locker}/web_scripts/</tt> for <a href="http://scripts.mit.edu/web/">web scripts</a> or 
+    <tt>/mit/${locker}/Scripts/svn/</tt> for <a href="http://scripts.mit.edu/faq/93/">Subversion</a>.
   </p>
   <p>
     <a href="${tg.url('/new/'+locker)}">Request a new hostname</a> for the ${locker} locker
