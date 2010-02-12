@@ -50,7 +50,7 @@ def get_path(locker,hostname):
 @log.exceptions
 def set_path(locker,vhost,path):
     """Sets the path of an existing vhost owned by the locker."""
-    validate_path(path)
+    path = validate_path(path)
     if vhost == locker+'.scripts.mit.edu':
         raise UserError("You cannot reconfigure "+vhost+"!")
     if is_host_reified(vhost):
@@ -90,7 +90,7 @@ def request_vhost(locker,hostname,path):
     locker = locker.encode('utf-8')
     hostname = hostname.lower().encode('utf-8')
     path = path.encode('utf-8')
-    validate_path(path)
+    path = validate_path(path)
     if not HOSTNAME_PATTERN.search(hostname):
         raise UserError("'%s' is not a valid hostname." % hostname)
     message = "The hostname '%s' is now configured." % hostname
@@ -159,7 +159,9 @@ def validate_path(path):
         and '..' not in path.split('/')
         and '.' not in path.split('/')
         and '//' not in path):
-        return
+        if path.endswith('/'):
+            path = path[:-1]
+        return path
     else:
         raise UserError("'%s' is not a valid path." % path)
 
