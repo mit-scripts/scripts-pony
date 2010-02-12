@@ -53,7 +53,5 @@ if __name__ == '__main__':
                 yield l
             whoami = pwd.getpwuid(os.getuid())[0]
             hostname = socket.gethostname()
-            yield "To restart: ssh %s@%s killall -u %s python\n" % (whoami,
-                                                                    hostname,
-                                                                    whoami)
+            yield "To restart: touch %s" % restart_file
         RestartingServer(errApp,restart_file).run()
