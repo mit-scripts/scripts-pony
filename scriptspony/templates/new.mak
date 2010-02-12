@@ -26,8 +26,10 @@ from socket import gethostbyname
       take a few business days to become active.  You can check whether
       a given mit.edu hostname is available by typing "stella &lt;hostname&gt;"
       from an Athena prompt.</li>
-    <li>You can request a non-MIT hostname, but you'll have to register the
-      hostname yourself and configure it to point to scripts-vhosts.mit.edu's
-      IP address, ${gethostbyname('scripts-vhosts.mit.edu')}.</li>
+    <li>You can request a non-MIT hostname, but you'll have to
+      register the hostname yourself and configure it with a CNAME
+      record for scripts-vhosts.mit.edu or an A record for
+      scripts-vhosts.mit.edu's IP address,
+      ${gethostbyname('scripts-vhosts.mit.edu')}.</li>
   </ul>
 </p>
