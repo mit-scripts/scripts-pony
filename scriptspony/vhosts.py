@@ -166,7 +166,7 @@ def validate_path(path):
 @log.exceptions
 def get_web_scripts_path(locker,path):
     """Return the web_scripts filesystem path for a given locker and vhost path."""
-    return os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],path)
+    return os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],'web_scripts',path)
 
 def get_uid_gid(locker):
     """Get the scripts uid and gid for a locker."""
