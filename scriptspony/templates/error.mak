@@ -3,3 +3,5 @@
 <%def name="title()">A ${code} Error has Occurred</%def>
 
 <div>${message|n}</div>
+
+<p><a href="/">Back to top</a></p>
