@@ -53,9 +53,11 @@
     the <a href="http://ist.mit.edu/services/certificates/wizard">IS&amp;T
     Certificate Help Wizard</a>.</p> 
 %else:
-  <p>Welcome to Scripts Pony!  This useful tool lets you configure all the
-  hostnames you use with the 
-  <a href="http://scripts.mit.edu/">scripts.mit.edu</a> hosting service.  
-  Log in with your MIT
-  certificates above.</p>
+  <p>
+    Welcome to Scripts Pony!  This useful tool lets you request short
+  hostnames to refer to your
+  <a href="http://scripts.mit.edu/">scripts.mit.edu</a> pages and
+  configure the hostnames you already have.  Log in with your MIT
+  certificates above.
+  </p>
 %endif

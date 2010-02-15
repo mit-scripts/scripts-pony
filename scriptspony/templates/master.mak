@@ -44,7 +44,7 @@ def set_port(url,port):
     %endif
     <link rel="stylesheet" href="http://${scriptshost}/server.css" type="text/css" />
     <title>${self.title()}</title>
-    <script type="text/javascript">
+    <script type="text/javascript"><!--
       var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
       document.onkeydown = function (e) {
         kkeys.push(e.keyCode);
@@ -62,7 +62,7 @@ def set_port(url,port):
 %endif
         window.location.reload()
       }
-    </script>
+    //--></script>
 </%def>
 
 <%def name="title()">Scripts Pony</%def>
@@ -111,9 +111,9 @@ tg_flash = tg.flash_obj.render('flash', use_js=False)
 
 <p>&nbsp;</p>
 
-<center>&copy; 2009-${datetime.now().year}, the SIPB scripts.mit.edu project.<br>These pages may be reused under either the <a href="/nolink/81/">GFDL 1.2</a> or <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/">CC-BY-SA 3.0</a>.<br>Questions? Contact <a href="mailto:scripts@mit.edu">scripts@mit.edu</a>.<br><br>
+<center><small>&copy; 2009-${datetime.now().year}, the SIPB scripts.mit.edu project.<br/>These pages may be reused under either the <a href="/nolink/81/">GFDL 1.2</a> or <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/">CC-BY-SA 3.0</a>.<br/>Questions? Contact <a href="mailto:scripts@mit.edu">scripts@mit.edu</a>.<br/><br/>
 
-You are currently connected to ${scriptshost}.
+You are currently connected to ${scriptshost}.</small></center>
 
 				</div>
 <div id="menu">
