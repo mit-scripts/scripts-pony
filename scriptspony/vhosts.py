@@ -72,8 +72,8 @@ def set_path(locker,vhost,path):
     conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
     conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
 
-    log.info("%s set path for vhost '%s' to '%s' for the %s locker."
-             % (current_user(),vhost,path,locker))
+    log.info("%s set path for vhost '%s' (locker '%s') to '%s'."
+             % (current_user(),vhost,locker,path))
     # TODO: Check path existance and warn if we know the web_scripts path
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
