@@ -1,6 +1,7 @@
 import ldap, ldap.sasl, ldap.filter
 import re
 import socket,subprocess,os,pwd,getpass
+import dns,dns.resolver,dns.exception
 import smtplib
 from email.mime.text import MIMEText
 
@@ -104,11 +105,14 @@ def request_vhost(locker,hostname,path):
             raise UserError("'%s' has too many dots for a mit.edu hostname."
                             % hostname)
         try:
-            socket.getaddrinfo(hostname, None)
+            dns.resolver.query(hostname, 0)
+        except dns.resolver.NXDOMAIN:
+            pass
+        except dns.exception.Timeout:
+            raise
+        except dns.exception.DNSException:
             raise UserError("'%s' already exists. Please choose another name or contact scripts@mit.edu if you wish to transfer the hostname to scripts."
                             % hostname)
-        except socket.gaierror:
-            pass
         # should use stella to check for reserved/deleted hosts and aliases
         # stella
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
