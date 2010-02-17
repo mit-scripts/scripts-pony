@@ -136,17 +136,23 @@ def request_vhost(locker,hostname,path):
     logmessage = "%s requested %s for locker '%s' path '%s'" % (
         current_user(), hostname, locker,path)
 
-    conn.add_s(apacheServerName,[('objectClass',['apacheConfig','top']),
-                                 ('apacheServerName',[hostname]),
-                                 ('apacheServerAlias',[alias] if alias else []),
-                                 ('apacheDocumentRoot',[web_scriptsPath]),
-                                 ('apacheSuexecUid',[str(uid)]),
-                                 ('apacheSuexecGid',[str(gid)])])
-    conn.add_s(scriptsVhostName,[('objectClass',['scriptsVhost','top']),
-                                 ('scriptsVhostName',[hostname]),
-                                 ('scriptsVhostAlias',[alias] if alias else []),
-                                 ('scriptsVhostAccount',[account]),
-                                 ('scriptsVhostDirectory',[path])])
+    conn.add_s(apacheServerName,
+               [('objectClass',['apacheConfig','top']),
+                ('apacheServerName',[hostname])]
+               +
+               ([('apacheServerAlias',alias)] if alias else [])
+               +
+               [('apacheDocumentRoot',[web_scriptsPath]),
+                ('apacheSuexecUid',[str(uid)]),
+                ('apacheSuexecGid',[str(gid)])])
+    conn.add_s(scriptsVhostName,
+               [('objectClass',['scriptsVhost','top']),
+                ('scriptsVhostName',[hostname])]
+               +
+               ([('scriptsVhostAlias',alias)] if alias else [])
+               +
+               [('scriptsVhostAccount',[account]),
+                ('scriptsVhostDirectory',[path])])
 
     log.info(logmessage)
     if reqtype == 'moira':
