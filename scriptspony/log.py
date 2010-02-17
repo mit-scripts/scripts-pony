@@ -31,4 +31,4 @@ def exceptions(func,*args,**kw):
             err("Pony: %s called %s(%s) but got: %s"
                 % (current_user(),func.func_name,argness,e))
             e.already_syslogged = True
-        raise e
+        raise
