@@ -54,8 +54,8 @@
     Certificate Help Wizard</a>.</p> 
 %else:
   <p>
-    Welcome to Scripts Pony!  This useful tool lets you request short
-  hostnames to refer to your
+    Welcome to the scripts.mit.edu hostname management tool.  You can
+    request short hostnames to refer to your
   <a href="http://scripts.mit.edu/">scripts.mit.edu</a> pages and
   configure the hostnames you already have.  Log in with your MIT
   certificates above.
