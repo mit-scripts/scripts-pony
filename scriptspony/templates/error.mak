@@ -4,4 +4,4 @@
 
 <div>${message|n}</div>
 
-<p><a href="/">Back to top</a></p>
+<p><a href="${tg.url('/')}">Back to top</a></p>
