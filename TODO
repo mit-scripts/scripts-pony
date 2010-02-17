@@ -1,14 +1,15 @@
  * Display aliases, and figure out what the right logic is for adding
    aliases for non-MIT hostnames.
+ * Allow aliases to be manually created and removed.
+   * This may require an ACI change.
+ * Allow vhosts to be deleted if you confirm 17 times.
+   * This will require an ACI change.
  * Check stella info with PyMoira before sending mail for *.mit.edu
    * Package PyMoira into an rpm and get installed on scripts servers
- * Deal with the new vhost reification system.
  * Semi-automatic mode:
      We have an admin queue.  When a *.mit.edu vhost is requested, an
      email to jweiss is composed and put in the queue; a scripts
      team member can click a button to send it, or edit it in place.
-     A cron job periodically resolves hostnames where the email's been
-     sent and emails the original user when the vhost is active.
    * Zephyr -c scripts when a new queue entry appears, and allow
      auth'd zephyrs from people on scripts-team to approve them
      via a zephyrbot.
@@ -19,3 +20,4 @@
    * Perodically monitor DNS and notify users (and update the admin queue)
      when their hostnames are live.
  * On error, go back where you were instead of punting to /index
+ * Deal with the new vhost reification system, if it starts existing.

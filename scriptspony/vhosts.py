@@ -105,14 +105,16 @@ def request_vhost(locker,hostname,path):
             raise UserError("'%s' has too many dots for a mit.edu hostname."
                             % hostname)
         try:
-            dns.resolver.query(hostname, 0)
+            dns.resolver.query(hostname+'.', 0)
         except dns.resolver.NXDOMAIN:
             pass
         except dns.exception.Timeout:
             raise
         except dns.exception.DNSException:
-            raise UserError("'%s' already exists. Please choose another name or contact scripts@mit.edu if you wish to transfer the hostname to scripts."
+            raise UserError("'%s' already exists. Please choose another name or contact scripts@mit.edu  if you wish to transfer the hostname to scripts."
                             % hostname)
+        else:
+            raise RuntimeError("DNS query should never return successfully!")
         # should use stella to check for reserved/deleted hosts and aliases
         # stella
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
