@@ -78,7 +78,7 @@ def set_path(locker,vhost,path):
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
 
-HOSTNAME_PATTERN = re.compile(r'^[\w-]+(?:[.][\w-]+)+$')
+HOSTNAME_PATTERN = re.compile(r'^(?:[\w-]+[.])+[\w-]+[.][a-z]+$')
 
 @sensitive
 @log.exceptions
