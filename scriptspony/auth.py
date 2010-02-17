@@ -57,11 +57,7 @@ class AuthError(webob.exc.HTTPForbidden):
 
 LOCKER_PATTERN = re.compile(r'^(?:\w[\w.-]*\w|\w)$')
 
-@decorator
-def sensitive(func, locker,*args,**kw):
-    """Wrap a function that takes a locker as the first argument
-    such that it throws an AuthError unless the authenticated
-    user can admin that locker."""
+def validate_locker(locker):
     if not LOCKER_PATTERN.search(locker):
         raise AuthError("'%s' is not a valid locker."%locker)
     else:
@@ -71,8 +67,14 @@ def sensitive(func, locker,*args,**kw):
             raise AuthError(html("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%locker))
         if not can_admin(locker):
             raise AuthError("You cannot administer the '%s' locker!"%locker)
-        else:
-            return func(locker.lower(),*args,**kw)
+
+@decorator
+def sensitive(func, locker,*args,**kw):
+    """Wrap a function that takes a locker as the first argument
+    such that it throws an AuthError unless the authenticated
+    user can admin that locker."""
+    validate_locker(locker)
+    return func(locker.lower(),*args,**kw)
 
 class ScriptsAuthMiddleware(object):
     def __init__(self, app):

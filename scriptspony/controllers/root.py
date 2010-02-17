@@ -117,5 +117,11 @@ class RootController(BaseController):
             else:
                 flash(status)
                 redirect('/index/'+locker)
+        else:
+            try:
+                auth.validate_locker(locker)
+            except auth.AuthError,e:
+                flash(e.message)
+                redirect('/')
 
         return dict(locker=locker,hostname=hostname,path=path)
