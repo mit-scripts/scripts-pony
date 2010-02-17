@@ -120,7 +120,7 @@ def request_vhost(locker,hostname,path):
     # Actually create the vhost
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
-                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostName=%s))',[hostname]),['scriptsVhostDirectory'],False)
+                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[hostname,hostname]),['scriptsVhostDirectory'],False)
     if len(res) != 0:
         raise UserError("'%s' is already a hostname on scripts.mit.edu."
                         % hostname)
