@@ -1,6 +1,6 @@
 import ldap, ldap.sasl, ldap.filter
 import re
-import socket,subprocess,os,pwd
+import socket,subprocess,os,pwd,getpass
 import smtplib
 from email.mime.text import MIMEText
 
@@ -197,7 +197,13 @@ def sendmail(locker,hostname,path):
     """Send mail for MIT vhost requests."""
     # Send manual mail for this case
     fromaddr = "%s@mit.edu" % current_user()
-    toaddr = "scripts@mit.edu"
+    uslocker = getpass.getuser()
+    if uslocker == 'pony':
+        toaddr = "scripts@mit.edu"
+        lockertag = ''
+    else:
+        toaddr = "scripts-pony@mit.edu"
+        lockertag = '[Pony.%s]' % uslocker
     short = hostname[:-len('.mit.edu')]
     msg = MIMEText("""%(user)s wants %(host)s to point to %(path)s in the %(locker)s locker.  Here's how to request it:
 
@@ -224,7 +230,7 @@ Thanks!
 Sincerely,
 ~Scripts Pony""" % dict(user=fromaddr,host=hostname,path=path,locker=locker,
                         short=short))
-    msg['Subject'] = "scripts-vhosts CNAME request: %s" % short
+    msg['Subject'] = "%sscripts-vhosts CNAME request: %s" % (lockertag,short)
     msg['From'] = fromaddr
     msg['To'] = toaddr
     s = smtplib.SMTP()

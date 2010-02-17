@@ -1,5 +1,6 @@
 from decorator import decorator
 from syslog import syslog,LOG_ERR,LOG_INFO
+import getpass
 LOG_AUTHPRIV = 10<<3
 
 def err(mess):
@@ -28,7 +29,10 @@ def exceptions(func,*args,**kw):
             if len(args) > 0 and len(kw) > 0:
                 argness += ', '
             argness += ', '.join('%s=%s'%(k,repr(kw[k])) for k in kw)
-            err("Pony: %s called %s(%s) but got: %s"
-                % (current_user(),func.func_name,argness,e))
+            dotlocker = ".%s" % getpass.getuser()
+            if dotlocker == ".pony":
+                dotlocker = ''
+            err("Pony%s: %s called %s(%s) but got: %s"
+                % (dotlocker,current_user(),func.func_name,argness,e))
             e.already_syslogged = True
         raise
