@@ -3,6 +3,7 @@
 
 from tg import expose, flash, require, url, request, redirect
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
+import pylons
 
 from scriptspony.lib.base import BaseController
 from scriptspony.model import DBSession, metadata
@@ -36,6 +37,9 @@ class RootController(BaseController):
     @expose('scriptspony.templates.index')
     def index(self,locker=None):
         """Handle the front-page."""
+        if locker is not None and pylons.request.response_ext:
+            locker += pylons.request.response_ext
+        
         olocker = locker
         hosts = None
         user = auth.current_user()
@@ -79,6 +83,8 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.edit')
     def edit(self,locker,hostname,path=None):
+        if path is None and pylons.request.response_ext:
+            hostname += pylons.request.response_ext
         if vhosts.is_host_reified(hostname):
             flash("The host '%s' has special configuration; email scripts@mit.edu to make changes to it." % hostname)
             redirect('/index/'+locker)
@@ -101,6 +107,8 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path=''):
+        if not hostname and not path and pylons.request.response_ext:
+            locker += pylons.request.response_ext
         if hostname:
             try:
                 status = vhosts.request_vhost(locker,hostname,path)
