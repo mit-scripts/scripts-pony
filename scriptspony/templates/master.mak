@@ -38,11 +38,11 @@ def set_port(url,port):
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
     %if pink:
-      <link rel="stylesheet" href="http://${scriptshost}/ponies.css" type="text/css" />
+      <link rel="stylesheet" href="${tg.url('/scripts/ponies.css')}" type="text/css" />
     %else:
-      <link rel="stylesheet" href="http://${scriptshost}/style.css" type="text/css" />
+      <link rel="stylesheet" href="${tg.url('/scripts/style.css')}" type="text/css" />
     %endif
-    <link rel="stylesheet" href="http://${scriptshost}/server.css" type="text/css" />
+    <link rel="stylesheet" href="${tg.url('/scripts/server.css')}" type="text/css" />
     <title>${self.title()}</title>
     <script type="text/javascript"><!--
       var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
@@ -124,7 +124,7 @@ Feel free to contact us with any questions, comments, or suggestions.
 <ul><li><a href="mailto:scripts@mit.edu">scripts@mit.edu</a></li>
 </ul>
 
-<a class="nobutt" href="http://scripts.mit.edu/faq/45/"><img src="http://scripts.mit.edu/media/powered_by-trans.gif" alt="powered by scripts.mit.edu"/></a>
+<a class="nobutt" href="http://scripts.mit.edu/faq/45/"><img src="${tg.url('/scripts/media/powered_by-trans.gif')}" alt="powered by scripts.mit.edu"/></a>
 
 					</div>
 				</div>

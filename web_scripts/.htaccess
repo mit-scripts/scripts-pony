@@ -7,6 +7,8 @@ RewriteEngine On
 RewriteRule ^dispatch\.f?cgi/.*$ - [L]
 RewriteRule ^public/.*$ - [L]
 
+RewriteRule ^scripts/(.*)$ http://scripts.mit.edu/$1 [P,L]
+
 # Get the local directory path and file that we're searching for
 RewriteCond %{REQUEST_FILENAME} ^(.*?)/(dev/)?([^/]*)$
 # If that file exists in ./public
