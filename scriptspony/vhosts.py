@@ -56,8 +56,6 @@ def set_path(locker,vhost,path):
         raise UserError("You cannot reconfigure "+vhost+"!")
     if is_host_reified(vhost):
         raise UserError("The host '%s' has special configuration; email scripts@mit.edu to make changes to it.")
-    if path.endswith('/'):
-        path = path[:-1]
     path = path.encode('utf-8')
     locker = locker.encode('utf-8')
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
@@ -187,7 +185,10 @@ def validate_path(path):
 @log.exceptions
 def get_web_scripts_path(locker,path):
     """Return the web_scripts filesystem path for a given locker and vhost path."""
-    return os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],'web_scripts',path)
+    web_scriptsPath = os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],'web_scripts',path)
+    if web_scriptsPath.endswith('/'):
+        web_scriptsPath = web_scriptsPath[:-1]
+    return web_scriptsPath
 
 def get_uid_gid(locker):
     """Get the scripts uid and gid for a locker."""
