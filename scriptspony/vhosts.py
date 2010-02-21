@@ -222,7 +222,7 @@ def sendmail(locker,hostname,path):
 
 1) Check to make sure that it's free by running "stella %(short)s"
 
-2) If it's free, send jweiss an email along the lines of below.  If
+2) If it's free, send Jonathon an email along the lines of below.  If
 not, but %(user)s is the owner or contact, ask them what they want
 done with the IP it's currently attached to.  If the hostname is owned
 by someone else, tell the user that the hostname's not available and
