@@ -19,9 +19,8 @@ def setup_app(command, conf, vars):
     # Load the models
     from scriptspony import model
     print "Creating tables"
-    model.metadata.drop_all(bind=config['pylons.app_globals'].sa_engine)
+    #model.metadata.drop_all(bind=config['pylons.app_globals'].sa_engine)
     model.metadata.create_all(bind=config['pylons.app_globals'].sa_engine)
-
 
     transaction.commit()
     print "Successfully setup"

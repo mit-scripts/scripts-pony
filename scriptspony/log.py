@@ -1,7 +1,8 @@
 from decorator import decorator
 from syslog import syslog,LOG_ERR,LOG_INFO
-import getpass
 LOG_AUTHPRIV = 10<<3
+import getpass, subprocess
+import tg
 
 def err(mess):
     syslog(LOG_ERR|LOG_AUTHPRIV,mess)
@@ -36,3 +37,15 @@ def exceptions(func,*args,**kw):
                 % (dotlocker,current_user(),func.func_name,argness,e))
             e.already_syslogged = True
         raise
+
+def zwrite(message,id):
+    """Zephyr about the given hostname with the given message."""
+    dotlocker = ".%s" % getpass.getuser()
+    if dotlocker == ".pony":
+        dotlocker = ''
+    zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","xavetest",
+                               "-i","pony%s:%s"%(dotlocker,id),
+                               "-s","%s%s"%(tg.request.host_url,
+                                            tg.url('/ticket/%s'%id)),
+                               "-m",message])
+    

@@ -58,5 +58,9 @@ def init_model(engine):
 
     #mapper(Reflected, t_reflected)
 
+import elixir
+elixir.metadata, elixir.session = metadata, DBSession
+
 # Import your model modules here.
 import user
+import queue

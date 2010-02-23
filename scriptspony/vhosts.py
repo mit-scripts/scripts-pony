@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 
 from .auth import sensitive,current_user
 from . import keytab, log
+from .model import queue
 
 def connect():
     global conn
@@ -128,42 +129,13 @@ def request_vhost(locker,hostname,path):
         if failed:
             raise UserError("'%s' does not point at scripts-vhosts."
                             %hostname)
-    # Actually create the vhost
-    res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
-                      ldap.SCOPE_ONELEVEL,
-                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[hostname,hostname]),['scriptsVhostDirectory'],False)
-    if len(res) != 0:
-        raise UserError("'%s' is already a hostname on scripts.mit.edu."
-                        % hostname)
-    scriptsVhostName = ldap.filter.filter_format("scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
-    apacheServerName = ldap.filter.filter_format("apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
-    if hostname.endswith('.mit.edu'):
-        alias = hostname[:-len('.mit.edu')]
+    if reqtype == 'moira':
+        queue.Ticket.create(locker,hostname,path)
     else:
-        alias = None
-    web_scriptsPath = get_web_scripts_path(locker,path)
-    uid,gid = get_uid_gid(locker)
-    account = ldap.filter.filter_format('uid=%s,ou=People,dc=scripts,dc=mit,dc=edu',[locker])
+        # Actually create the vhost
+        actually_create_vhost(locker,hostname,path)
     logmessage = "%s requested %s for locker '%s' path '%s'" % (
         current_user(), hostname, locker,path)
-
-    conn.add_s(apacheServerName,
-               [('objectClass',['apacheConfig','top']),
-                ('apacheServerName',[hostname])]
-               +
-               ([('apacheServerAlias',alias)] if alias else [])
-               +
-               [('apacheDocumentRoot',[web_scriptsPath]),
-                ('apacheSuexecUid',[str(uid)]),
-                ('apacheSuexecGid',[str(gid)])])
-    conn.add_s(scriptsVhostName,
-               [('objectClass',['scriptsVhost','top']),
-                ('scriptsVhostName',[hostname])]
-               +
-               ([('scriptsVhostAlias',alias)] if alias else [])
-               +
-               [('scriptsVhostAccount',[account]),
-                ('scriptsVhostDirectory',[path])])
 
     log.info(logmessage)
     if reqtype == 'moira':
@@ -251,3 +223,38 @@ Sincerely,
     s.connect()
     s.sendmail(fromaddr,[toaddr],msg.as_string())
     s.quit()
+
+def actually_create_vhost(locker,hostname,path):
+    res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
+                      ldap.SCOPE_ONELEVEL,
+                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[hostname,hostname]),['scriptsVhostDirectory'],False)
+    if len(res) != 0:
+        raise UserError("'%s' is already a hostname on scripts.mit.edu."
+                        % hostname)
+    scriptsVhostName = ldap.filter.filter_format("scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
+    apacheServerName = ldap.filter.filter_format("apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
+    if hostname.endswith('.mit.edu'):
+        alias = hostname[:-len('.mit.edu')]
+    else:
+        alias = None
+    web_scriptsPath = get_web_scripts_path(locker,path)
+    uid,gid = get_uid_gid(locker)
+    account = ldap.filter.filter_format('uid=%s,ou=People,dc=scripts,dc=mit,dc=edu',[locker])
+
+    conn.add_s(apacheServerName,
+               [('objectClass',['apacheConfig','top']),
+                ('apacheServerName',[hostname])]
+               +
+               ([('apacheServerAlias',alias)] if alias else [])
+               +
+               [('apacheDocumentRoot',[web_scriptsPath]),
+                ('apacheSuexecUid',[str(uid)]),
+                ('apacheSuexecGid',[str(gid)])])
+    conn.add_s(scriptsVhostName,
+               [('objectClass',['scriptsVhost','top']),
+                ('scriptsVhostName',[hostname])]
+               +
+               ([('scriptsVhostAlias',alias)] if alias else [])
+               +
+               [('scriptsVhostAccount',[account]),
+                ('scriptsVhostDirectory',[path])])
