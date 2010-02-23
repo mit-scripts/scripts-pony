@@ -133,3 +133,10 @@ class RootController(BaseController):
             flash("You are not authorized for this area!")
             redirect('/')
         return dict(tickets=queue.Ticket.all())
+
+    @expose('scriptspony.templates.ticket')
+    def ticket(self,id):
+        if not auth.on_scripts_team():
+            flash("You are not authorized for this area!")
+            redirect('/')
+        return dict(ticket=queue.Ticket.get(id))

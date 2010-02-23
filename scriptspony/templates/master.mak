@@ -76,7 +76,7 @@ def set_port(url,port):
 	<div id="outer">
 			<div id="masthead">
 
-				<h1 id="header"><a rel="home" href="http://pony.scripts.mit.edu/">${self.title()}</a></h1>
+				<h1 id="header"><a rel="home" href="${tg.url('/')}">${self.title()}</a></h1>
 				<h2 id="tagline">Manage Hostnames for scripts.mit.edu</h2>
 			</div>
 			<div id="hmenu">
@@ -88,7 +88,11 @@ def set_port(url,port):
         Welcome ${auth.first_name()}.
         <a href="${set_port(pylons.request.application_url,80)}">Logout</a>
       %endif
-    </li><li><a href="http://scripts.mit.edu/">scripts.mit.edu home</a></li>
+    </li>
+    %if auth.on_scripts_team():
+      <li><a href="${tg.url('/queue')}">Admin Queue</a></li>
+    %endif    
+    <li><a href="http://scripts.mit.edu/">scripts.mit.edu home</a></li>
 </ul>
 
 				</div>

@@ -28,7 +28,7 @@ class Ticket(Entity):
     # "open" or "moira" or "dns" or "resolved"
     state = Field(Unicode(32))
     
-    events = OneToMany('Event')
+    events = OneToMany('Event',order_by='timestamp')
 
     @staticmethod
     def create(locker,hostname,path):
@@ -41,7 +41,8 @@ class Ticket(Entity):
     def addEvent(self,type,state,by=None,target=None,subject=None,body=None):
         if by is None:
             by = auth.current_user()
-        Event(ticket=self,type=type,target=target,subject=subject,body=body)
+        Event(ticket=self,type=type,target=target,subject=subject,body=body,
+              by=by)
         log.zwrite("%s's %s changed the ticket re: %s to %s"
                    % (by,type,self.hostname,state),
                    id=self.id)
