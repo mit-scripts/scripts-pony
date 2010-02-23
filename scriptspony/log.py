@@ -4,10 +4,13 @@ LOG_AUTHPRIV = 10<<3
 import getpass, subprocess
 import tg
 
-def err(mess):
-    syslog(LOG_ERR|LOG_AUTHPRIV,mess)
+def err(mess,level=LOG_ERR):
+    dotlocker = ".%s" % getpass.getuser()
+    if dotlocker == ".pony":
+        dotlocker = ''
+    syslog(level|LOG_AUTHPRIV,"Pony%s: %s"%(dotlocker,mess))
 def info(mess):
-    syslog(LOG_INFO|LOG_AUTHPRIV,mess)
+    err(mess,level=LOG_INFO)
 
 from webob.exc import HTTPException
 
@@ -30,11 +33,8 @@ def exceptions(func,*args,**kw):
             if len(args) > 0 and len(kw) > 0:
                 argness += ', '
             argness += ', '.join('%s=%s'%(k,repr(kw[k])) for k in kw)
-            dotlocker = ".%s" % getpass.getuser()
-            if dotlocker == ".pony":
-                dotlocker = ''
-            err("Pony%s: %s called %s(%s) but got: %s"
-                % (dotlocker,current_user(),func.func_name,argness,e))
+            err("%s called %s(%s) but got: %s"
+                % (current_user(),func.func_name,argness,e))
             e.already_syslogged = True
         raise
 
