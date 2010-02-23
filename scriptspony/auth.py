@@ -87,7 +87,8 @@ class ScriptsAuthMiddleware(object):
         # some reason
         state.https = environ.get('HTTP_HOST','').endswith(':444')
         state.name = environ.get('SSL_CLIENT_S_DN_CN','')
-        keytab.auth()
+        if keytab.exists():
+            keytab.auth()
         return self.app(environ,start_response)
 
 def on_scripts_team():
