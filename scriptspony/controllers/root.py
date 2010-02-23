@@ -12,11 +12,21 @@ from scriptspony.controllers.error import ErrorController
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from decorator import decorator
+
 from .. import auth,vhosts
 from ..model import queue
 
 __all__ = ['RootController']
 
+# Not in auth because it depends on TG
+@decorator
+def scripts_team_only(func,*args,**kw):
+    if not auth.on_scripts_team():
+        flash("You are not authorized for this area!")
+        redirect('/')
+    else:
+        return func(*args,**kw)
 
 class RootController(BaseController):
     """
@@ -128,13 +138,12 @@ class RootController(BaseController):
         return dict(locker=locker,hostname=hostname,path=path)
 
     @expose('scriptspony.templates.queue')
+    @scripts_team_only
     def queue(self):
-        if not auth.on_scripts_team():
-            flash("You are not authorized for this area!")
-            redirect('/')
         return dict(tickets=queue.Ticket.all())
 
     @expose('scriptspony.templates.ticket')
+    @scripts_team_only
     def ticket(self,id):
         if not auth.on_scripts_team():
             flash("You are not authorized for this area!")
