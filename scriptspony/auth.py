@@ -33,6 +33,8 @@ def first_name():
 
 def can_admin(locker):
     """Return true if the authentiated user can admin the named locker."""
+    if not current_user():
+        return False
     if not keytab.exists():
         cmd = ["/usr/local/bin/admof",'-noauth',locker,current_user()]
     else:
@@ -87,3 +89,16 @@ class ScriptsAuthMiddleware(object):
         state.name = environ.get('SSL_CLIENT_S_DN_CN','')
         keytab.auth()
         return self.app(environ,start_response)
+
+def on_scripts_team():
+    if not current_user():
+        return False
+    if not keytab.exists():
+        cmd = ["pts",'memb','system:scripts-team','-noauth']
+    else:
+        cmd = ["/usr/bin/pagsh","-c",
+               "aklog && pts memb system:scripts-team -encrypt"]
+    pts = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    out,err = pts.communicate()
+    teamers = (n.strip() for n in out.strip().split('\n')[1:])
+    return current_user() in teamers

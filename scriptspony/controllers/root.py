@@ -13,6 +13,7 @@ from scriptspony.controllers.error import ErrorController
 from sqlalchemy.orm.exc import NoResultFound
 
 from .. import auth,vhosts
+from ..model import queue
 
 __all__ = ['RootController']
 
@@ -125,3 +126,10 @@ class RootController(BaseController):
                 redirect('/')
 
         return dict(locker=locker,hostname=hostname,path=path)
+
+    @expose('scriptspony.templates.queue')
+    def queue(self):
+        if not auth.on_scripts_team():
+            flash("You are not authorized for this area!")
+            redirect('/')
+        return dict(tickets=queue.Ticket.all())

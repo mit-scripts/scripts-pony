@@ -45,6 +45,10 @@ class Ticket(Entity):
         log.zwrite("%s's %s changed the ticket re: %s to %s"
                    % (by,type,self.hostname,state),
                    id=self.id)
+    
+    @staticmethod
+    def all():
+        return Ticket.query.all()
 
 class Event(Entity):
     using_options(tablename=tname)
