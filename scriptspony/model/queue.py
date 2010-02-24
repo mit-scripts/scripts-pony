@@ -43,6 +43,7 @@ class Ticket(Entity):
             by = auth.current_user()
         Event(ticket=self,type=type,target=target,subject=subject,body=body,
               by=by)
+        self.state = state
         log.zwrite("%s's %s changed the ticket re: %s to %s"
                    % (by,type,self.hostname,state),
                    id=self.id)

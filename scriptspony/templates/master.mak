@@ -43,6 +43,11 @@ def set_port(url,port):
       <link rel="stylesheet" href="${tg.url('/scripts/style.css')}" type="text/css" />
     %endif
     <link rel="stylesheet" href="${tg.url('/scripts/server.css')}" type="text/css" />
+    <style type="text/css">
+      table {width: 100%; margin-bottom: 10px}
+      textarea {width: 100%; height: 200px}
+      input[type=text] {width: 300px}
+    </style>
     <title>${self.title()}</title>
     <script type="text/javascript"><!--
       var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";

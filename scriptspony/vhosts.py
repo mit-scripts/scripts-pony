@@ -130,6 +130,8 @@ def request_vhost(locker,hostname,path):
             raise UserError("'%s' does not point at scripts-vhosts."
                             %hostname)
     if reqtype == 'moira':
+        # actually_create_vhost does this check for other reqtypes
+        check_if_already_exists(hostname)
         queue.Ticket.create(locker,hostname,path)
     else:
         # Actually create the vhost
@@ -224,13 +226,16 @@ Sincerely,
     s.sendmail(fromaddr,[toaddr],msg.as_string())
     s.quit()
 
-def actually_create_vhost(locker,hostname,path):
+def check_if_already_exists(hostname):
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
                       ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[hostname,hostname]),['scriptsVhostDirectory'],False)
     if len(res) != 0:
         raise UserError("'%s' is already a hostname on scripts.mit.edu."
                         % hostname)
+
+def actually_create_vhost(locker,hostname,path):
+    check_if_already_exists(hostname)
     scriptsVhostName = ldap.filter.filter_format("scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
     apacheServerName = ldap.filter.filter_format("apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
     if hostname.endswith('.mit.edu'):

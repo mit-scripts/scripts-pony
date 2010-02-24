@@ -145,7 +145,35 @@ class RootController(BaseController):
     @expose('scriptspony.templates.ticket')
     @scripts_team_only
     def ticket(self,id):
-        if not auth.on_scripts_team():
-            flash("You are not authorized for this area!")
-            redirect('/')
-        return dict(ticket=queue.Ticket.get(id))
+        return dict(tickets=[queue.Ticket.get(int(id))])
+
+    @expose('scriptspony.templates.message')
+    @scripts_team_only
+    def approve(self,id,subject=None,body=None):
+        t = queue.Ticket.get(int(id))
+        if t.state != 'open':
+            flash("This ticket's not open!")
+            redirect('/ticket/%s'%id)
+        if subject and body:
+            try:
+                vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
+            except vhosts.UserError,e:
+                flash(e.message)
+            else:
+                # This sends mail and records it as an event
+                t.addEvent(type='mail',state='moira',target='jweiss',
+                           subject=subject,body=body)
+                redirect('/queue')
+        short = t.hostname[:-len('.mit.edu')]
+        return dict(tickets=[t],action=url('/approve/%s'%id),
+                    subject="scripts-vhosts CNAME request: %s"%short,
+                    body="""Hi Jonathon,
+
+At your convenience, please make %(short)s an alias of scripts-vhosts.
+
+stella scripts-vhosts -a %(short)s
+
+Thanks!
+-%(first)s
+""" % dict(short=short,first=auth.first_name()))
+            
