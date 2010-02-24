@@ -235,6 +235,10 @@ def check_if_already_exists(hostname):
                         % hostname)
 
 def actually_create_vhost(locker,hostname,path):
+    locker=locker.encode('utf-8')
+    hostname=hostname.encode('utf-8')
+    path=path.encode('utf-8')
+    
     check_if_already_exists(hostname)
     scriptsVhostName = ldap.filter.filter_format("scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
     apacheServerName = ldap.filter.filter_format("apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
