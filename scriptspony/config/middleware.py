@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """WSGI middleware initialization for the ScriptsPony application."""
 
+from paste.pony import PonyMiddleware
+
 from scriptspony.config.app_cfg import base_config
 from scriptspony.config.environment import load_environment
 
@@ -61,6 +63,8 @@ def make_app(global_conf, full_stack=True, **app_conf):
     app = make_base_app(global_conf, full_stack=True, **app_conf)
     
     # Wrap your base TurboGears 2 application with custom middleware here
+    app = PonyMiddleware(app)
+
     app = UnrewriteMiddleware(app,{'dispatch.fcgi':''})
 
     app = ScriptsAuthMiddleware(app)
