@@ -3,6 +3,8 @@
 import site,os.path
 site.addsitedir(os.path.dirname(__file__))
 
+import transaction
+
 from scriptspony.model import queue
 from scriptspony import util,keytab,mail,log,auth,vhosts
 
@@ -29,6 +31,8 @@ http://scripts.mit.edu/
                        target=u'user',
                        subject=subject,
                        body=body)
+
+    transaction.commit()
 
 if __name__ == '__main__':
     auth.set_user_from_parent_process()

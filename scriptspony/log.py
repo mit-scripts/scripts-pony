@@ -50,6 +50,7 @@ def zwrite(message,id):
         url = "https://pony.scripts.mit.edu:444/ticket/%s" % id
     zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","scripts",
                                "-i","pony%s:%s"%(dotlocker,id),
+                               "-q",
                                "-s",url,
                                "-m",message])
     
