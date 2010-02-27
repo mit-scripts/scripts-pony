@@ -21,4 +21,12 @@
 %if next is not UNDEFINED and hasattr(next,'body'):
   ${next.body()}
   <p><a href="${tg.url('/queue')}">Back to queue</a></p>
+%else:
+  <form method="get">
+    Display tickets that are:
+    %for s in all:
+      <label><input type="checkbox" name="${s}" value="1"${' checked' if s in included else ''} /> ${s}</label>
+    %endfor
+    <input type="submit" value="Filter" />
+  </form>
 %endif

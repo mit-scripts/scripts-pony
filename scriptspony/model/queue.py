@@ -25,7 +25,7 @@ class Ticket(Entity):
     hostname = Field(Unicode(255), index=True)
     # path
     path = Field(Unicode(255))
-    # "open" or "rt" or "moira" or "dns" or "resolved"
+    # "open" or "moira" or "dns" or "resolved"
     state = Field(Unicode(32))
     rtid = Field(Integer)
     

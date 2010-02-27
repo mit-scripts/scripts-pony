@@ -139,8 +139,15 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.queue')
     @scripts_team_only
-    def queue(self):
-        return dict(tickets=queue.Ticket.all())
+    def queue(self,**kw):
+        all = ('open','moira','dns','resolved')
+        if len(kw) <= 0:
+            kw = dict(open='1',moira='1',dns='1')
+        query = queue.Ticket.query
+        for k in all:
+            if k not in kw:
+                query = query.filter(queue.Ticket.state != k)
+        return dict(tickets=query.all(),all=all,included=kw)
 
     @expose('scriptspony.templates.ticket')
     @scripts_team_only
