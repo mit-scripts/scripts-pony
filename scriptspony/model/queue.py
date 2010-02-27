@@ -39,7 +39,7 @@ class Ticket(Entity):
         session.flush()
         t.addEvent(type='request',state="open",target='us')
         return t
-    
+
     def addEvent(self,type,state,by=None,target=None,subject=None,body=None):
         if by is None:
             by = auth.current_user()

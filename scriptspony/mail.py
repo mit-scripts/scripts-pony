@@ -38,10 +38,10 @@ def create_ticket(subject,body,id,requestor):
              "%s@mit.edu" % requestor,
              "scripts@mit.edu",rtcc=ponyaddr(id))
 
-def send_comment(subject,body,id,rtid,to):
+def send_comment(subject,body,id,rtid,fromaddr,toaddr):
     sendmail("%s [help.mit.edu #%s]" %(subject,rtid),body,
-             ponyaddr(id),
-             "%s@mit.edu" % to,
+             "%s@mit.edu" % fromaddr,
+             "%s@mit.edu" % toaddr,
              cc="scripts-comment@mit.edu",
              replyto="scripts-comment@mit.edu, %s"%(ponyaddr(id)))
 

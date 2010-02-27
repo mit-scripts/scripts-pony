@@ -5,7 +5,7 @@ import dns,dns.resolver,dns.exception
 
 import tg
 
-from .auth import sensitive,current_user
+from .auth import sensitive,team_sensitive,current_user
 from . import keytab, log, util, mail
 from .model import queue
 
@@ -33,7 +33,7 @@ def list_vhosts(locker):
             for i,m in res]
 
 
-@sensitive
+@team_sensitive
 @log.exceptions
 def get_path(locker,hostname):
     """Return a the path for the given hostname.
@@ -192,6 +192,7 @@ def check_if_already_exists(hostname):
         raise UserError("'%s' is already a hostname on scripts.mit.edu."
                         % hostname)
 
+@team_sensitive
 def actually_create_vhost(locker,hostname,path):
     locker=locker.encode('utf-8')
     hostname=hostname.encode('utf-8')

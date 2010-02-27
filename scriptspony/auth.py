@@ -59,7 +59,7 @@ class AuthError(webob.exc.HTTPForbidden):
 
 LOCKER_PATTERN = re.compile(r'^(?:\w[\w.-]*\w|\w)$')
 
-def validate_locker(locker):
+def validate_locker(locker,team_ok=False):
     if not LOCKER_PATTERN.search(locker):
         raise AuthError("'%s' is not a valid locker."%locker)
     else:
@@ -67,7 +67,7 @@ def validate_locker(locker):
             pwd.getpwnam(locker)
         except KeyError:
             raise AuthError(html("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%locker))
-        if not can_admin(locker):
+        if (not team_ok or not on_scripts_team()) and not can_admin(locker):
             raise AuthError("You cannot administer the '%s' locker!"%locker)
 
 @decorator
@@ -76,6 +76,14 @@ def sensitive(func, locker,*args,**kw):
     such that it throws an AuthError unless the authenticated
     user can admin that locker."""
     validate_locker(locker)
+    return func(locker.lower(),*args,**kw)
+
+@decorator
+def team_sensitive(func, locker,*args,**kw):
+    """Wrap a function that takes a locker as the first argument
+    such that it throws an AuthError unless the authenticated
+    user can admin that locker or is on scripts-team."""
+    validate_locker(locker,team_ok=True)
     return func(locker.lower(),*args,**kw)
 
 class ScriptsAuthMiddleware(object):
@@ -94,6 +102,9 @@ class ScriptsAuthMiddleware(object):
 def on_scripts_team():
     if not current_user():
         return False
+    # Treat procmail/cron as scripts team
+    if current_user().startswith('/'):
+        return True
     if not keytab.exists():
         cmd = ["pts",'memb','system:scripts-team','-noauth']
     else:

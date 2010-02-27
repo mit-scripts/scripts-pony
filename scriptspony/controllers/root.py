@@ -167,7 +167,8 @@ class RootController(BaseController):
             else:
                 # Send mail and records it as an event
                 # XXX use me instead of jweiss for testing
-                mail.send_comment(subject,body,t.id,t.rtid,'xavid')
+                mail.send_comment(subject,body,t.id,t.rtid,
+                                  auth.current_user(),'xavid')
                 t.addEvent(type='mail',state='moira',target='jweiss',
                            subject=subject,body=body)
                 redirect('/queue')
