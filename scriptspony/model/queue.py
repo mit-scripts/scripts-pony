@@ -25,8 +25,9 @@ class Ticket(Entity):
     hostname = Field(Unicode(255), index=True)
     # path
     path = Field(Unicode(255))
-    # "open" or "moira" or "dns" or "resolved"
+    # "open" or "rt" or "moira" or "dns" or "resolved"
     state = Field(Unicode(32))
+    rtid = Field(Integer)
     
     events = OneToMany('Event',order_by='timestamp')
 
@@ -37,6 +38,7 @@ class Ticket(Entity):
                    state="open")
         session.flush()
         t.addEvent(type='request',state="open",target='us')
+        return t
     
     def addEvent(self,type,state,by=None,target=None,subject=None,body=None):
         if by is None:

@@ -1,10 +1,16 @@
 <%inherit file="scriptspony.templates.master"/>
 
 <table border="1">
-  <tr><th></th><th>Requestor</th><th>Locker</th><th>Hostname</th><th>Path</th><th>State</th></tr>
+  <tr><th>#</th><th>RT ID</th><th>User</th><th>Locker</th><th>Hostname</th><th>State</th></tr>
   %for t in tickets:
     <tr>
-      <td><a href="${tg.url('/ticket/%s'%t.id)}">${t.id}</a></td><td>${t.requestor}</td><td>${t.locker}</td><td>${t.hostname}</td><td>${t.path}</td><td>${t.state}</td>
+      <td><a href="${tg.url('/ticket/%s'%t.id)}">${t.id}</a></td>
+      %if t.rtid is not None:
+        <td><a href="https://help.mit.edu/Ticket/Display.html?id=${t.rtid}">${t.rtid}</a></td>
+      %else:
+        <td></td>
+      %endif
+      <td>${t.requestor}</td><td>${t.locker}</td><td>${t.hostname}</td><td>${t.state}</td>
       %if t.state == 'open':
         <td><a href="${tg.url('/approve/%s'%t.id)}">Approve</a></td>
       %endif
@@ -14,4 +20,5 @@
 
 %if next is not UNDEFINED and hasattr(next,'body'):
   ${next.body()}
+  <p><a href="${tg.url('/queue')}">Back to queue</a></p>
 %endif

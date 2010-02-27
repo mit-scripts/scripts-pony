@@ -1,7 +1,7 @@
 import subprocess
 import threading
 from decorator import decorator
-import pwd
+import pwd, os
 import re
 
 import webob.exc
@@ -18,7 +18,7 @@ html_escape = webflash.html_escape
 webflash.html_escape = lambda s: s[len('<html>'):] if s.startswith('<html>') else html_escape(s)
 
 def current_user():
-    return state.username
+    return getattr(state,'username',None)
 
 def is_https():
     return state.https
@@ -103,3 +103,7 @@ def on_scripts_team():
     out,err = pts.communicate()
     teamers = (n.strip() for n in out.strip().split('\n')[1:])
     return current_user() in teamers
+
+def set_user_from_parent_process():
+    cmdline = file("/proc/%s/cmdline" % os.getppid()).read()
+    state.username = cmdline.split('\x00')[0]

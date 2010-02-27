@@ -43,9 +43,13 @@ def zwrite(message,id):
     dotlocker = ".%s" % getpass.getuser()
     if dotlocker == ".pony":
         dotlocker = ''
+    try:
+        url = "%s%s"%(tg.request.host_url, tg.url('/ticket/%s'%id))
+    except:
+        # Default to something sane if we're not in the context of a request
+        url = "https://pony.scripts.mit.edu/ticket/%s" % id
     zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","xavetest",
                                "-i","pony%s:%s"%(dotlocker,id),
-                               "-s","%s%s"%(tg.request.host_url,
-                                            tg.url('/ticket/%s'%id)),
+                               "-s",url,
                                "-m",message])
     
