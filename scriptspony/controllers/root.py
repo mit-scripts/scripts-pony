@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from decorator import decorator
 
-from .. import auth,vhosts
+from .. import auth,vhosts,mail
 from ..model import queue
 
 __all__ = ['RootController']
@@ -154,13 +154,20 @@ class RootController(BaseController):
         if t.state != 'open':
             flash("This ticket's not open!")
             redirect('/ticket/%s'%id)
+        if t.rtid is None:
+            flash("This ticket has no RT ID!")
+            redirect('/ticket/%s'%id)
         if subject and body:
             try:
-                vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
+                # XXX commented out for testing w/o credentials
+                #vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
+                pass
             except vhosts.UserError,e:
                 flash(e.message)
             else:
-                # This sends mail and records it as an event
+                # Send mail and records it as an event
+                # XXX use me instead of jweiss for testing
+                mail.send_comment(subject,body,t.id,t.rtid,'xavid')
                 t.addEvent(type='mail',state='moira',target='jweiss',
                            subject=subject,body=body)
                 redirect('/queue')
@@ -175,5 +182,7 @@ stella scripts-vhosts -a %(short)s
 
 Thanks!
 -%(first)s
+
+/set status=stalled
 """ % dict(short=short,first=auth.first_name()))
             

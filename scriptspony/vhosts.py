@@ -1,12 +1,12 @@
 import ldap, ldap.sasl, ldap.filter
 import re
-import socket,subprocess,os,pwd,getpass
+import subprocess,os,pwd,getpass
 import dns,dns.resolver,dns.exception
-import smtplib
-from email.mime.text import MIMEText
+
+import tg
 
 from .auth import sensitive,current_user
-from . import keytab, log
+from . import keytab, log, util, mail
 from .model import queue
 
 def connect():
@@ -119,20 +119,25 @@ def request_vhost(locker,hostname,path):
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
     else:
         reqtype='external'
-        failed = False
-        try:
-            if (socket.gethostbyname(hostname+'.')
-                != socket.gethostbyname("scripts-vhosts.mit.edu.")):
-                failed=True
-        except socket.gaierror:
-            failed=True
-        if failed:
+        if not util.points_at_scripts(hostname):
             raise UserError("'%s' does not point at scripts-vhosts."
                             %hostname)
     if reqtype == 'moira':
         # actually_create_vhost does this check for other reqtypes
         check_if_already_exists(hostname)
-        queue.Ticket.create(locker,hostname,path)
+        t = queue.Ticket.create(locker,hostname,path)
+        short = hostname[:-len('.mit.edu')]
+        mail.create_ticket(subject="scripts-vhosts CNAME request: %s"%short,
+                           body="""Heyas,
+
+%(user)s requested %(hostname)s for locker '%(locker)s' path %(path)s.
+Go to %(url)s to approve it.
+
+Love,
+~Scripts Pony
+""" % dict(short=short,user=current_user(),locker=locker,hostname=hostname,
+           path=path,url=tg.request.host_url+tg.url('/ticket/%s'%t.id)),
+                           id=t.id, requestor=current_user())
     else:
         # Actually create the vhost
         actually_create_vhost(locker,hostname,path)
@@ -140,8 +145,6 @@ def request_vhost(locker,hostname,path):
         current_user(), hostname, locker,path)
 
     log.info(logmessage)
-    if reqtype == 'moira':
-        sendmail(locker,hostname,path)
     return message
 
 def validate_path(path):
@@ -180,51 +183,6 @@ def is_host_reified(hostname):
 
 class UserError(log.ExpectedException):
     pass
-
-def sendmail(locker,hostname,path):
-    """Send mail for MIT vhost requests."""
-    # Send manual mail for this case
-    fromaddr = "%s@mit.edu" % current_user()
-    uslocker = getpass.getuser()
-    if uslocker == 'pony':
-        toaddr = "scripts@mit.edu"
-        lockertag = ''
-    else:
-        toaddr = "scripts-pony@mit.edu"
-        lockertag = '[Pony.%s]' % uslocker
-    short = hostname[:-len('.mit.edu')]
-    msg = MIMEText("""%(user)s wants %(host)s to point to %(path)s in the %(locker)s locker.  Here's how to request it:
-
-1) Check to make sure that it's free by running "stella %(short)s"
-
-2) If it's free, send Jonathon an email along the lines of below.  If
-not, but %(user)s is the owner or contact, ask them what they want
-done with the IP it's currently attached to.  If the hostname is owned
-by someone else, tell the user that the hostname's not available and
-ask them if they want another one.
-
-===
-Hi Jonathon,
-
-At your convenience, please make %(short)s an alias of scripts-vhosts.
-
-stella scripts-vhosts -a %(short)s
-
-Thanks!
-===
-
-(The vhost is already configured in LDAP, but the hostname needs to be requested.)
-
-Sincerely,
-~Scripts Pony""" % dict(user=fromaddr,host=hostname,path=path,locker=locker,
-                        short=short))
-    msg['Subject'] = "%sscripts-vhosts CNAME request: %s" % (lockertag,short)
-    msg['From'] = fromaddr
-    msg['To'] = toaddr
-    s = smtplib.SMTP()
-    s.connect()
-    s.sendmail(fromaddr,[toaddr],msg.as_string())
-    s.quit()
 
 def check_if_already_exists(hostname):
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
