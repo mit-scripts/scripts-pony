@@ -46,7 +46,7 @@ def set_port(url,port):
     <style type="text/css">
       table {width: 100%; margin-bottom: 10px}
       textarea {width: 100%; height: 200px}
-      input[type=text] {width: 300px}
+      input[type=text] {width: 200px}
     </style>
     <title>${self.title()}</title>
     <script type="text/javascript"><!--
@@ -136,6 +136,7 @@ Feel free to contact us with any questions, comments, or suggestions.
 <a class="nobutt" href="http://scripts.mit.edu/faq/45/"><img src="${tg.url('/scripts/media/powered_by-trans.gif')}" alt="powered by scripts.mit.edu"/></a>
 
 					</div>
+<center><a href="${tg.url('/pony')}" style="color:white">(and ponies)</a></center>
 				</div>
 
 		      <div id="clearer">&nbsp;</div>
