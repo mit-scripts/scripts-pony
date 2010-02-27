@@ -159,16 +159,13 @@ class RootController(BaseController):
             redirect('/ticket/%s'%id)
         if subject and body:
             try:
-                # XXX commented out for testing w/o credentials
-                #vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
-                pass
+                vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
             except vhosts.UserError,e:
                 flash(e.message)
             else:
                 # Send mail and records it as an event
-                # XXX use me instead of jweiss for testing
                 mail.send_comment(subject,body,t.id,t.rtid,
-                                  auth.current_user(),'xavid')
+                                  auth.current_user(),'jweiss')
                 t.addEvent(type='mail',state='moira',target='jweiss',
                            subject=subject,body=body)
                 redirect('/queue')

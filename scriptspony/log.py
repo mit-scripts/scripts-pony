@@ -48,7 +48,7 @@ def zwrite(message,id):
     except:
         # Default to something sane if we're not in the context of a request
         url = "https://pony.scripts.mit.edu:444/ticket/%s" % id
-    zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","xavetest",
+    zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","scripts",
                                "-i","pony%s:%s"%(dotlocker,id),
                                "-s",url,
                                "-m",message])
