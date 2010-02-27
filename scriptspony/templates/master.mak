@@ -29,6 +29,13 @@ def set_port(url,port):
         host += portbit
     return newprot+"://"+host+"/"+rester
 
+import getpass
+locker = getpass.getuser()
+if locker != 'pony':
+    lockerbang = locker+'!'
+else:
+    lockerbang = ''
+
 %>
 
 <%def name="head()">
@@ -45,7 +52,7 @@ def set_port(url,port):
     <link rel="stylesheet" href="${tg.url('/scripts/server.css')}" type="text/css" />
     <style type="text/css">
       table {width: 100%; margin-bottom: 10px}
-      textarea {width: 100%; height: 200px}
+      textarea {width: 100%; height: 250px}
       input[type=text] {width: 200px}
     </style>
     <title>${self.title()}</title>
@@ -70,7 +77,7 @@ def set_port(url,port):
     //--></script>
 </%def>
 
-<%def name="title()">Scripts Pony</%def>
+<%def name="title()">${lockerbang}Scripts Pony</%def>
 
 <head>
   ${self.head()}
