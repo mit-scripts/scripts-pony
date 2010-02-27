@@ -11,3 +11,11 @@
   <input type="submit" value="Save" />
 </form>
 
+<p>
+  Notes:
+  <ul>
+    <li>The path should be a directory containing an <tt>index.html</tt> or
+      <tt>index.cgi</tt> file, a webapp, or similar.  The path can't
+      point at a specific file.</li>
+  </ul>
+</p>
