@@ -45,9 +45,12 @@ class Ticket(Entity):
             by = auth.current_user()
         Event(ticket=self,type=type,target=target,subject=subject,body=body,
               by=by)
-        self.state = state
-        log.zwrite("%s's %s changed the ticket re: %s to %s"
-                   % (by,type,self.hostname,state),
+        if state != self.state:
+            self.state = state
+            pat = "%s's %s changed the ticket re: %s to %s"
+        else:
+            pat = "%s's %s left the ticket re: %s as %s"
+        log.zwrite(pat % (by,type,self.hostname,state),
                    id=self.id)
     
     @staticmethod

@@ -21,11 +21,9 @@ def handle_mail():
 
     ID_PATTERN = re.compile(r'pony\+(\d+)\@')
     m = ID_PATTERN.search(message['delivered-to'])
+    if m is None:
+        return
     id = int(m.group(1))
-
-    RTID_PATTERN = re.compile(r'\[help.mit.edu\s+\#(\d+)\]')
-    m = RTID_PATTERN.search(message['subject'])
-    rtid = int(m.group(1))
 
     by = unicode(message['from'].lower(),'utf-8',errors='replace')
     FROM_PATTERN = re.compile(r'\<([^<>]+)\>')
@@ -36,7 +34,12 @@ def handle_mail():
         by = by[:-len(u'@mit.edu')]
 
     t = queue.Ticket.get(id)
-    t.rtid = rtid
+
+    RTID_PATTERN = re.compile(r'\[help.mit.edu\s+\#(\d+)\]')
+    m = RTID_PATTERN.search(message['subject'])
+    if m:
+        t.rtid = int(m.group(1))
+    
     newstate = t.state
     if by == u'jweiss':
         newstate = u'dns'
