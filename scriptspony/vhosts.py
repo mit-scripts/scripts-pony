@@ -103,8 +103,12 @@ def request_vhost(locker,hostname,path):
         if hostname.count('.') != 2:
             raise UserError("'%s' has too many dots for a mit.edu hostname."
                             % hostname)
-        if bit hostname[0].isalpha():
+        if not hostname[0].isalpha():
             raise UserError(".mit.edu hostnames must start with a letter.")
+        if hostname[-len(".mit.edu")-1] == '-':
+            raise UserError(".mit.edu hostnames cannot end with a dash.")
+        if '_' in hostname:
+            raise UserError(".mit.edu hostnames cannot contain an underscore.")
         try:
             dns.resolver.query(hostname+'.', 0)
         except dns.resolver.NXDOMAIN:
