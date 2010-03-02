@@ -8,17 +8,11 @@
  * Check stella info with PyMoira before sending mail for *.mit.edu
    * Package PyMoira into an rpm and get installed on scripts servers
  * Semi-automatic mode:
-     We have an admin queue.  When a *.mit.edu vhost is requested, an
-     email to jweiss is composed and put in the queue; a scripts
-     team member can click a button to send it, or edit it in place.
-   * Zephyr -c scripts when a new queue entry appears, and allow
-     auth'd zephyrs from people on scripts-team to approve them
+   * allow auth'd zephyrs from people on scripts-team to approve them
      via a zephyrbot.
    * I want to use mail scripts to parse jweiss's responses for 
-     "done mod DNS", but this doesn't actually do anything useful.
-     Though possibly we do want jweiss's responses to go to the pony
-     admin queue and not RT.
-   * Perodically monitor DNS and notify users (and update the admin queue)
-     when their hostnames are live.
+     "done mod DNS", and raise a flag if it looks like they contain actual 
+     content.
+   * Allow tickets to be rejected from the queue
  * On error, go back where you were instead of punting to /index
  * Deal with the new vhost reification system, if it starts existing.

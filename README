@@ -32,7 +32,7 @@ To periodically check DNS automatically for tickets blocking on DNS,
 you need to be signed up for cron_scripts and load a crontab that
 contains:
 
-* * * * 2,17,32,49 /mit/locker/Scripts/turbogears/ScriptsPony/check_dns.py
+2,17,32,49 * * * * /mit/locker/Scripts/turbogears/ScriptsPony/check_dns.py
 
 === Authentication and Authorization ===
 
