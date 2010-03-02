@@ -93,20 +93,23 @@ class RootController(BaseController):
                     https=https)
 
     @expose('scriptspony.templates.edit')
-    def edit(self,locker,hostname,path=None):
+    def edit(self,locker,hostname,path=None,token=None):
         if path is None and pylons.request.response_ext:
             hostname += pylons.request.response_ext
         if vhosts.is_host_reified(hostname):
             flash("The host '%s' has special configuration; email scripts@mit.edu to make changes to it." % hostname)
             redirect('/index/'+locker)
         if path is not None:
-            try:
-                vhosts.set_path(locker,hostname,path)
-            except vhosts.UserError,e:
-                flash(e.message)
+            if token != auth.token():
+                flash("Invalid token!")
             else:
-                flash("Host '%s' reconfigured."%hostname)
-                redirect('/index/'+locker)
+                try:
+                    vhosts.set_path(locker,hostname,path)
+                except vhosts.UserError,e:
+                    flash(e.message)
+                else:
+                    flash("Host '%s' reconfigured."%hostname)
+                    redirect('/index/'+locker)
         else:
             try:
                 path=vhosts.get_path(locker,hostname)
@@ -117,17 +120,20 @@ class RootController(BaseController):
                     path=path)
 
     @expose('scriptspony.templates.new')
-    def new(self,locker,hostname='',path=''):
+    def new(self,locker,hostname='',path='',token=None):
         if not hostname and not path and pylons.request.response_ext:
             locker += pylons.request.response_ext
         if hostname:
-            try:
-                status = vhosts.request_vhost(locker,hostname,path)
-            except vhosts.UserError,e:
-                flash(e.message)
+            if token != auth.token():
+                flash("Invalid token!")
             else:
-                flash(status)
-                redirect('/index/'+locker)
+                try:
+                    status = vhosts.request_vhost(locker,hostname,path)
+                except vhosts.UserError,e:
+                    flash(e.message)
+                else:
+                    flash(status)
+                    redirect('/index/'+locker)
         else:
             try:
                 auth.validate_locker(locker)
@@ -156,7 +162,7 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.message')
     @scripts_team_only
-    def approve(self,id,subject=None,body=None):
+    def approve(self,id,subject=None,body=None,token=None):
         t = queue.Ticket.get(int(id))
         if t.state != 'open':
             flash("This ticket's not open!")
@@ -165,17 +171,20 @@ class RootController(BaseController):
             flash("This ticket has no RT ID!")
             redirect('/ticket/%s'%id)
         if subject and body:
-            try:
-                vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
-            except vhosts.UserError,e:
-                flash(e.message)
+            if token != auth.token():
+                flash("Invalid token!")
             else:
-                # Send mail and records it as an event
-                mail.send_comment(subject,body,t.id,t.rtid,
-                                  auth.current_user(),'jweiss')
-                t.addEvent(type='mail',state='moira',target='jweiss',
-                           subject=subject,body=body)
-                redirect('/queue')
+                try:
+                    vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
+                except vhosts.UserError,e:
+                    flash(e.message)
+                else:
+                    # Send mail and records it as an event
+                    mail.send_comment(subject,body,t.id,t.rtid,
+                                      auth.current_user(),'jweiss')
+                    t.addEvent(type='mail',state='moira',target='jweiss',
+                               subject=subject,body=body)
+                    redirect('/queue')
         short = t.hostname[:-len('.mit.edu')]
         return dict(tickets=[t],action=url('/approve/%s'%id),
                     subject="scripts-vhosts CNAME request: %s"%short,

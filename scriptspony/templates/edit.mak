@@ -1,5 +1,9 @@
 <%inherit file="scriptspony.templates.master"/>
 
+<%!
+from scriptspony import auth
+%>
+
 <div><a href="${tg.url('/')}">Back to list</a></div>
 
 <form method="post">
@@ -9,6 +13,7 @@
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
   </ul>
   <input type="submit" value="Save" />
+  <input type="hidden" name="token" value="${auth.token()}" />
 </form>
 
 <p>

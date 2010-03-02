@@ -64,3 +64,4 @@ elixir.metadata, elixir.session = metadata, DBSession
 # Import your model modules here.
 import user
 import queue
+import meta

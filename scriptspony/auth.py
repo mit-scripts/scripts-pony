@@ -7,6 +7,7 @@ import re
 import webob.exc
 
 from . import keytab,log
+from .model import meta
 
 state = threading.local()
 
@@ -118,3 +119,6 @@ def on_scripts_team():
 def set_user_from_parent_process():
     cmdline = file("/proc/%s/cmdline" % os.getppid()).read()
     state.username = cmdline.split('\x00')[0]
+
+def token():
+    return meta.Meta.token_for_user(current_user())

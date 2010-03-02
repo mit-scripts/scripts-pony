@@ -7,14 +7,12 @@
     <table border="1">
       <tr><th>Hostname</th><th>Path</th></tr>
       %for host,path in hosts:
-        <form method="post">
-          <tr>
-            <td>${host}</td><td><small style="color:grey">/mit/${locker}/web_scripts/</small>${path}</td>
-            %if host not in (locker+'.scripts.mit.edu',):
-              <td><a href="${tg.url('/edit/'+locker+'/'+host)}">edit</a></td>
-            %endif
-          </tr>
-        </form>
+        <tr>
+          <td>${host}</td><td><small style="color:grey">/mit/${locker}/web_scripts/</small>${path}</td>
+          %if host not in (locker+'.scripts.mit.edu',):
+            <td><a href="${tg.url('/edit/'+locker+'/'+host)}">edit</a></td>
+          %endif
+        </tr>
       %endfor
     </table>
     
