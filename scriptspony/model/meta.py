@@ -17,7 +17,7 @@ class Meta(Entity):
     using_table_options(mysql_engine='InnoDB',mysql_charset='utf8')
 
     # Secret key
-    secret = Field(String(8),required=True)
+    secret = Field(Binary(8),required=True)
 
     def __init__(self):
         self.secret = ''.join(chr(random.randint(0,255)) for x in xrange(8))
