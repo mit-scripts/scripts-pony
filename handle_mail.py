@@ -19,6 +19,11 @@ def handle_mail():
     if keytab.exists():
         keytab.auth()
 
+    if ('subject' not in message
+        or 'delivered-to' not in message
+        or 'from' not in message):
+        return
+
     ID_PATTERN = re.compile(r'pony\+(\d+)\@')
     m = ID_PATTERN.search(message['delivered-to'])
     if m is None:
