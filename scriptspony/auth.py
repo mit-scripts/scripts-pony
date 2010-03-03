@@ -104,7 +104,7 @@ def on_scripts_team():
     if not current_user():
         return False
     # Treat procmail/cron as scripts team
-    if current_user().startswith('/'):
+    if current_user().startswith('!'):
         return True
     if not keytab.exists():
         cmd = ["pts",'memb','system:scripts-team','-noauth']
@@ -118,7 +118,7 @@ def on_scripts_team():
 
 def set_user_from_parent_process():
     cmdline = file("/proc/%s/cmdline" % os.getppid()).read()
-    state.username = cmdline.split('\x00')[0]
+    state.username = '!'+cmdline.split('\x00')[0]
 
 def token():
     return meta.Meta.token_for_user(current_user())

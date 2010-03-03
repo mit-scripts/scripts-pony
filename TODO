@@ -16,3 +16,4 @@
    * Allow tickets to be rejected from the queue
  * On error, go back where you were instead of punting to /index
  * Deal with the new vhost reification system, if it starts existing.
+ * Customizable templates for outgoing mail
