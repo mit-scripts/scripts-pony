@@ -14,6 +14,8 @@
      "done mod DNS", and raise a flag if it looks like they contain actual 
      content.
    * Allow tickets to be rejected from the queue
+   * Customizable templates for outgoing mail
+   * On DNS, check if it looks like you're getting a 404 or a 403 or a
+     broken wordpress, and add advice.
  * On error, go back where you were instead of punting to /index
  * Deal with the new vhost reification system, if it starts existing.
- * Customizable templates for outgoing mail

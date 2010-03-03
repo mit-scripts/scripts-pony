@@ -43,6 +43,8 @@ def handle_mail():
     RTID_PATTERN = re.compile(r'\[help.mit.edu\s+\#(\d+)\]')
     m = RTID_PATTERN.search(message['subject'])
     if m:
+        if t.rtid is None:
+            by = u'rt'
         t.rtid = int(m.group(1))
     
     newstate = t.state
