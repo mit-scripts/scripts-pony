@@ -29,7 +29,7 @@ def check_dns():
                     sitestatus = "This site looks like a WordPress blog; for the new URL to work properly, you'll need to access the WordPress admin interface via your old URL, go to General Settings, and change the WordPress address and Blog address to 'http://%s'." % hostname
                 else:
                     sitestatus = "Your site appears to be working properly."
-            except HTTPError,e:
+            except urllib2.HTTPError,e:
                 if e.code == 404:
                     sitestatus = "There doesn't seem to be any content currently at %s; make sure that directory exists and has an index.html, index.cgi, or similar, or change this hostname to point somewhere else at http://pony.scripts.mit.edu." % path
                 elif e.code == 403:
