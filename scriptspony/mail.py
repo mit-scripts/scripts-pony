@@ -10,8 +10,8 @@ def sendmail(subject,body,fromaddr,toaddr,cc=None,rtcc=None,replyto=None):
         subject = '[Pony.%s] %s' % (uslocker,subject)
     
     msg = MIMEText(body)
-    msg['Subject'] = subject
     msg['From'] = fromaddr
+    msg['Subject'] = subject
     msg['To'] = toaddr
     dests = [toaddr]
     if cc is not None:
@@ -38,14 +38,21 @@ def create_ticket(subject,body,id,requestor):
              "%s@mit.edu" % requestor,
              "scripts@mit.edu",rtcc=ponyaddr(id))
 
-def send_comment(subject,body,id,rtid,fromaddr,toaddr):
+def send_comment(subject,body,id,rtid,fromaddr,toaddr=None):
+    if toaddr is not None:
+        cc="scripts-comment@mit.edu"
+    else:
+        toaddr="scripts-comment@mit.edu"
+        cc=None
     sendmail("%s [help.mit.edu #%s]" %(subject,rtid),body,
              "%s@mit.edu" % fromaddr,
              "%s@mit.edu" % toaddr,
-             cc="scripts-comment@mit.edu",
+             cc=cc,
              replyto="scripts-comment@mit.edu, %s"%(ponyaddr(id)))
 
-def send_correspondence(subject,body,id,rtid):
+def send_correspondence(subject,body,id,rtid,fromaddr=None):
+    if fromaddr is None:
+        fromaddr = ponyaddr(id)
     sendmail("%s [help.mit.edu #%s]" %(subject,rtid),body,
-             ponyaddr(id),
+             fromaddr,
              "scripts@mit.edu")

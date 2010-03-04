@@ -54,6 +54,7 @@ else:
       table {width: 100%; margin-bottom: 10px}
       textarea {width: 100%; height: 250px}
       input[type=text] {width: 200px}
+      input[type=text].wide {width: 400px}
     </style>
     <title>${self.title()}</title>
     <script type="text/javascript"><!--

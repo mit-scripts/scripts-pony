@@ -146,7 +146,7 @@ class RootController(BaseController):
     @expose('scriptspony.templates.queue')
     @scripts_team_only
     def queue(self,**kw):
-        all = ('open','moira','dns','resolved')
+        all = ('open','moira','dns','resolved','rejected')
         if len(kw) <= 0:
             kw = dict(open='1',moira='1',dns='1')
         query = queue.Ticket.query
@@ -184,6 +184,7 @@ class RootController(BaseController):
                                       auth.current_user(),'jweiss')
                     t.addEvent(type='mail',state='moira',target='jweiss',
                                subject=subject,body=body)
+                    flash("Ticket approved; mail sent to jweiss.")
                     redirect('/queue')
         short = t.hostname[:-len('.mit.edu')]
         return dict(tickets=[t],action=url('/approve/%s'%id),
@@ -198,5 +199,47 @@ Thanks!
 -%(first)s
 
 /set status=stalled
-""" % dict(short=short,first=auth.first_name()))
+""" % dict(short=short,first=auth.first_name()),
+                    help_text="Be sure to check the hostname with stella before sending.  (DNS got checked on request, but it could still be reserved or there could be a race going on.)")
             
+    @expose('scriptspony.templates.message')
+    @scripts_team_only
+    def reject(self,id,subject=None,body=None,token=None,silent=False):
+        t = queue.Ticket.get(int(id))
+        if t.state != 'open':
+            flash("This ticket's not open!")
+            redirect('/ticket/%s'%id)
+        if t.rtid is None:
+            flash("This ticket has no RT ID!")
+            redirect('/ticket/%s'%id)
+        if (subject and body) or silent:
+            if token != auth.token():
+                flash("Invalid token!")
+            else:
+                # Send mail and records it as an event
+                if not silent:
+                    mail.send_correspondence(subject,body,t.id,t.rtid,
+                                             auth.current_user())
+                    t.addEvent(type=u'mail',state=u'rejected',target=u'user',
+                               subject=subject,body=body)
+                    flash("Ticket rejected; mail sent to user.")
+                else:
+                    mail.send_comment(subject,body,t.id,t.rtid,
+                                      auth.current_user())
+                    t.addEvent(type=u'mail',state=u'rejected',
+                               target=u'rt', subject=subject,body=body)
+                    flash("Ticket rejected silently.")
+                redirect('/queue')
+        return dict(tickets=[t],action=url('/reject/%s'%id),
+                    subject="Problem with request for %s"%t.hostname,
+                    body="""Hello,
+
+Unfortunately, the hostname %(hostname)s is not available.  You can go to http://pony.scripts.mit.edu/ to request a different one.
+
+Sorry for the inconvenience,
+-%(first)s
+
+/set status=rejected
+""" % dict(hostname=t.hostname,first=auth.first_name()),
+                    submit='Send to %s' % t.requestor,
+                    extra_buttons={'silent':'Send as Comment'})

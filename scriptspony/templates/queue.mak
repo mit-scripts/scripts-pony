@@ -13,6 +13,7 @@
       <td>${t.requestor}</td><td>${t.locker}</td><td>${t.hostname}</td><td>${t.state}</td>
       %if t.state == 'open':
         <td><a href="${tg.url('/approve/%s'%t.id)}">Approve</a></td>
+        <td><a href="${tg.url('/reject/%s'%t.id)}">Reject</a></td>
       %endif
     </tr>
   %endfor
