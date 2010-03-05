@@ -7,6 +7,10 @@
  * Ask for a description when requesting hostnames, as a social factor.
  * Check stella info with PyMoira before sending mail for *.mit.edu
    * Package PyMoira into an rpm and get installed on scripts servers
+ * When people request or edit a vhost, try to see if we can tell whether
+   the path exists.  If we can tell it doesn't exist or that it's not 
+   a directory, display a useful warning and make the user confirm that's
+   what they want.
  * Semi-automatic mode:
    * allow auth'd zephyrs from people on scripts-team to approve them
      via a zephyrbot.
