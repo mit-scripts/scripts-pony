@@ -20,7 +20,7 @@ def check_dns():
         if util.points_at_scripts(t.hostname):
             path = '/mit/%s/web_scripts/%s' % (t.locker,
                                                vhosts.get_path(t.locker,t.hostname))
-            wordpress = "This site looks like a WordPress blog; for the new URL to work properly, you'll need to access the WordPress admin interface via your old URL, go to General Settings, and change the WordPress address and Blog address to 'http://%s'." % hostname
+            wordpress = "This site looks like a WordPress blog; for the new URL to work properly, you'll need to access the WordPress admin interface via your old URL, go to General Settings, and change the WordPress address and Blog address to 'http://%s'." % t.hostname
             
             # Try to figure out what's up with the hostname currently
             try:
