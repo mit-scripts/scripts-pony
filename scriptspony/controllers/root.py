@@ -197,6 +197,7 @@ stella scripts-vhosts -a %(short)s
 
 Thanks!
 -%(first)s
+SIPB Scripts Team
 
 /set status=stalled
 """ % dict(short=short,first=auth.first_name()),
