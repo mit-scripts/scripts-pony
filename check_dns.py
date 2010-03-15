@@ -30,14 +30,16 @@ def check_dns():
                     or 'wp-login' in page.geturl()):
                     sitestatus = wordpress
                 else:
-                    sitestatus = "Your site appears to be working properly.  Have fun"
+                    sitestatus = "Your site appears to be working properly.  Have fun!"
             except urllib2.HTTPError,e:
                 if 'wp-login' in e.geturl():
                     sitestatus = wordpress
                 elif e.code == 404:
                     sitestatus = "There doesn't seem to be any content currently at %s; make sure that directory exists and has an index.html, index.cgi, or similar, or change this hostname to point somewhere else at http://pony.scripts.mit.edu." % path
                 elif e.code == 403:
-                    sitestatus = "Visiting that page yields a Forbidden error; this is often caused by a lack of valid content at %s.  Putting an index.html, index.cgi, or similar there may solve this." % path
+                    sitestatus = "Visiting that page yields a Forbidden error; this is often caused by a lack of valid content at %s.  Putting an index.html, index.cgi, or similar there may solve this.  Alternately, you may just have your site password-protected or cert-protected." % path
+                elif e.code == 401:
+                    sitestatus = "Visiting that page yields an Unauthorized error.  This generally means that you have your site password-protected or cert-protected, so we can't confirm whether it's working." % path
                 else:
                     sitestatus = "Visiting that page yields a %s error, suggesting a problem with the content at %s.  Email us at scripts@mit.edu if you need help resolving this." % (e.code, path)
         
