@@ -14,9 +14,13 @@
  * Semi-automatic mode:
    * allow auth'd zephyrs from people on scripts-team to approve them
      via a zephyrbot.
-   * I want to use mail scripts to parse jweiss's responses for 
+   * I want to parse jweiss's responses for 
      "done mod DNS", and raise a flag if it looks like they contain actual 
      content.
    * Customizable templates for outgoing mail
  * On error, go back where you were instead of punting to /index
  * Deal with the new vhost reification system, if it starts existing.
+ * Let people on scripts-team request vhosts on lockers they don't
+   control, to make dealing with emails at scripts@ easier.  Put up an
+   obvious warning/make them confirm to make sure they don't do so
+   accidently, and make these lockers not get remembered in the locker list.
