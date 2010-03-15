@@ -155,6 +155,7 @@ Love,
 
 def validate_path(path):
     """Throw a UserError if path is not valid for a vhost path."""
+    path = path.strip()
     if (not path.startswith('/')
         and '..' not in path.split('/')
         and '.' not in path.split('/')
