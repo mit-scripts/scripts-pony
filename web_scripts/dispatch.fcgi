@@ -53,5 +53,5 @@ if __name__ == '__main__':
                 yield l
             whoami = pwd.getpwuid(os.getuid())[0]
             hostname = socket.gethostname()
-            yield "To restart: touch %s" % restart_file
+            yield "To restart: touch %s\n" % os.path.abspath(restart_file)
         RestartingServer(errApp,restart_file).run()

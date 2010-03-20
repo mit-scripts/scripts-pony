@@ -6,7 +6,8 @@ site.addsitedir(os.path.dirname(__file__))
 import transaction
 
 from scriptspony.model import queue
-from scriptspony import keytab, mail, log, auth
+from scriptspony import mail
+from scripts import keytab, log, auth
 from scriptspony.config.environment import load_environment
 
 import email, sys, re

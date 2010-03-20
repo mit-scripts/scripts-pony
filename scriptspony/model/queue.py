@@ -8,7 +8,9 @@ from elixir import (ManyToOne, Entity, Field, OneToMany,
                     drop_all, create_all, session)
 import datetime
 
-from .. import auth,log
+import tg
+
+from scripts import auth,log
 
 def tname(typ):
     return typ.__name__.lower()
@@ -50,8 +52,14 @@ class Ticket(Entity):
             pat = "%s's %s changed the ticket re: %s to %s"
         else:
             pat = "%s's %s left the ticket re: %s as %s"
+        try:
+            url = "%s%s"%(tg.request.host_url, tg.url('/queue'))
+        except:
+            # Default to something sane if we're not in the context of a request
+            url = "https://pony.scripts.mit.edu:444/queue"
+
         log.zwrite(pat % (by,type,self.hostname,state),
-                   id=self.id)
+                   instance=self.id,zsig=url)
     
     @staticmethod
     def all():

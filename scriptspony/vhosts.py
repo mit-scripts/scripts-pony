@@ -5,8 +5,9 @@ import dns,dns.resolver,dns.exception
 
 import tg
 
-from .auth import sensitive,team_sensitive,current_user
-from . import keytab, log, util, mail
+from scripts.auth import sensitive,team_sensitive,current_user
+from scripts import keytab, log, hosts
+from . import mail
 from .model import queue
 
 def connect():
@@ -125,7 +126,7 @@ def request_vhost(locker,hostname,path):
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
     else:
         reqtype='external'
-        if not util.points_at_scripts(hostname):
+        if not hosts.points_at_scripts(hostname):
             raise UserError("'%s' does not point at scripts-vhosts."
                             %hostname)
     if reqtype == 'moira':

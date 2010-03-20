@@ -14,7 +14,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from decorator import decorator
 
-from .. import auth,vhosts,mail
+from scripts import auth
+from .. import mail,vhosts
 from ..model import queue
 
 __all__ = ['RootController']

@@ -2,7 +2,7 @@
 
 <%!
 from socket import gethostbyname
-from scriptspony import auth
+from scripts.auth import token
 %>
 
 <div><a href="${tg.url('/')}">Back to list</a></div>
@@ -14,7 +14,7 @@ from scriptspony import auth
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
   </ul>
   <input type="submit" value="Request Hostname" />
-  <input type="hidden" name="token" value="${auth.token()}" />
+  <input type="hidden" name="token" value="${token()}" />
 </form>
 
 <p>

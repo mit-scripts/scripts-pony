@@ -1,7 +1,7 @@
 <%inherit file="scriptspony.templates.queue"/>
 
 <%!
-from scriptspony import auth
+from scripts.auth import token
 %>
 
 %if help_text is not UNDEFINED:
@@ -17,5 +17,5 @@ from scriptspony import auth
   %for n,v in context.get('extra_buttons',{}).items():
     <input type="submit" name="${n}" value="${v}" />
   %endfor
-  <input type="hidden" name="token" value="${auth.token()}" />
+  <input type="hidden" name="token" value="${token()}" />
 </form>

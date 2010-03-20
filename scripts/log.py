@@ -1,14 +1,34 @@
 from decorator import decorator
 from syslog import syslog,LOG_ERR,LOG_INFO
 LOG_AUTHPRIV = 10<<3
-import getpass, subprocess
-import tg
+import subprocess
+import getpass
+
+tag="Unknown"+getpass.getuser()
+
+def set_tag(ctag,locker):
+    """Sets the tag and usual locker this app is assoiciated with.
+
+    This is used to label log entries, including whether this instance
+    is running in an unusual locker."""
+
+    global tag,unusual
+    l = getpass.getuser()
+    if l == locker:
+        tag = ctag
+        unusual = False
+    else:
+        tag = "%s.%s" % (ctag,l)
+        unusual = True
+
+def get_tag():
+    return tag
+
+def unusual_locker():
+    return unusual
 
 def err(mess,level=LOG_ERR):
-    dotlocker = ".%s" % getpass.getuser()
-    if dotlocker == ".pony":
-        dotlocker = ''
-    syslog(level|LOG_AUTHPRIV,"Pony%s: %s"%(dotlocker,mess))
+    syslog(level|LOG_AUTHPRIV,"%s: %s"%(tag,mess))
 def info(mess):
     err(mess,level=LOG_INFO)
 
@@ -38,19 +58,14 @@ def exceptions(func,*args,**kw):
             e.already_syslogged = True
         raise
 
-def zwrite(message,id):
-    """Zephyr about the given hostname with the given message."""
-    dotlocker = ".%s" % getpass.getuser()
-    if dotlocker == ".pony":
-        dotlocker = ''
-    try:
-        url = "%s%s"%(tg.request.host_url, tg.url('/ticket/%s'%id))
-    except:
-        # Default to something sane if we're not in the context of a request
-        url = "https://pony.scripts.mit.edu:444/ticket/%s" % id
-    zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c","scripts",
-                               "-i","pony%s:%s"%(dotlocker,id),
+def zwrite(message,zclass="scripts",instance="",zsig=""):
+    """Zephyr with the given message, class, instance suffix, and zsig."""
+    if instance:
+        instance = "%s:%s"%(tag.lower(),instance)
+    else:
+        instance = tag.lower()
+    zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c",zclass,
+                               "-i",instance,
                                "-q",
-                               "-s",url,
+                               "-s",zsig,
                                "-m",message])
-    

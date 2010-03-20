@@ -38,7 +38,7 @@ class UnrewriteMiddleware(object):
         environ['SCRIPT_NAME'] = '/'.join(comps)
         return self.app(environ, start_response)
 
-from ..auth import ScriptsAuthMiddleware
+from scripts.auth import ScriptsAuthMiddleware
 
 def make_app(global_conf, full_stack=True, **app_conf):
     """
