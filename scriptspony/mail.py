@@ -11,7 +11,7 @@ def ponyaddr(id):
 def create_ticket(subject,body,id,requestor):
     mail.create_ticket(subject,body,ponyaddr(id),requestor)
 
-def send_comment(subject,body,id,rtid,fromaddr,toaddr):
+def send_comment(subject,body,id,rtid,fromaddr,toaddr=None):
     mail.send_comment(subject,body,ponyaddr(id),rtid,fromaddr,toaddr)
 
 def send_correspondence(subject,body,id,rtid,fromaddr=None):
