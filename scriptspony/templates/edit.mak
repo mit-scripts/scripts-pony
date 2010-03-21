@@ -12,9 +12,29 @@ from scripts.auth import token
     <li>Locker: ${locker}</li>
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
   </ul>
-  <input type="submit" value="Save" />
+  <input type="submit" value="Save Path" />
   <input type="hidden" name="token" value="${token()}" />
 </form>
+
+<p>
+  Aliases:
+  <ul>
+    %if len(aliases) > 0:
+      %for a in aliases:
+        <li>${a}</li>
+      %endfor
+    %else:
+      <li>None</li>
+    %endif
+  </ul>
+  %if not hostname.endswith('mit.edu'):
+    <form method="post">
+      <input type="text" name="alias" value="${alias}" />
+      <input type="submit" value="Add Alias" />
+      <input type="hidden" name="token" value="${token()}" />
+    </form>
+  %endif
+</p>
 
 <p>
   Notes:

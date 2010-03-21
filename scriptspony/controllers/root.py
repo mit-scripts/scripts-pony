@@ -94,7 +94,7 @@ class RootController(BaseController):
                     https=https)
 
     @expose('scriptspony.templates.edit')
-    def edit(self,locker,hostname,path=None,token=None):
+    def edit(self,locker,hostname,path=None,token=None,alias=''):
         if path is None and pylons.request.response_ext:
             hostname += pylons.request.response_ext
         if vhosts.is_host_reified(hostname):
@@ -111,14 +111,27 @@ class RootController(BaseController):
                 else:
                     flash("Host '%s' reconfigured."%hostname)
                     redirect('/index/'+locker)
+            _,aliases=vhosts.get_vhost_info(locker,hostname)
         else:
+            if alias:
+                if token != auth.token():
+                    flash("Invalid token!")
+                else:
+                    try:
+                        vhosts.add_alias(locker,hostname,alias)
+                    except vhosts.UserError,e:
+                        flash(e.message)
+                    else:
+                        flash("Alias '%s' added to hostname '%s'."
+                              % (alias,hostname))
+                        redirect('/index/'+locker)
             try:
-                path=vhosts.get_path(locker,hostname)
+                path,aliases=vhosts.get_vhost_info(locker,hostname)
             except vhosts.UserError,e:
                 flash(e.message)
                 redirect('/index/'+locker)
         return dict(locker=locker, hostname=hostname,
-                    path=path)
+                    path=path, aliases=aliases, alias=alias)
 
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path='',token=None):
