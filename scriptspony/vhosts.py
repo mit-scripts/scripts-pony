@@ -263,6 +263,8 @@ def add_alias(locker,hostname,alias):
                                      [alias])])
     conn.modify_s(apacheVhostName,[(ldap.MOD_ADD,'apacheServerAlias',
                                      [alias])])
+    log.info("%s added alias '%s' to '%s' (locker '%s')."
+             % (current_user(),alias,hostname,locker))
 
 def get_vhost_names(locker,vhost):
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
