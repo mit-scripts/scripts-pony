@@ -5,10 +5,18 @@
 
   <p>
     <table border="1">
-      <tr><th>Hostname</th><th>Aliases</th><th>Path</th></tr>
+      <tr><th>Hostname</th><th>Path</th></tr>
       %for host,aliases,path in hosts:
         <tr>
-          <td>${host}</td><td>${', '.join(aliases)}</td><td><small style="color:grey">/mit/${locker}/web_scripts/</small>${path}</td>
+          <td>
+	    ${host}
+	    %if len(aliases) > 0:
+	      <br /><small>(${', '.join(aliases)})</small>
+	    %endif
+	  </td>
+	  <td>
+	    <small>/mit/${locker}/web_scripts/</small>${path}
+	  </td>
           %if host not in (locker+'.scripts.mit.edu',):
             <td><a href="${tg.url('/edit/'+locker+'/'+host)}">edit</a></td>
           %endif

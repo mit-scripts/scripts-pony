@@ -53,6 +53,7 @@ else:
       textarea {width: 100%; height: 250px}
       input[type=text] {width: 200px}
       input[type=text].wide {width: 400px}
+      small {color:grey}
     </style>
     <title>${lockertag}${self.title()}</title>
     <script type="text/javascript"><!--
