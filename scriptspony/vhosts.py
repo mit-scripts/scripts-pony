@@ -96,7 +96,7 @@ def request_vhost(locker,hostname,path):
     
     if reqtype == 'moira':
         # actually_create_vhost does this check for other reqtypes
-        check_if_already_exists(hostname)
+        check_if_already_exists(hostname,locker)
         t = queue.Ticket.create(locker,hostname,path)
         short = hostname[:-len('.mit.edu')]
         mail.create_ticket(subject="scripts-vhosts CNAME request: %s"%short,
@@ -199,13 +199,24 @@ def is_host_reified(hostname):
 class UserError(log.ExpectedException):
     pass
 
-def check_if_already_exists(hostname):
+def check_if_already_exists(hostname,locker):
+    """Raise a UserError if hostname already exists on scripts,
+    unless it only exists as a wildcard hostname owned by locker."""
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
                       ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[hostname,hostname]),['scriptsVhostDirectory'],False)
     if len(res) != 0:
         raise UserError("'%s' is already a hostname on scripts.mit.edu."
                         % hostname)
+    bits = hostname.split('.')
+    possibilities = ['*.'+'.'.join(bits[x:]) for x in xrange(1,len(bits))]
+    for p in possibilities:
+        res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
+                          ldap.SCOPE_ONELEVEL,
+                          ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[p,p]),['scriptsVhostAccount'],False)
+        if len(res) != 0 and res[0][1]['scriptsVhostAccount'][0] != 'uid=%s,ou=People,dc=scripts,dc=mit,dc=edu' % locker:
+            raise UserError("'%s' is already a hostname on scripts.mit.edu."
+                            % hostname)
 
 @team_sensitive
 def actually_create_vhost(locker,hostname,path):
@@ -213,7 +224,7 @@ def actually_create_vhost(locker,hostname,path):
     hostname=hostname.encode('utf-8')
     path=path.encode('utf-8')
     
-    check_if_already_exists(hostname)
+    check_if_already_exists(hostname,locker)
     scriptsVhostName = ldap.filter.filter_format("scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
     apacheServerName = ldap.filter.filter_format("apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
     if hostname.endswith('.mit.edu'):
@@ -255,7 +266,7 @@ def add_alias(locker,hostname,alias):
     if reqtype != 'external':
         raise RuntimeError("We didn't catch that something wasn't a .mit.edu hostname.")
     
-    check_if_already_exists(alias)
+    check_if_already_exists(alias,locker)
 
     # If we got here, we're good
     scriptsVhostName,apacheVhostName = get_vhost_names(locker,hostname)
