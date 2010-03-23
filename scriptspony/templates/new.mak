@@ -12,6 +12,7 @@ from scripts.auth import token
     <li>Locker: ${locker}</li>
     <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
+    <li>Purpose: <textarea name="desc">${desc}</textarea></li>
   </ul>
   <input type="submit" value="Request Hostname" />
   <input type="hidden" name="token" value="${token()}" />

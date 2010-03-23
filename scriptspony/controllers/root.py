@@ -134,12 +134,14 @@ class RootController(BaseController):
                     path=path, aliases=aliases, alias=alias)
 
     @expose('scriptspony.templates.new')
-    def new(self,locker,hostname='',path='',token=None):
+    def new(self,locker,hostname='',path='',desc='',token=None):
         if not hostname and not path and pylons.request.response_ext:
             locker += pylons.request.response_ext
         if hostname:
             if token != auth.token():
                 flash("Invalid token!")
+            elif not desc:
+                flash("Please specify the purpose of this hostname.")
             else:
                 try:
                     status = vhosts.request_vhost(locker,hostname,path)
@@ -155,7 +157,7 @@ class RootController(BaseController):
                 flash(e.message)
                 redirect('/')
 
-        return dict(locker=locker,hostname=hostname,path=path)
+        return dict(locker=locker,hostname=hostname,path=path,desc=desc)
 
     @expose('scriptspony.templates.queue')
     @scripts_team_only
