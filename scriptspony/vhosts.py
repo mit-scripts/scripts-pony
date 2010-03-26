@@ -5,7 +5,7 @@ import dns,dns.resolver,dns.exception
 
 import tg
 
-from scripts.auth import sensitive,team_sensitive,current_user
+from scripts.auth import sensitive,team_sensitive,sudo_sensitive,current_user
 from scripts import keytab, log, hosts
 from . import mail
 from .model import queue
@@ -81,7 +81,7 @@ def set_path(locker,vhost,path):
 
 HOSTNAME_PATTERN = re.compile(r'^(?:[\w-]+[.])+[a-z]+$')
 
-@sensitive
+@sudo_sensitive
 @log.exceptions
 def request_vhost(locker,hostname,path):
     """Request hostname as a vhost for the given locker and path.

@@ -54,8 +54,10 @@ else:
       input[type=text] {width: 200px}
       input[type=text].wide {width: 400px}
       small {color:grey}
+      .alarming {font-size: large; color: red; line-height:1.2}
+      h1.alarming {font-size: xx-large; text-align: left;}
     </style>
-    <title>${lockertag}${self.title()}</title>
+    <title>${lockertag}${tg.config['title']}</title>
     <script type="text/javascript"><!--
       var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
       document.onkeydown = function (e) {
@@ -86,8 +88,8 @@ else:
 	<div id="outer">
 			<div id="masthead">
 
-				<h1 id="header"><a rel="home" href="${tg.url('/')}">${lockertag}${self.title()}</a></h1>
-				<h2 id="tagline">${self.tagline()}</h2>
+				<h1 id="header"><a rel="home" href="${tg.url('/')}">${lockertag}${tg.config['title']}</a></h1>
+				<h2 id="tagline">${tg.config['tagline']}</h2>
 			</div>
 			<div id="hmenu">
 				<div id="hnav">

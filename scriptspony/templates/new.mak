@@ -1,13 +1,18 @@
-<%inherit file="scriptspony.templates.master"/>
+<%inherit file="scripts.templates.master"/>
 
 <%!
 from socket import gethostbyname
 from scripts.auth import token
 %>
 
-<div><a href="${tg.url('/')}">Back to list</a></div>
+<div><a href="${tg.url('/index/'+locker)}">Back to list</a></div>
 
 <form method="post">
+  %if confirmed:
+    <p class="alarming">Warning!  You are using your Scripts Team bits
+      to force-submit a request!  Be careful!</p>
+  %endif
+  <p>
   <ul>
     <li>Locker: ${locker}</li>
     <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
@@ -16,6 +21,9 @@ from scripts.auth import token
   </ul>
   <input type="submit" value="Request Hostname" />
   <input type="hidden" name="token" value="${token()}" />
+  %if confirmed:
+    <input type="hidden" name="confirmed" value="1" />
+  %endif
 </form>
 
 <p>

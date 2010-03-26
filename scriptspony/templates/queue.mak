@@ -1,4 +1,4 @@
-<%inherit file="scriptspony.templates.master"/>
+<%inherit file="scripts.templates.master"/>
 
 <table border="1">
   <tr><th>#</th><th>RT ID</th><th>User</th><th>Locker</th><th>Hostname</th><th>State</th></tr>

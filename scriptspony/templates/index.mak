@@ -1,4 +1,8 @@
-<%inherit file="scriptspony.templates.master"/>
+<%inherit file="scripts.templates.master"/>
+
+<%!
+from scripts import auth
+%>
 
 %if hosts is not None:
   <h3>Hostnames for the ${locker} locker</h3>
@@ -52,6 +56,9 @@
   <form action="${tg.url('/index')}">
    Switch to managing the <input type="text" name="locker" value="${locker}" /> locker
     <input type="submit" value="Switch" />
+    %if auth.on_scripts_team():
+      <input type="submit" value="Request as Scripts Team" name="sudo" />
+    %endif
   </form>
 %elif https:
   <p>You don't seem to be presenting a valid certificate.  You may

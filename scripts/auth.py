@@ -60,7 +60,7 @@ class AuthError(webob.exc.HTTPForbidden):
 
 LOCKER_PATTERN = re.compile(r'^(?:\w[\w.-]*\w|\w)$')
 
-def validate_locker(locker,team_ok=False):
+def validate_locker(locker,team_ok=False,sudo_ok=False):
     if not LOCKER_PATTERN.search(locker):
         raise AuthError("'%s' is not a valid locker."%locker)
     else:
@@ -68,7 +68,9 @@ def validate_locker(locker,team_ok=False):
             pwd.getpwnam(locker)
         except KeyError:
             raise AuthError(html("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%locker))
-        if (not team_ok or not on_scripts_team()) and not can_admin(locker):
+        if ((not team_ok or not on_scripts_team())
+            and (not sudo_ok or not getattr(state,'sudo',False))
+            and not can_admin(locker)):
             raise AuthError("You cannot administer the '%s' locker!"%locker)
 
 @decorator
@@ -85,6 +87,15 @@ def team_sensitive(func, locker,*args,**kw):
     such that it throws an AuthError unless the authenticated
     user can admin that locker or is on scripts-team."""
     validate_locker(locker,team_ok=True)
+    return func(locker.lower(),*args,**kw)
+
+@decorator
+def sudo_sensitive(func, locker,*args,**kw):
+    """Wrap a function that takes a locker as the first argument
+    such that it throws an AuthError unless the authenticated
+    user can admin that locker or is on scripts-team and actively
+    trying to sudo."""
+    validate_locker(locker,sudo_ok=True)
     return func(locker.lower(),*args,**kw)
 
 class ScriptsAuthMiddleware(object):
@@ -115,6 +126,13 @@ def on_scripts_team():
     out,err = pts.communicate()
     teamers = (n.strip() for n in out.strip().split('\n')[1:])
     return current_user() in teamers
+
+def scripts_team_sudo():
+    """If the user is on scripts team, give them a few extra bits."""
+    if on_scripts_team():
+        state.sudo = True
+    else:
+        raise AuthError("You are not on Scripts Team!")
 
 def set_user_from_parent_process():
     cmdline = file("/proc/%s/cmdline" % os.getppid()).read()

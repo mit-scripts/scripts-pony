@@ -1,4 +1,4 @@
-<%inherit file="scriptspony.templates.master"/>
+<%inherit file="scripts.templates.master"/>
 
 <%!
 from scripts.auth import token

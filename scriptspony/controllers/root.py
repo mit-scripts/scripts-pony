@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, url, request, redirect
+from tg import expose, flash, require, url, request, redirect, override_template
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 import pylons
 
@@ -47,7 +47,7 @@ class RootController(BaseController):
     error = ErrorController()
 
     @expose('scriptspony.templates.index')
-    def index(self,locker=None):
+    def index(self,locker=None,sudo=False):
         """Handle the front-page."""
         if locker is not None and pylons.request.response_ext:
             locker += pylons.request.response_ext
@@ -59,6 +59,10 @@ class RootController(BaseController):
         # Find or create the associated user info object.
         # TODO: is there a find_or_create sqlalchemy method?
         if user:
+            if sudo and auth.on_scripts_team():
+                override_template(self.index, 'mako:scripts.templates.confirm')
+                return dict(action=url('/new/'+locker),title="Really use Scripts Team bits to request a hostname as locker '%s'?"%locker,question="Only do this in response to a user support request, and after checking to make sure that the request comes from someone authorized to make requests for the locker.",
+                            backurl=url('/index'))
             try:
                 user_info = DBSession.query(UserInfo).filter(UserInfo.user==user).one()
             except NoResultFound:
@@ -135,6 +139,10 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path='',desc='',token=None):
+    def new(self,locker,hostname='',path='',desc='',token=None,
+            confirmed=False):
+        if confirmed and token == auth.token():
+            auth.scripts_team_sudo()
         if not hostname and not path and pylons.request.response_ext:
             locker += pylons.request.response_ext
         if hostname:
@@ -152,12 +160,17 @@ class RootController(BaseController):
                     redirect('/index/'+locker)
         else:
             try:
-                auth.validate_locker(locker)
+                auth.validate_locker(locker,sudo_ok=True)
             except auth.AuthError,e:
                 flash(e.message)
                 redirect('/')
 
+<<<<<<< HEAD
         return dict(locker=locker,hostname=hostname,path=path,desc=desc)
+=======
+        return dict(locker=locker,hostname=hostname,path=path,
+                    confirmed=confirmed)
+>>>>>>>  * Allow scripts-team members to submit hostname requests for
 
     @expose('scriptspony.templates.queue')
     @scripts_team_only
