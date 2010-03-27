@@ -152,6 +152,8 @@ class RootController(BaseController):
                 flash("Invalid token!")
             elif not desc and not confirmed:
                 flash("Please specify the purpose of this hostname.")
+            elif requestor is not None and not requestor.strip():
+                flash("Please specify requestor.")
             else:
                 try:
                     status = vhosts.request_vhost(locker,hostname,path,

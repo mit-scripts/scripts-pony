@@ -2,7 +2,7 @@
 
 <%!
 from socket import gethostbyname
-from scripts.auth import token, current_user
+from scripts.auth import token
 %>
 
 <div><a href="${tg.url('/index/'+locker)}">Back to list</a></div>
@@ -16,7 +16,7 @@ from scripts.auth import token, current_user
   <p>
   <ul>
     %if confirmed:
-      <li>Requestor: <input type="text" name="requestor" value="${current_user()}" /></li>
+      <li>Requestor: <input type="text" name="requestor" value="" /></li>
     %endif
     <li>Locker: ${locker}</li>
     <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
