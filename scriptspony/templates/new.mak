@@ -20,7 +20,9 @@ from scripts.auth import token, current_user
     <li>Locker: ${locker}</li>
     <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
-    <li>Purpose: <textarea name="desc">${desc}</textarea></li>
+    %if not confirmed:
+      <li>Purpose: <textarea name="desc">${desc}</textarea></li>
+    %endif
   </ul>
   <input type="submit" value="Request Hostname" />
   <input type="hidden" name="token" value="${token()}" />
