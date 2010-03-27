@@ -138,7 +138,6 @@ class RootController(BaseController):
                     path=path, aliases=aliases, alias=alias)
 
     @expose('scriptspony.templates.new')
-    def new(self,locker,hostname='',path='',desc='',token=None):
     def new(self,locker,hostname='',path='',desc='',token=None,
             confirmed=False):
         if confirmed and token == auth.token():
@@ -165,12 +164,8 @@ class RootController(BaseController):
                 flash(e.message)
                 redirect('/')
 
-<<<<<<< HEAD
-        return dict(locker=locker,hostname=hostname,path=path,desc=desc)
-=======
-        return dict(locker=locker,hostname=hostname,path=path,
+        return dict(locker=locker,hostname=hostname,path=path,desc=desc,
                     confirmed=confirmed)
->>>>>>>  * Allow scripts-team members to submit hostname requests for
 
     @expose('scriptspony.templates.queue')
     @scripts_team_only
