@@ -84,7 +84,7 @@ HOSTNAME_PATTERN = re.compile(r'^(?:[\w-]+[.])+[a-z]+$')
 
 @sudo_sensitive
 @log.exceptions
-def request_vhost(locker,hostname,path):
+def request_vhost(locker,hostname,path,user=None):
     """Request hostname as a vhost for the given locker and path.
 
     Throws a UserError if the request is invalid, otherwise returns
@@ -94,11 +94,14 @@ def request_vhost(locker,hostname,path):
     path = path.encode('utf-8')
     path = validate_path(path)
     message = "The hostname '%s' is now configured." % hostname
+
+    if user is None:
+        user = current_user()
     
     if reqtype == 'moira':
         # actually_create_vhost does this check for other reqtypes
         check_if_already_exists(hostname,locker)
-        t = queue.Ticket.create(locker,hostname,path)
+        t = queue.Ticket.create(locker,hostname,path,requestor=user)
         short = hostname[:-len('.mit.edu')]
         mail.create_ticket(subject="scripts-vhosts CNAME request: %s"%short,
                            body="""Heyas,
@@ -108,16 +111,21 @@ Go to %(url)s to approve it.
 
 Love,
 ~Scripts Pony
-""" % dict(short=short,user=current_user(),locker=locker,hostname=hostname,
+""" % dict(short=short,user=user,locker=locker,hostname=hostname,
            path=path,url=tg.request.host_url+tg.url('/ticket/%s'%t.id)),
-                           id=t.id, requestor=current_user())
+                           id=t.id, requestor=user)
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
     else:
         # Actually create the vhost
         actually_create_vhost(locker,hostname,path)
-    sudobit = '+sudo' if is_sudoing() else ''
-    logmessage = "%s%s requested %s for locker '%s' path '%s'" % (
-        current_user(), sudobit, hostname, locker,path)
+    if is_sudoing():
+        sudobit = '+sudo'
+        forbit = ' (for %s)' % user
+    else:
+        sudobit = ''
+        forbit = ''
+    logmessage = "%s%s requested %s for locker '%s' path '%s'%s" % (
+        current_user(), sudobit, hostname, locker,path,forbit)
 
     log.info(logmessage)
     return message

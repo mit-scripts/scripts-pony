@@ -139,19 +139,22 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path='',desc='',token=None,
-            confirmed=False):
+            confirmed=False,requestor=None):
         if confirmed and token == auth.token():
             auth.scripts_team_sudo()
+        else:
+            requestor = None
         if not hostname and not path and pylons.request.response_ext:
             locker += pylons.request.response_ext
         if hostname:
             if token != auth.token():
                 flash("Invalid token!")
-            elif not desc:
+            elif not desc and not confirmed:
                 flash("Please specify the purpose of this hostname.")
             else:
                 try:
-                    status = vhosts.request_vhost(locker,hostname,path)
+                    status = vhosts.request_vhost(locker,hostname,path,
+                                                  user=requestor)
                 except vhosts.UserError,e:
                     flash(e.message)
                 else:

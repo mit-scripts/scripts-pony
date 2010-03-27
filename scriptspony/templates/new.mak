@@ -2,7 +2,7 @@
 
 <%!
 from socket import gethostbyname
-from scripts.auth import token
+from scripts.auth import token, current_user
 %>
 
 <div><a href="${tg.url('/index/'+locker)}">Back to list</a></div>
@@ -14,6 +14,9 @@ from scripts.auth import token
   %endif
   <p>
   <ul>
+    %if confirmed:
+      <li>Requestor: <input type="text" name="requestor" value="${current_user()}" /></li>
+    %endif
     <li>Locker: ${locker}</li>
     <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>

@@ -34,8 +34,10 @@ class Ticket(Entity):
     events = OneToMany('Event',order_by='timestamp')
 
     @staticmethod
-    def create(locker,hostname,path):
-        t = Ticket(requestor=auth.current_user(),
+    def create(locker,hostname,path,requestor=None):
+        if requestor is None:
+            requestor = auth.current_user()
+        t = Ticket(requestor=requestor,
                    hostname=hostname,locker=locker,path=path,
                    state="open")
         session.flush()

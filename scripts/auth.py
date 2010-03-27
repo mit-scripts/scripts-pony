@@ -131,7 +131,8 @@ def on_scripts_team():
     return current_user() in teamers
 
 def scripts_team_sudo():
-    """If the user is on scripts team, give them a few extra bits."""
+    """If the user is on scripts team, give them a few extra bits;
+    otherwise, raise AuthError."""
     if on_scripts_team():
         state.sudo = True
     else:
