@@ -10,7 +10,8 @@ from scripts.auth import token, current_user
 <form method="post">
   %if confirmed:
     <p class="alarming">Warning!  You are using your Scripts Team bits
-      to force-submit a request!  Be careful!</p>
+      to force-submit a request!  Only do this in response to a user request!
+      Be careful!</p>
   %endif
   <p>
   <ul>

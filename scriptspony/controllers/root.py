@@ -60,9 +60,10 @@ class RootController(BaseController):
         # TODO: is there a find_or_create sqlalchemy method?
         if user:
             if sudo and auth.on_scripts_team():
-                override_template(self.index, 'mako:scripts.templates.confirm')
-                return dict(action=url('/new/'+locker),title="Really use Scripts Team bits to request a hostname as locker '%s'?"%locker,question="Only do this in response to a user support request, and after checking to make sure that the request comes from someone authorized to make requests for the locker.",
-                            backurl=url('/index'))
+                #override_template(self.index, 'mako:scripts.templates.confirm')
+                #return dict(action=url('/new/'+locker),title="Really use Scripts Team bits to request a hostname as locker '%s'?"%locker,question="Only do this in response to a user support request, and after checking to make sure that the request comes from someone authorized to make requests for the locker.",
+                #           backurl=url('/index'))
+                redirect('/new/%s?confirmed=true'%locker)
             try:
                 user_info = DBSession.query(UserInfo).filter(UserInfo.user==user).one()
             except NoResultFound:
@@ -140,7 +141,7 @@ class RootController(BaseController):
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path='',desc='',token=None,
             confirmed=False,requestor=None):
-        if confirmed and token == auth.token():
+        if confirmed:
             auth.scripts_team_sudo()
         else:
             requestor = None
