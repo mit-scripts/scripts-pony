@@ -5,7 +5,8 @@ import dns,dns.resolver,dns.exception
 
 import tg
 
-from scripts.auth import sensitive,team_sensitive,sudo_sensitive,current_user
+from scripts.auth import (sensitive,team_sensitive,sudo_sensitive,current_user,
+                          is_sudoing)
 from scripts import keytab, log, hosts
 from . import mail
 from .model import queue
@@ -114,8 +115,9 @@ Love,
     else:
         # Actually create the vhost
         actually_create_vhost(locker,hostname,path)
-    logmessage = "%s requested %s for locker '%s' path '%s'" % (
-        current_user(), hostname, locker,path)
+    sudobit = '+sudo' if is_sudoing() else ''
+    logmessage = "%s%s requested %s for locker '%s' path '%s'" % (
+        current_user(), sudobit, hostname, locker,path)
 
     log.info(logmessage)
     return message

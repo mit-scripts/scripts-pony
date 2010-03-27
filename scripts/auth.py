@@ -24,6 +24,9 @@ def current_user():
 def is_https():
     return state.https
 
+def is_sudoing():
+    return getattr(state,'sudo',False)
+
 def first_name():
     fullname = state.name
     bits = fullname.split()
