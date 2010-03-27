@@ -159,7 +159,10 @@ class RootController(BaseController):
                     flash(e.message)
                 else:
                     flash(status)
-                    redirect('/index/'+locker)
+                    if confirmed:
+                        redirect('/queue')
+                    else:
+                        redirect('/index/'+locker)
         else:
             try:
                 auth.validate_locker(locker,sudo_ok=True)
