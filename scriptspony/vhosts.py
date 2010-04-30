@@ -146,7 +146,10 @@ def validate_path(path):
 def validate_hostname(hostname,locker):
     hostname = hostname.lower().encode('utf-8')
     if not HOSTNAME_PATTERN.search(hostname):
-        raise UserError("'%s' is not a valid hostname." % hostname)
+        if '.' not in hostname:
+            raise UserError("'%s' is not an absolute hostname.  Do you mean '%s.mit.edu'?" % (hostname,hostname))
+        else:
+            raise UserError("'%s' is not a valid hostname." % hostname)
 
     if hostname.endswith(".scripts.mit.edu"):
         reqtype = 'subscripts'
