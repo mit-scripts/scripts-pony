@@ -64,7 +64,7 @@ http://scripts.mit.edu/
                        subject=subject,
                        body=body)
 
-    transaction.commit()
+            transaction.commit()
 
 if __name__ == '__main__':
     auth.set_user_from_parent_process()
