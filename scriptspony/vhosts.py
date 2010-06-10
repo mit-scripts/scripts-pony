@@ -2,6 +2,7 @@ import ldap, ldap.sasl, ldap.filter
 import re
 import subprocess,os,pwd,getpass
 import dns,dns.resolver,dns.exception
+from decorator import decorator
 
 import tg
 
@@ -22,8 +23,17 @@ def connect():
     else:
         conn.simple_bind_s()
 
+@decorator
+def reconnecting(func,*args,**kw):
+    try:
+        return func(*args,**kw)
+    except ldap.SERVER_DOWN:
+        connect()
+        return func(*args,**kw)
+
 @sensitive
 @log.exceptions
+@reconnecting
 def list_vhosts(locker):
     """Return a list of (vhost,aliases,directory) for the given locker.
 
@@ -45,6 +55,7 @@ def get_path(locker,hostname):
 
 @team_sensitive
 @log.exceptions
+@reconnecting
 def get_vhost_info(locker,hostname):
     """Return path,aliases for the given hostname."""
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
@@ -59,6 +70,7 @@ def get_vhost_info(locker,hostname):
 
 @sensitive
 @log.exceptions
+@reconnecting
 def set_path(locker,vhost,path):
     """Sets the path of an existing vhost owned by the locker."""
     path = validate_path(path)
@@ -188,6 +200,7 @@ def validate_hostname(hostname,locker):
     return hostname,reqtype
 
 @log.exceptions
+@reconnecting
 def get_web_scripts_path(locker,path):
     """Return the web_scripts filesystem path for a given locker and vhost path."""
     web_scriptsPath = os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],'web_scripts',path)
@@ -212,6 +225,7 @@ def is_host_reified(hostname):
 class UserError(log.ExpectedException):
     pass
 
+@reconnecting
 def check_if_already_exists(hostname,locker):
     """Raise a UserError if hostname already exists on scripts,
     unless it only exists as a wildcard hostname owned by locker."""
@@ -232,6 +246,7 @@ def check_if_already_exists(hostname,locker):
                             % hostname)
 
 @team_sensitive
+@reconnecting
 def actually_create_vhost(locker,hostname,path):
     locker=locker.encode('utf-8')
     hostname=hostname.encode('utf-8')
@@ -268,6 +283,7 @@ def actually_create_vhost(locker,hostname,path):
 
 @sensitive
 @log.exceptions
+@reconnecting
 def add_alias(locker,hostname,alias):
     locker = locker.encode('utf-8')
     hostname = hostname.lower().encode('utf-8')
@@ -290,6 +306,7 @@ def add_alias(locker,hostname,alias):
     log.info("%s added alias '%s' to '%s' (locker '%s')."
              % (current_user(),alias,hostname,locker))
 
+@reconnecting
 def get_vhost_names(locker,vhost):
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
