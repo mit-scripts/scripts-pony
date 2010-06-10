@@ -16,8 +16,11 @@ def check_dns():
     if keytab.exists():
         keytab.auth()
 
-    for t in queue.Ticket.query.filter_by(state=u'dns'):
-
+    # Use a list so all the ids are resolved early and transactions aren't
+    # a problem
+    for tid in [t.id for t in queue.Ticket.query.filter_by(state=u'dns')]:
+        t = queue.Ticket.get(tid)
+        
         if hosts.points_at_scripts(t.hostname):
             path = '/mit/%s/web_scripts/%s' % (t.locker,
                                                vhosts.get_path(t.locker,t.hostname))
