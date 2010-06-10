@@ -44,9 +44,8 @@ from scripts.auth import token
       a given mit.edu hostname is available by typing "stella &lt;hostname&gt;"
       from an Athena prompt.</li>
     <li>You can request a non-MIT hostname, but you'll have to
-      register the hostname yourself and configure it's DNS with a CNAME
-      record for "scripts-vhosts.mit.edu." or an A record for
-      scripts-vhosts.mit.edu's IP address,
-      ${gethostbyname('scripts-vhosts.mit.edu')}.</li>
+      register the hostname yourself and configure its DNS with an A record
+      for ${gethostbyname('scripts-vhosts.mit.edu.')}.  For more information,
+      see <a href="http://scripts.mit.edu/faq/14/do-cnames-work-with-the-script-service">the relevant scripts.mit.edu FAQ</a>.</li>
   </ul>
 </p>
