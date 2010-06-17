@@ -19,6 +19,9 @@ RewriteRule ^(?:dev/)?(.*)$ public/$1 [L]
 # Use FCGI for everything else
 RewriteRule ^(.*)$ dispatch\.fcgi/$1 [L]
 
+#Error mode
+#RewriteRule ^(.*)$ error.html [L]
+
 AuthType SSLCert
 Require valid-user
 AuthSSLCertAuthoritative off
