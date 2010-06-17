@@ -131,7 +131,7 @@ Love,
         # Actually create the vhost
         actually_create_vhost(locker,hostname,path)
     if is_sudoing():
-        sudobit = '+sudo'
+        sudobit = '+scripts-team'
         forbit = ' (for %s)' % user
     else:
         sudobit = ''
