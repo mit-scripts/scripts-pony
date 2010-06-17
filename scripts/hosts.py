@@ -1,12 +1,14 @@
-import socket
+import socket, dns.resolver
 
 def points_at_scripts(hostname):
     """Return whether the hostname has the same IP as scripts-vhosts."""
-    failed = False
+    scriptsvhosts = socket.gethostbyname("scripts-vhosts.mit.edu.")
     try:
-        if (socket.gethostbyname(hostname+'.')
-            != socket.gethostbyname("scripts-vhosts.mit.edu.")):
-            failed=True
-    except socket.gaierror:
-        failed=True
-    return not failed
+        for addr in (answer.address for answer in dns.resolver.query(hostname+'.', 'A')):
+            if addr != scriptsvhosts:
+                return False
+    except dns.resolver.NXDOMAIN:
+        return False
+    except dns.resolver.NoAnswer:
+        return False
+    return True

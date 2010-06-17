@@ -92,7 +92,7 @@ def set_path(locker,vhost,path):
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
 
-HOSTNAME_PATTERN = re.compile(r'^(?:[\w-]+[.])+[a-z]+$')
+HOSTNAME_PATTERN = re.compile(r'^(?:[*][.])?(?:[\w-]+[.])+[a-z]+$')
 
 @sudo_sensitive
 @log.exceptions
@@ -242,7 +242,7 @@ def check_if_already_exists(hostname,locker):
                           ldap.SCOPE_ONELEVEL,
                           ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[p,p]),['scriptsVhostAccount'],False)
         if len(res) != 0 and res[0][1]['scriptsVhostAccount'][0] != 'uid=%s,ou=People,dc=scripts,dc=mit,dc=edu' % locker:
-            raise UserError("'%s' is already a hostname on scripts.mit.edu."
+            raise UserError("'%s' is already a wildcard hostname on scripts.mit.edu."
                             % hostname)
 
 @team_sensitive
