@@ -1,4 +1,4 @@
-import socket, dns.resolver
+import socket, dns.resolver, dns.exception
 
 def points_at_scripts(hostname):
     """Return whether the hostname has the same IP as scripts-vhosts."""
@@ -7,6 +7,8 @@ def points_at_scripts(hostname):
         for addr in (answer.address for answer in dns.resolver.query(hostname+'.', 'A')):
             if addr != scriptsvhosts:
                 return False
+    except dns.exception.Timeout:
+        return False
     except dns.resolver.NXDOMAIN:
         return False
     except dns.resolver.NoAnswer:
