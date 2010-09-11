@@ -2,7 +2,7 @@ from decorator import decorator
 from syslog import syslog,LOG_ERR,LOG_INFO
 LOG_AUTHPRIV = 10<<3
 import subprocess
-import getpass
+import getpass, os
 
 tag="Unknown"+getpass.getuser()
 
@@ -12,14 +12,18 @@ def set_tag(ctag,locker):
     This is used to label log entries, including whether this instance
     is running in an unusual locker."""
 
-    global tag,unusual
+    global tag,unusual,user
     l = getpass.getuser()
+    user = None
     if l == locker:
         tag = ctag
         unusual = False
     else:
         tag = "%s.%s" % (ctag,l)
         unusual = True
+        if os.getuid() != os.getgid():
+            # We're running out of a user locker
+            user = l
 
 def get_tag():
     return tag
@@ -28,7 +32,10 @@ def unusual_locker():
     return unusual
 
 def err(mess,level=LOG_ERR):
-    syslog(level|LOG_AUTHPRIV,"%s: %s"%(tag,mess))
+    if user:
+        zwrite(mess,recip=user,zsig=str(level))
+    else:
+        syslog(level|LOG_AUTHPRIV,"%s: %s"%(tag,mess))
 def info(mess):
     err(mess,level=LOG_INFO)
 
@@ -58,14 +65,19 @@ def exceptions(func,*args,**kw):
             e.already_syslogged = True
         raise
 
-def zwrite(message,zclass="scripts",instance="",zsig=""):
+def zwrite(message,zclass="scripts",instance="",zsig="",recip=None):
     """Zephyr with the given message, class, instance suffix, and zsig."""
     if instance:
         instance = "%s:%s"%(tag.lower(),instance)
     else:
         instance = tag.lower()
-    zwrite = subprocess.Popen(["/usr/bin/zwrite","-d","-c",zclass,
-                               "-i",instance,
-                               "-q",
-                               "-s",zsig,
-                               "-m",message])
+    procness = ["/usr/bin/zwrite","-d"]
+    if recip:
+        procness += [recip]
+    else:
+        procness += ["-c",zclass,
+                     "-i",instance]
+    procness += ["-q",
+                 "-s",zsig,
+                 "-m",message]
+    zwrite = subprocess.Popen(procness)

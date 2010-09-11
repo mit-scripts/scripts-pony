@@ -24,5 +24,6 @@
     vhosts via Pony
  * Let scripts-team members specify the RT ID manually when sudoing, to avoid 
    creating a new ticket.
- * For non-global Pony installs, zephyr errors somewhere useful instead of 
-   logging.
+ * Move pony to URLspace on scripts.mit.edu/something, and create
+   infrastructure for other similar apps to go there.
+ * Save the desc field somewhere when people request hostnames.
