@@ -12,12 +12,16 @@ Scripts Pony, and make sure that daemon.scripts can read everything
 in your checkout and write the data directory.
 
 ln -s "$(pwd)/web_scripts" ~/web_scripts/pony
+add consult
 fsr sa . daemon.scripts read
 fsr sa data daemon.scripts write
 
 Pony will try to use your username+scripts-pony database on
 sql.mit.edu.  Go to sql.mit.edu and create this database, and
 be sure the login info in your ~/.my.conf is accurate.
+
+Then run:
+paster setup-app development.ini
 
 === Mail and Cron ===
 
