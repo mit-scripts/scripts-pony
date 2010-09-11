@@ -2,13 +2,17 @@ import ldap, ldap.sasl, ldap.filter
 import re
 import subprocess,os,pwd,getpass
 import dns,dns.resolver,dns.exception
+import httplib, socket
+import hashlib
+import random
+import string
 from decorator import decorator
 
 import tg
 
 from scripts.auth import (sensitive,team_sensitive,sudo_sensitive,current_user,
                           is_sudoing)
-from scripts import keytab, log, hosts
+from scripts import keytab, log, hosts, auth
 from . import mail
 from .model import queue
 
@@ -155,6 +159,14 @@ def validate_path(path):
     else:
         raise UserError("'%s' is not a valid path." % path)
 
+def generate_hostname_check_file(hostname,locker):
+    """Generate a unique-ish hash for a given hostname and locker"""
+    return "scripts_%s.html" % hashlib.sha1(hostname.lower() + locker).hexdigest()[:10]
+
+def generate_random_hostname():
+    """Generates a random string for use as a subdomain"""
+    return ''.join(random.choice(string.ascii_lowercase) for x in xrange(9))
+
 def validate_hostname(hostname,locker):
     hostname = hostname.lower().encode('utf-8')
     if not HOSTNAME_PATTERN.search(hostname):
@@ -194,8 +206,25 @@ def validate_hostname(hostname,locker):
     else:
         reqtype='external'
         if not hosts.points_at_scripts(hostname):
-            raise UserError("'%s' does not point at scripts-vhosts."
-                            %hostname)
+            # Check if our magic file is there.
+            check_file = generate_hostname_check_file(hostname,locker)
+            try:
+                # If this is a wildcard, pick some random domain to test.
+                # We expect that *all* subdomains will match the same host if you're
+                # using a wildcard.
+                test_hostname = hostname
+                if test_hostname[0:2] == '*.':
+                    test_hostname = generate_random_hostname() + test_hostname[1:]
+                connection = httplib.HTTPConnection(test_hostname,timeout=5) # Shortish timeout - 5 seconds
+                connection.request("HEAD", "/%s" % check_file)
+                status = connection.getresponse()
+                connection.close()
+                if status.status != httplib.OK:
+                    raise UserError(auth.html("'%s' does not point at scripts-vhosts. If you want to continue anyway, please create a file called '%s' in the root directory of the site. See <a href='http://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
+                                    % (hostname,check_file)))
+            except httplib.HTTPException, socket.gaierror: # socket.gaierror is raised if the user provided a malformed URL.
+                raise UserError(auth.html("'%s' does not point at scripts-vhosts, and appears to have no running webserver. Please see <a href='http://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
+                                % hostname))
 
     return hostname,reqtype
 
