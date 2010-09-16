@@ -222,7 +222,9 @@ def validate_hostname(hostname,locker):
                 if status.status != httplib.OK:
                     raise UserError(auth.html("'%s' does not point at scripts-vhosts. If you want to continue anyway, please create a file called '%s' in the root directory of the site. See <a href='http://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
                                     % (hostname,check_file)))
-            except httplib.HTTPException, socket.gaierror: # socket.gaierror is raised if the user provided a malformed URL.
+            except socket.gaierror:
+                raise UserError("'%s' does not exist." % hostname)
+            except (httplib.HTTPException, socket.error):
                 raise UserError(auth.html("'%s' does not point at scripts-vhosts, and appears to have no running webserver. Please see <a href='http://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
                                 % hostname))
 
