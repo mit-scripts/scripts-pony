@@ -43,7 +43,7 @@ def check_dns():
                 elif e.code == 403:
                     sitestatus = "Visiting that page yields a Forbidden error; this is often caused by a lack of valid content at %s.  Putting an index.html, index.cgi, or similar there may solve this.  Alternately, you may just have your site password-protected or cert-protected." % path
                 elif e.code == 401:
-                    sitestatus = "Visiting that page yields an Unauthorized error.  This generally means that you have your site password-protected or cert-protected, so we can't confirm whether it's working." % path
+                    sitestatus = "Visiting that page yields an Unauthorized error.  This generally means that you have your site password-protected or cert-protected, so we can't confirm whether it's working."
                 else:
                     sitestatus = "Visiting that page yields a %s error, suggesting a problem with the content at %s.  Email us at scripts@mit.edu if you need help resolving this." % (e.code, path)
         
