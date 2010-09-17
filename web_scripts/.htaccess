@@ -3,6 +3,9 @@ AddDefaultCharset utf-8
 Options +FollowSymLinks
 RewriteEngine On
 
+#Error mode
+#RewriteRule ^(.*)$ error.html [L]
+
 # Prevent recursion
 RewriteRule ^dispatch\.f?cgi/.*$ - [L]
 RewriteRule ^public/.*$ - [L]
@@ -18,9 +21,6 @@ RewriteRule ^(?:dev/)?(.*)$ public/$1 [L]
 
 # Use FCGI for everything else
 RewriteRule ^(.*)$ dispatch\.fcgi/$1 [L]
-
-#Error mode
-#RewriteRule ^(.*)$ error.html [L]
 
 AuthType SSLCert
 Require valid-user
