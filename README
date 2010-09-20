@@ -20,7 +20,7 @@ Pony will try to use your username+scripts-pony database on
 sql.mit.edu.  Go to sql.mit.edu and create this database, and
 be sure the login info in your ~/.my.conf is accurate.
 
-Then run:
+Then ssh into scripts.mit.edu and run:
 paster setup-app development.ini
 
 === Mail and Cron ===
