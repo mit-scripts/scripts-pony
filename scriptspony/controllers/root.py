@@ -195,7 +195,7 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.message')
     @scripts_team_only
-    def approve(self,id,subject=None,body=None,token=None):
+    def approve(self,id,subject=None,body=None,token=None,silent=False):
         t = queue.Ticket.get(int(id))
         if t.state != 'open':
             flash("This ticket's not open!")
@@ -212,12 +212,19 @@ class RootController(BaseController):
                 except vhosts.UserError,e:
                     flash(e.message)
                 else:
-                    # Send mail and records it as an event
-                    mail.send_comment(subject,body,t.id,t.rtid,
-                                      auth.current_user(),'jweiss')
-                    t.addEvent(type='mail',state='moira',target='jweiss',
-                               subject=subject,body=body)
-                    flash("Ticket approved; mail sent to jweiss.")
+                    if not silent:
+                        # Send mail and records it as an event
+                        mail.send_comment(subject,body,t.id,t.rtid,
+                                          auth.current_user(),'jweiss')
+                        t.addEvent(type='mail',state='moira',target='jweiss',
+                                   subject=subject,body=body)
+                        flash("Ticket approved; mail sent to jweiss.")
+                    else:
+                        mail.send_comment(subject,"Ticket approved silently.\n\n"+body,t.id,t.rtid,
+                                          auth.current_user())
+                        t.addEvent(type='mail',state='moira',
+                                   target='us')
+                        flash("Ticket approved silently.")
                     redirect('/queue')
         short = t.hostname[:-len('.mit.edu')]
         return dict(tickets=[t],action=url('/approve/%s'%id),
@@ -234,7 +241,8 @@ SIPB Scripts Team
 
 /set status=stalled
 """ % dict(short=short,first=auth.first_name()),
-                    help_text="Be sure to check the hostname with stella before sending.  (DNS got checked on request, but it could still be reserved or there could be a race going on.)")
+                    help_text="Be sure to check the hostname with stella before sending.  (DNS got checked on request, but it could still be reserved or there could be a race going on.)",
+                    extra_buttons={'silent':'Approve without sending mail'})
             
     @expose('scriptspony.templates.message')
     @scripts_team_only
@@ -258,7 +266,7 @@ SIPB Scripts Team
                                subject=subject,body=body)
                     flash("Ticket rejected; mail sent to user.")
                 else:
-                    mail.send_comment(subject,body,t.id,t.rtid,
+                    mail.send_comment(subject,"Ticket rejected silently.\n\n"+body,t.id,t.rtid,
                                       auth.current_user())
                     t.addEvent(type=u'mail',state=u'rejected',
                                target=u'rt', subject=subject,body=body)
