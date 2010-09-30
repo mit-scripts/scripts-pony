@@ -222,7 +222,7 @@ class RootController(BaseController):
                     else:
                         mail.send_comment(subject,"Ticket approved silently.\n\n"+body,t.id,t.rtid,
                                           auth.current_user())
-                        t.addEvent(type='mail',state='moira',
+                        t.addEvent(type='mail',state='dns',
                                    target='us')
                         flash("Ticket approved silently.")
                     redirect('/queue')
@@ -242,7 +242,7 @@ SIPB Scripts Team
 /set status=stalled
 """ % dict(short=short,first=auth.first_name()),
                     help_text="Be sure to check the hostname with stella before sending.  (DNS got checked on request, but it could still be reserved or there could be a race going on.)",
-                    extra_buttons={'silent':'Approve without sending mail'})
+                    extra_buttons={'silent':'Approve without mailing jweiss'})
             
     @expose('scriptspony.templates.message')
     @scripts_team_only
