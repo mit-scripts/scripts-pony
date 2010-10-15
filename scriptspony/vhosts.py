@@ -197,7 +197,12 @@ def validate_hostname(hostname,locker):
         except dns.exception.Timeout:
             raise
         except dns.exception.DNSException:
-            raise UserError("'%s' already exists. Please choose another name or contact scripts@mit.edu if you wish to transfer the hostname to scripts."
+            if hosts.points_at_scripts(hostname) and is_sudoing():
+                # It was manually transfered to scripts; if it's not an
+                # existing vhost, we good.
+                reqtype = 'manual'
+            else:
+                raise UserError("'%s' already exists. Please choose another name or contact scripts@mit.edu if you wish to transfer the hostname to scripts."
                             % hostname)
         else:
             raise RuntimeError("DNS query should never return successfully!")
