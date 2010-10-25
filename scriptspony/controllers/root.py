@@ -241,7 +241,7 @@ SIPB Scripts Team
 
 /set status=stalled
 """ % dict(short=short,first=auth.first_name()),
-                    help_text="Be sure to check the hostname with stella before sending.  (DNS got checked on request, but it could still be reserved or there could be a race going on.)",
+                    help_text="Be sure to check the hostname with stella before sending.  (DNS got checked on request, but it could still be reserved or there could be a race going on.)  Even if it's DELETED, you need to forward explicit confirmation that it's OK to reuse (from owner/contact/billing contact, rccsuper for dorms or FSILGs, or a FSILG's net contact, or similar).",
                     extra_buttons={'silent':'Approve without mailing jweiss'})
             
     @expose('scriptspony.templates.message')
