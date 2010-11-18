@@ -51,9 +51,13 @@ def handle_mail():
     newstate = t.state
     if by == u'jweiss':
         newstate = u'dns'
+    body = ''
+    for part in message.walk():
+        if (part.get_content_maintype() == 'text'):
+            body += part.get_payload()
     t.addEvent(type=u'mail',state=newstate,by=by,target=u'us',
                subject=unicode(message['subject'],'utf-8',errors='replace'),
-               body=unicode(message.get_payload(),'utf-8',errors='replace'))
+               body=unicode(body,'utf-8',errors='replace'))
 
     transaction.commit()
 
