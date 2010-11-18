@@ -61,7 +61,8 @@ http://scripts.mit.edu/
 
 /set status=resolved
 """ % dict(hostname=t.hostname,locker=t.locker,path=path,sitestatus=sitestatus)
-            mail.send_correspondence(subject,body,t.id,rtid=t.rtid)        
+            mail.send_correspondence(subject,body,"scripts@mit.edu",
+                                     rtid=t.rtid)
             t.addEvent(type=u'mail',state=u'resolved',by=u'dns',
                        target=u'user',
                        subject=subject,
