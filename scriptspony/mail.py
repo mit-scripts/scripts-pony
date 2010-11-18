@@ -14,7 +14,7 @@ def create_ticket(subject,body,id,requestor):
 def send_comment(subject,body,id,rtid,fromaddr,toaddr=None):
     mail.send_comment(subject,body,ponyaddr(id),rtid,fromaddr,toaddr)
 
-def send_correspondence(subject,body,id,rtid,fromaddr=None):
+def send_correspondence(subject,body,rtid,fromaddr=None):
     if fromaddr is None:
-        fromaddr = ponyaddr(id)
+        fromaddr = "scripts@mit.edu"
     mail.send_correspondence(subject,body,fromaddr,rtid)

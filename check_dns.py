@@ -47,7 +47,7 @@ def check_dns():
                 else:
                     sitestatus = "Visiting that page yields a %s error, suggesting a problem with the content at %s.  Email us at scripts@mit.edu if you need help resolving this." % (e.code, path)
         
-            subject = u"Hostname %s now working"%t.hostname
+            subject = u"Re: Request for hostname %s"%t.hostname
             body = u"""Hello,
 
 Just wanted to let you know that the hostname %(hostname)s is now configured and working.  It currently points to %(path)s.  Visit http://%(hostname)s/ to check it out.
@@ -61,7 +61,7 @@ http://scripts.mit.edu/
 
 /set status=resolved
 """ % dict(hostname=t.hostname,locker=t.locker,path=path,sitestatus=sitestatus)
-            mail.send_correspondence(subject,body,"scripts@mit.edu",
+            mail.send_correspondence(subject,body,
                                      rtid=t.rtid)
             t.addEvent(type=u'mail',state=u'resolved',by=u'dns',
                        target=u'user',

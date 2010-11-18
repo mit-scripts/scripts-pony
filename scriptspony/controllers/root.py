@@ -260,8 +260,8 @@ SIPB Scripts Team
             else:
                 # Send mail and records it as an event
                 if not silent:
-                    mail.send_correspondence(subject,body,t.id,t.rtid,
-                                             auth.current_user())
+                    mail.send_correspondence(subject,body,
+                                             t.rtid, auth.current_user())
                     t.addEvent(type=u'mail',state=u'rejected',target=u'user',
                                subject=subject,body=body)
                     flash("Ticket rejected; mail sent to user.")
@@ -273,7 +273,7 @@ SIPB Scripts Team
                     flash("Ticket rejected silently.")
                 redirect('/queue')
         return dict(tickets=[t],action=url('/reject/%s'%id),
-                    subject="Problem with request for %s"%t.hostname,
+                    subject="Re: Request for hostname %s"%t.hostname,
                     body="""Hello,
 
 Unfortunately, the hostname %(hostname)s is not available.  You can go to http://pony.scripts.mit.edu/ to request a different one.
