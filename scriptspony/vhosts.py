@@ -100,7 +100,7 @@ HOSTNAME_PATTERN = re.compile(r'^(?:[*][.])?(?:[\w-]+[.])+[a-z]+$')
 
 @sudo_sensitive
 @log.exceptions
-def request_vhost(locker,hostname,path,user=None):
+def request_vhost(locker,hostname,path,user=None,desc=''):
     """Request hostname as a vhost for the given locker and path.
 
     Throws a UserError if the request is invalid, otherwise returns
@@ -125,9 +125,12 @@ def request_vhost(locker,hostname,path,user=None):
 %(user)s requested %(hostname)s for locker '%(locker)s' path %(path)s.
 Go to %(url)s to approve it.
 
+Purpose:
+%(desc)s
+
 Love,
 ~Scripts Pony
-""" % dict(short=short,user=user,locker=locker,hostname=hostname,
+""" % dict(short=short,user=user,locker=locker,hostname=hostname,desc=desc,
            path=path,url=tg.request.host_url+tg.url('/ticket/%s'%t.id)),
                            id=t.id, requestor=user)
         message = "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active." % hostname
@@ -140,8 +143,8 @@ Love,
     else:
         sudobit = ''
         forbit = ''
-    logmessage = "%s%s requested %s for locker '%s' path '%s'%s" % (
-        current_user(), sudobit, hostname, locker,path,forbit)
+    logmessage = "%s%s requested %s for locker '%s' path '%s'%s (Purpose: %s)" % (
+        current_user(), sudobit, hostname, locker,path,forbit,desc)
 
     log.info(logmessage)
     return message

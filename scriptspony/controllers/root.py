@@ -157,7 +157,8 @@ class RootController(BaseController):
             else:
                 try:
                     status = vhosts.request_vhost(locker,hostname,path,
-                                                  user=requestor)
+                                                  user=requestor,
+                                                  desc=desc)
                 except vhosts.UserError,e:
                     flash(e.message)
                 else:
