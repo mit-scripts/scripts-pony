@@ -46,5 +46,5 @@ def send_comment(subject,body,replyto,rtid,fromaddr,toaddr=None):
 
 def send_correspondence(subject,body,fromaddr,rtid):
     sendmail("%s [help.mit.edu #%s]" %(subject,rtid),body,
-             fromaddr,
+             "%s@mit.edu" % fromaddr,
              "scripts@mit.edu")
