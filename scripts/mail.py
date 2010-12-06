@@ -6,6 +6,13 @@ from . import log
 def sendmail(subject,body,fromaddr,toaddr,cc=None,rtcc=None,replyto=None):
     """Send mail."""
 
+    if (fromaddr is not None) and (fromaddr.find('@') == -1):
+        fromaddr="%s@mit.edu" % fromaddr
+    if (toaddr is not None) and (toaddr.find('@') == -1):
+        toaddr="%s@mit.edu" % toaddr
+    if (cc is not None) and (cc.find('@') == -1):
+        cc="%s@mit.edu" % cc
+
     if log.unusual_locker():
         subject = '[%s] %s' % (log.get_tag(),subject)
     
@@ -28,9 +35,7 @@ def sendmail(subject,body,fromaddr,toaddr,cc=None,rtcc=None,replyto=None):
     s.quit()
 
 def create_ticket(subject,body,rtcc,requestor):
-    sendmail(subject,body,
-             "%s@mit.edu" % requestor,
-             "scripts@mit.edu",rtcc=rtcc)
+    sendmail(subject,body,requestor,"scripts@mit.edu",rtcc=rtcc)
 
 def send_comment(subject,body,replyto,rtid,fromaddr,toaddr=None):
     if toaddr is not None:
@@ -38,13 +43,11 @@ def send_comment(subject,body,replyto,rtid,fromaddr,toaddr=None):
     else:
         toaddr="scripts-comment@mit.edu"
         cc=None
-    sendmail("%s [help.mit.edu #%s]" %(subject,rtid),body,
-             "%s@mit.edu" % fromaddr,
-             "%s@mit.edu" % toaddr,
+    sendmail("%s [help.mit.edu #%s]" %(subject,rtid),body,fromaddr,toaddr,
              cc=cc,
              replyto="scripts-comment@mit.edu, %s"%(replyto))
 
 def send_correspondence(subject,body,fromaddr,rtid):
     sendmail("%s [help.mit.edu #%s]" %(subject,rtid),body,
-             "%s@mit.edu" % fromaddr,
+             fromaddr,
              "scripts@mit.edu")
