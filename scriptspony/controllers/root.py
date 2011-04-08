@@ -100,7 +100,7 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.edit')
     def edit(self,locker,hostname,path=None,token=None,alias=''):
-        if path is None and pylons.request.response_ext:
+        if pylons.request.response_ext:
             hostname += pylons.request.response_ext
         if vhosts.is_host_reified(hostname):
             flash("The host '%s' has special configuration; email scripts@mit.edu to make changes to it." % hostname)
@@ -145,7 +145,7 @@ class RootController(BaseController):
             auth.scripts_team_sudo()
         else:
             requestor = None
-        if not hostname and not path and pylons.request.response_ext:
+        if pylons.request.response_ext:
             locker += pylons.request.response_ext
         if hostname:
             if token != auth.token():
