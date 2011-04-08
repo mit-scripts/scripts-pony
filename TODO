@@ -27,3 +27,6 @@
  * Move pony to URLspace on scripts.mit.edu/something, and create
    infrastructure for other similar apps to go there.
  * Save the desc field somewhere when people request hostnames.
+ * Shouldn't notify or run the LDAP modify query (I'm not 100% sure it      
+   does the latter) for a docroot "change" to the same thing it was         
+   before.                                                                  
