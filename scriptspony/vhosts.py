@@ -279,8 +279,8 @@ def check_if_already_exists(hostname,locker):
     for p in possibilities:
         res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                           ldap.SCOPE_ONELEVEL,
-                          ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s)))',[p,p]),['scriptsVhostAccount'],False)
-        if len(res) != 0 and res[0][1]['scriptsVhostAccount'][0] != 'uid=%s,ou=People,dc=scripts,dc=mit,dc=edu' % locker:
+                          ldap.filter.filter_format('(&(objectClass=scriptsVhost)(|(scriptsVhostName=%s)(scriptsVhostAlias=%s))(!(|(scriptsVhostName=notfound.example.com)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))))',[p,p,locker]),['scriptsVhostAccount'],False)
+        if len(res) != 0:
             raise UserError("'%s' is already a wildcard hostname on scripts.mit.edu."
                             % hostname)
 
