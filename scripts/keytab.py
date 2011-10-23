@@ -22,7 +22,11 @@ def auth():
     now = datetime.now()
     if (not hasattr(state,'got_tickets') 
         or now - state.got_tickets < timedelta(hours=10)):
-        subprocess.Popen(['/usr/kerberos/bin/kinit',
+        if os.path.exists('/usr/kerberos/bin/kinit'):
+            kinit = '/usr/kerberos/bin/kinit'
+        else:
+            kinit = '/usr/bin/kinit'
+        subprocess.Popen([kinit,
                           principle,
                           '-k','-t', KEYTAB_FILE]).wait()
         state.got_tickets = now
