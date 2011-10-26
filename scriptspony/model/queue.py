@@ -30,16 +30,18 @@ class Ticket(Entity):
     # "open" or "moira" or "dns" or "resolved"
     state = Field(Unicode(32))
     rtid = Field(Integer)
+    # Purpose
+    purpose = Field(UnicodeText())
     
     events = OneToMany('Event',order_by='timestamp')
 
     @staticmethod
-    def create(locker,hostname,path,requestor=None):
+    def create(locker,hostname,path,requestor=None,purpose=""):
         if requestor is None:
             requestor = auth.current_user()
         t = Ticket(requestor=requestor,
                    hostname=hostname,locker=locker,path=path,
-                   state="open")
+                   state="open",purpose=purpose)
         session.flush()
         t.addEvent(type='request',state="open",target='us')
         return t

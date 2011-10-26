@@ -117,7 +117,7 @@ def request_vhost(locker,hostname,path,user=None,desc=''):
     if reqtype == 'moira':
         # actually_create_vhost does this check for other reqtypes
         check_if_already_exists(hostname,locker)
-        t = queue.Ticket.create(locker,hostname,path,requestor=user)
+        t = queue.Ticket.create(locker,hostname,path,requestor=user,purpose=desc)
         short = hostname[:-len('.mit.edu')]
         mail.create_ticket(subject="scripts-vhosts CNAME request: %s"%short,
                            body="""Heyas,

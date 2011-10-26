@@ -16,6 +16,11 @@
         <td><a href="${tg.url('/reject/%s'%t.id)}">Reject</a></td>
       %endif
     </tr>
+%if t.state == 'open':
+    <tr>
+    <td colspan="8"><strong>Purpose:</strong> ${t.purpose}</td>
+    </tr>
+%endif
   %endfor
 </table>
 
