@@ -8,6 +8,10 @@ from scripts.auth import token
   <p>${help_text}</p>
 %endif
 
+%if help_text_html is not UNDEFINED:
+  ${help_text_html | n}
+%endif
+
 <form action="${action}" method="post">
   <label>Subject: <input type="text" name="subject" value="${subject}" class="wide" /></label><br/>
   <label>Body:

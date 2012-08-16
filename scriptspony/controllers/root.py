@@ -13,6 +13,8 @@ from scriptspony.controllers.error import ErrorController
 from sqlalchemy.orm.exc import NoResultFound
 
 from decorator import decorator
+import subprocess
+import cgi
 
 from scripts import auth
 from .. import mail,vhosts
@@ -228,6 +230,9 @@ class RootController(BaseController):
                         flash("Ticket approved silently.")
                     redirect('/queue')
         short = t.hostname[:-len('.mit.edu')]
+        assert t.hostname[0] != '-'
+        stella = subprocess.Popen(["/usr/bin/stella",t.hostname],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        out,err = stella.communicate()
         return dict(tickets=[t],action=url('/approve/%s'%id),
                     subject="scripts-vhosts CNAME request: %s"%short,
                     body="""Hi Jonathon,
@@ -242,7 +247,7 @@ SIPB Scripts Team
 
 /set status=stalled
 """ % dict(short=short,first=auth.first_name()),
-                    help_text="Be sure to check the hostname with stella before sending.  (DNS got checked on request, but it could still be reserved or there could be a race going on.)  Even if it's DELETED, you need to forward explicit confirmation that it's OK to reuse (from owner/contact/billing contact, or rccsuper for dorms, or a FSILG's net contact, or similar).",
+      help_text_html="<p>Make sure the host name is not being used:</p><pre>$ stella %s\n%s\n%s</pre><p>If it's DELETED, you need to forward explicit confirmation that it's OK to reuse (from owner/contact/billing contact, or rccsuper for dorms, or a FSILG's net contact, or similar).</p>" % (cgi.escape(t.hostname),cgi.escape(out),cgi.escape(err)),
                     extra_buttons={'silent':'Approve without mailing jweiss'})
             
     @expose('scriptspony.templates.message')
