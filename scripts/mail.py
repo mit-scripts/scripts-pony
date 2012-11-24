@@ -16,7 +16,7 @@ def sendmail(subject,body,fromaddr,toaddr,cc=None,rtcc=None,replyto=None):
     if log.unusual_locker():
         subject = '[%s] %s' % (log.get_tag(),subject)
     
-    msg = MIMEText(body)
+    msg = MIMEText(body, _charset='utf-8')
     msg['From'] = fromaddr
     msg['Subject'] = subject
     msg['To'] = toaddr
