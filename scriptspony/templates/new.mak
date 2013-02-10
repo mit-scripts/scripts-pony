@@ -16,14 +16,14 @@ from scripts.auth import token
   <p>You about to request a hostname for the <b>${locker}</b> locker. If you purchased a domain and want to associate it with Scripts, your request will be automatically approved. <a href="http://scripts.mit.edu/faq/14/do-cnames-work-with-the-script-service">Our FAQ has details on the process</a>.</p>
   <p>Requests for hostnames ending in ".${locker}.scripts.mit.edu" will also be automatically approved.</p>
   <p>If you want a different hostname ending in ".mit.edu", this will require approval by the Scripts team, get forwarded to IS&T for processing, and then become active after a few business days.</p>
-  <ul>
+  <ul class="form">
     %if confirmed:
-      <li>Requestor: <input type="text" name="requestor" value="" /></li>
+    <li><b>Requestor</b>: <input type="text" name="requestor" value=""/></li>
     %endif
-    <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
-    <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
+    <li><b>Hostname</b>: <input type="text" name="hostname" value="${hostname}" placeholder="hello.${locker}.scripts.mit.edu" /></li>
+    <li><b>Path</b>: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
     %if not confirmed:
-      <li>Purpose: <textarea name="desc">${desc}</textarea></li>
+      <li><b>Purpose</b>: <textarea name="desc" placeholder="I want this hostname for my student group / course / annual event / pony.">${desc}</textarea></li>
     %endif
   </ul>
   <input type="submit" value="Request Hostname" />

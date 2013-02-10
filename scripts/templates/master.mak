@@ -56,6 +56,11 @@ else:
       small {color:grey}
       .alarming {font-size: large; color: red; line-height:1.2}
       h1.alarming {font-size: xx-large; text-align: left;}
+      ul.form {
+	list-style-type: none;
+	padding:0;
+	margin:0;
+      }
     </style>
     <title>${lockertag}${tg.config['title']}</title>
     <script type="text/javascript"><!--
