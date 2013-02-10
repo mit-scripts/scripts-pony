@@ -13,12 +13,13 @@ from scripts.auth import token
       to force-submit a request!  Only do this in response to a user request!
       Be careful!</p>
   %endif
-  <p>
+  <p>You about to request a hostname for the <b>${locker}</b> locker. If you purchased a domain and want to associate it with Scripts, your request will be automatically approved. <a href="http://scripts.mit.edu/faq/14/do-cnames-work-with-the-script-service">Our FAQ has details on the process</a>.</p>
+  <p>Requests for hostnames ending in ".${locker}.scripts.mit.edu" will also be automatically approved.</p>
+  <p>If you want a different hostname ending in ".mit.edu", this will require approval by the Scripts team, get forwarded to IS&T for processing, and then become active after a few business days.</p>
   <ul>
     %if confirmed:
       <li>Requestor: <input type="text" name="requestor" value="" /></li>
     %endif
-    <li>Locker: ${locker}</li>
     <li>Hostname: <input type="text" name="hostname" value="${hostname}" /></li>
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
     %if not confirmed:
@@ -31,21 +32,3 @@ from scripts.auth import token
     <input type="hidden" name="confirmed" value="1" />
   %endif
 </form>
-
-<p>
-  Notes:
-  <ul>
-    <li>
-      You can request any hostname ending with ".${locker}.scripts.mit.edu"
-      freely.
-    </li>
-    <li>Only some hostnames ending with ".mit.edu" are available, and they
-      take a few business days to become active.  You can check whether
-      a given mit.edu hostname is available by typing "stella &lt;hostname&gt;"
-      from an Athena prompt.</li>
-    <li>You can request a non-MIT hostname, but you'll have to
-      register the hostname yourself and configure its DNS with an A record
-      for ${gethostbyname('scripts-vhosts.mit.edu.')}.  For more information,
-      see <a href="http://scripts.mit.edu/faq/14/do-cnames-work-with-the-script-service">the relevant scripts.mit.edu FAQ</a>.</li>
-  </ul>
-</p>
