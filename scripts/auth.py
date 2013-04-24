@@ -88,7 +88,7 @@ def sensitive(func, locker,*args,**kw):
 def team_sensitive(func, locker,*args,**kw):
     """Wrap a function that takes a locker as the first argument
     such that it throws an AuthError unless the authenticated
-    user can admin that locker or is on scripts-team."""
+    user can admin that locker or is on scripts-pony-acl."""
     validate_locker(locker,team_ok=True)
     return func(locker.lower(),*args,**kw)
 
@@ -96,7 +96,7 @@ def team_sensitive(func, locker,*args,**kw):
 def sudo_sensitive(func, locker,*args,**kw):
     """Wrap a function that takes a locker as the first argument
     such that it throws an AuthError unless the authenticated
-    user can admin that locker or is on scripts-team and actively
+    user can admin that locker or is on scripts-pony-acl and actively
     trying to sudo."""
     validate_locker(locker,sudo_ok=True)
     return func(locker.lower(),*args,**kw)
@@ -121,10 +121,10 @@ def on_scripts_team():
     if current_user().startswith('!'):
         return True
     if not keytab.exists():
-        cmd = ["pts",'memb','system:scripts-team','-noauth']
+        cmd = ["pts",'memb','system:scripts-pony-acl','-noauth']
     else:
         cmd = ["/usr/bin/pagsh","-c",
-               "aklog && pts memb system:scripts-team -encrypt"]
+               "aklog && pts memb system:scripts-pony-acl -encrypt"]
     pts = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     out,err = pts.communicate()
     teamers = (n.strip() for n in out.strip().split('\n')[1:])
