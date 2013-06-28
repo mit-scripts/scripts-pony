@@ -13,7 +13,7 @@ from scripts import auth
       %for host,aliases,path in hosts:
         <tr>
           <td>
-	    ${host}
+	  <a href="http://${host}">${host}</a>
 	    %if len(aliases) > 0:
 	      <br /><small>(${', '.join(aliases)})</small>
 	    %endif
