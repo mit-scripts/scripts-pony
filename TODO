@@ -14,9 +14,8 @@
    * allow auth'd zephyrs from people on scripts-team to approve them
      via a zephyrbot.
      * Get PyZephyr working/packaged on scripts.
-   * I want to parse jweiss's responses for 
-     "done mod DNS", and raise a flag if it looks like they contain actual 
-     content.
+   * When we get a reply from an Accounts person, query moira to see
+     if we acquired the alias, rather than just assuming it worked.
    * Customizable templates for outgoing mail
  * On error, go back where you were instead of punting to /index
  * Deal with the new vhost reification system, if it starts existing.
