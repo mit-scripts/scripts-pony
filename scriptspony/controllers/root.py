@@ -235,7 +235,7 @@ class RootController(BaseController):
         out,err = stella.communicate()
         return dict(tickets=[t],action=url('/approve/%s'%id),
                     subject="scripts-vhosts CNAME request: %s"%short,
-                    body="""Hi Jonathon,
+                    body="""Hi accounts-internal,
 
 At your convenience, please make %(short)s an alias of scripts-vhosts.
 
