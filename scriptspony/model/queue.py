@@ -76,7 +76,7 @@ class Event(Entity):
     ticket = ManyToOne('Ticket',required=True)
     # 'mail' or 'dns' or 'request'
     type = Field(Unicode(32))
-    # 'jweiss' or 'us' or 'user'
+    # 'accounts-internal' or 'us' or 'user'
     target = Field(Unicode(32))
     by = Field(Unicode(255))
     timestamp = Field(DateTime, default=datetime.datetime.now)

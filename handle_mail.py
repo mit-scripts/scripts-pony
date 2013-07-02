@@ -49,7 +49,8 @@ def handle_mail():
         t.rtid = int(m.group(1))
     
     newstate = t.state
-    if by == u'jweiss':
+    # TODO: blanche accounts-internal
+    if by in (u'boojum', u'jdreed', u'jmorzins', u'mvan', u'othomas', u'peloquin'):
         newstate = u'dns'
     body = ''
     for part in message.walk():

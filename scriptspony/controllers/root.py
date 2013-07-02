@@ -218,10 +218,10 @@ class RootController(BaseController):
                     if not silent:
                         # Send mail and records it as an event
                         mail.send_comment(subject,body,t.id,t.rtid,
-                                          auth.current_user(),'jweiss')
-                        t.addEvent(type='mail',state='moira',target='jweiss',
+                                          auth.current_user(),'accounts-internal')
+                        t.addEvent(type='mail',state='moira',target='accounts-internal',
                                    subject=subject,body=body)
-                        flash("Ticket approved; mail sent to jweiss.")
+                        flash("Ticket approved; mail sent to accounts-internal.")
                     else:
                         mail.send_comment(subject,"Ticket approved silently.\n\n"+body,t.id,t.rtid,
                                           auth.current_user())
@@ -248,7 +248,7 @@ SIPB Scripts Team
 /set status=stalled
 """ % dict(short=short,first=auth.first_name()),
       help_text_html="<p>Make sure the host name is not being used:</p><pre>$ stella %s\n%s\n%s</pre><p>If it's DELETED, you need to forward explicit confirmation that it's OK to reuse (from owner/contact/billing contact, or rccsuper for dorms, or a FSILG's net contact, or similar).</p>" % (cgi.escape(t.hostname),cgi.escape(out),cgi.escape(err)),
-                    extra_buttons={'silent':'Approve without mailing jweiss'})
+                    extra_buttons={'silent':'Approve without mailing accounts-internal'})
             
     @expose('scriptspony.templates.message')
     @scripts_team_only
