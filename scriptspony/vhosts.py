@@ -16,9 +16,12 @@ from scripts import keytab, log, hosts, auth
 from . import mail
 from .model import queue
 
+LDAP_SERVERS = ['doppelganger', 'alter-ego', 'body-double']
+
 def connect():
     global conn
-    conn = ldap.initialize('ldap://localhost')
+    hostname = "{0}.mit.edu".format(LDAP_SERVERS[random.randint(0,2)])
+    conn = ldap.initialize('ldap://{0}'.format(hostname))
     # Only try to use the keytab if we have one
     if keytab.exists():
         keytab.auth()
