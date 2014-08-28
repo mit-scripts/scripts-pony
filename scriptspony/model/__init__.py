@@ -58,6 +58,8 @@ def init_model(engine):
 
     #mapper(Reflected, t_reflected)
 
+import sqlalchemy.orm
+sqlalchemy.orm.ScopedSession = sqlalchemy.orm.scoped_session
 import elixir
 elixir.metadata, elixir.session = metadata, DBSession
 

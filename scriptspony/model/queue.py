@@ -2,6 +2,8 @@
 """Models relating to tracking information on .mit.edu hostname requests."""
 
 from sqlalchemy import *
+import sqlalchemy.orm
+sqlalchemy.orm.ScopedSession = sqlalchemy.orm.scoped_session
 from elixir import (ManyToOne, Entity, Field, OneToMany,
                     using_options, using_table_options,
                     ManyToMany, setup_all,
