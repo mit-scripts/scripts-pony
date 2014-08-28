@@ -45,7 +45,7 @@ from scripts import auth
     %if l == locker:
     <b>${l}</b>
     %else:
-    <a href="${tg.url('/index', locker=l)}">${l | h}</a>
+    <a href="${tg.url('/index', params={'locker':l})}">${l | h}</a>
     %endif
     </li>
     %endfor
