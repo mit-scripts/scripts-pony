@@ -3,6 +3,8 @@
 
 from sqlalchemy import *
 from sqlalchemy.orm.exc import NoResultFound
+import sqlalchemy.orm
+sqlalchemy.orm.ScopedSession = sqlalchemy.orm.scoped_session
 from elixir import (ManyToOne, Entity, Field, OneToMany,
                     using_options, using_table_options,
                     ManyToMany, setup_all,
