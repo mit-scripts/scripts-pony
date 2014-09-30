@@ -108,6 +108,7 @@ class ScriptsAuthMiddleware(object):
         state.username = environ.get('REMOTE_USER',None)
         # We don't use SERVER_PORT because that lies and says 443 for
         # some reason
+        state.sudo = None
         state.https = environ.get('HTTP_HOST','').endswith(':444')
         state.name = environ.get('SSL_CLIENT_S_DN_CN','')
         if keytab.exists():
