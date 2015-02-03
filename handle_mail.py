@@ -11,6 +11,8 @@ from scripts import keytab, log, auth
 from scriptspony.config.environment import load_environment
 
 import email, sys, re
+from email.header import make_header, decode_header
+from email.utils import parseaddr
 
 @log.exceptions
 def handle_mail():
@@ -26,23 +28,22 @@ def handle_mail():
         return
 
     ID_PATTERN = re.compile(r'pony\+(\d+)\@')
-    m = ID_PATTERN.search(message['delivered-to'])
+    toname, to = parseaddr(unicode(make_header(decode_header(message['delivered-to']))))
+    m = ID_PATTERN.match(to)
     if m is None:
         return
     id = int(m.group(1))
 
-    by = unicode(message['from'].lower(),'utf-8',errors='replace')
-    FROM_PATTERN = re.compile(r'\<([^<>]+)\>')
-    m = FROM_PATTERN.search(by)
-    if m:
-        by = m.group(1)
+    byname, by = parseaddr(unicode(make_header(decode_header(message['from']))))
+    by = by.lower()
     if by.endswith(u'@mit.edu'):
         by = by[:-len(u'@mit.edu')]
 
     t = queue.Ticket.get(id)
 
     RTID_PATTERN = re.compile(r'\[help.mit.edu\s+\#(\d+)\]')
-    m = RTID_PATTERN.search(message['subject'])
+    subject = unicode(make_header(decode_header(message['subject'])))
+    m = RTID_PATTERN.search(subject)
     if m:
         if t.rtid is None:
             by = u'rt'
@@ -52,13 +53,12 @@ def handle_mail():
     # TODO: blanche accounts-internal
     if by in (u'boojum', u'jdreed', u'jmorzins', u'mvan', u'othomas', u'peloquin'):
         newstate = u'dns'
-    body = ''
+    body = u''
     for part in message.walk():
         if (part.get_content_maintype() == 'text'):
-            body += part.get_payload()
+            body += unicode(part.get_payload(decode=True), part.get_content_charset('us-ascii'))
     t.addEvent(type=u'mail',state=newstate,by=by,target=u'us',
-               subject=unicode(message['subject'],'utf-8',errors='replace'),
-               body=unicode(body,'utf-8',errors='replace'))
+               subject=subject, body=body)
 
     transaction.commit()
 
