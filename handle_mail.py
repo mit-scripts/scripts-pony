@@ -29,7 +29,7 @@ def handle_mail():
 
     ID_PATTERN = re.compile(r'pony\+(\d+)\@')
     toname, to = parseaddr(unicode(make_header(decode_header(message['delivered-to']))))
-    m = ID_PATTERN.match(to)
+    m = ID_PATTERN.search(to)
     if m is None:
         return
     id = int(m.group(1))
