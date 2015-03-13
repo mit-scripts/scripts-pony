@@ -74,7 +74,7 @@ def validate_locker(locker,team_ok=False,sudo_ok=False):
         if ((not team_ok or not on_scripts_team())
             and (not sudo_ok or not getattr(state,'sudo',False))
             and not can_admin(locker)):
-            raise AuthError("You cannot administer the '%s' locker!"%locker)
+            raise AuthError("You cannot administer the '%s' locker! Please see http://scripts.mit.edu/faq/159 for more details."%locker)
 
 @decorator
 def sensitive(func, locker,*args,**kw):
