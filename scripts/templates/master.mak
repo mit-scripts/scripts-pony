@@ -64,13 +64,16 @@ else:
     </style>
     <title>${lockertag}${tg.config['title']}</title>
     <script type="text/javascript"><!--
-      var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
+      var konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
+          konami_jump = [-1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+          konami_state = 0;
       document.onkeydown = function (e) {
-        kkeys.push(e.keyCode);
-        var idx = kkeys.toString().indexOf( konami );
-        if (idx >= 0 && idx != kkeys.toString().length - konami.length) {
-          kkeys = [];
+        while (konami_state != -1 && e.keyCode != konami[konami_state]) {
+          konami_state = konami_jump[konami_state];
+        }
+        if (++konami_state == konami.length) {
           rainbow();
+          konami_state = 0;
         }
       };
       function rainbow () {
