@@ -1,3 +1,11 @@
+<If "%{HTTPS} != 'on' || %{SERVER_NAME} in {'pony.scripts', 'scripts', 'scripts.mit.edu', 'scripts-cert', 'scripts-cert.mit.edu'}">
+RedirectPermanent / https://pony.scripts.mit.edu/
+</If>
+
+<If "%{SERVER_NAME} in {'pony.scripts.mit.edu'}">
+Header always set Strict-Transport-Security "max-age=31536000"
+</If>
+
 AddDefaultCharset utf-8
 
 Options +FollowSymLinks
