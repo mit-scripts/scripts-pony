@@ -157,10 +157,12 @@ def validate_path(path):
     path = path.strip()
     if (not path.startswith('/')
         and '..' not in path.split('/')
-        and '.' not in path.split('/')
+        and (path == '.' or '.' not in path.split('/'))
         and '//' not in path):
         if path.endswith('/'):
             path = path[:-1]
+        if path == '':
+            path = '.'
         return path
     else:
         raise UserError("'%s' is not a valid path." % path)
@@ -254,6 +256,8 @@ def validate_hostname(hostname,locker):
 def get_web_scripts_path(locker,path):
     """Return the web_scripts filesystem path for a given locker and vhost path."""
     web_scriptsPath = os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],'web_scripts',path)
+    if web_scriptsPath.endswith('/.'):
+        web_scriptsPath = web_scriptsPath[:-2]
     if web_scriptsPath.endswith('/'):
         web_scriptsPath = web_scriptsPath[:-1]
     return web_scriptsPath
