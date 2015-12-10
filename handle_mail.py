@@ -51,7 +51,7 @@ def handle_mail():
     
     newstate = t.state
     # TODO: blanche accounts-internal
-    if by in (u'boojum', u'jmorzins', u'maponte', u'othomas'):
+    if by in (u'aswayze', u'jmorzins', u'othomas'):
         newstate = u'dns'
     body = u''
     for part in message.walk():
