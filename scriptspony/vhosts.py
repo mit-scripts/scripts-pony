@@ -87,11 +87,9 @@ def set_path(locker,vhost,path):
         raise UserError("The host '%s' has special configuration; email scripts@mit.edu to make changes to it.")
     path = path.encode('utf-8')
     locker = locker.encode('utf-8')
-    scriptsVhostName,apacheVhostName = get_vhost_names(locker,vhost)
-    web_scriptsPath = get_web_scripts_path(locker,path)
+    scriptsVhostName = get_vhost_name(locker,vhost)
 
     conn.modify_s(scriptsVhostName,[(ldap.MOD_REPLACE,'scriptsVhostDirectory',[path])])
-    conn.modify_s(apacheVhostName,[(ldap.MOD_REPLACE,'apacheDocumentRoot',[web_scriptsPath])])
 
     log.info("%s set path for vhost '%s' (locker '%s') to '%s'."
              % (current_user(),vhost,locker,path))
@@ -251,17 +249,6 @@ def validate_hostname(hostname,locker):
 
     return hostname,reqtype
 
-@log.exceptions
-@reconnecting
-def get_web_scripts_path(locker,path):
-    """Return the web_scripts filesystem path for a given locker and vhost path."""
-    web_scriptsPath = os.path.join(conn.search_s('ou=People,dc=scripts,dc=mit,dc=edu',ldap.SCOPE_ONELEVEL,ldap.filter.filter_format('(uid=%s)',[locker]))[0][1]['homeDirectory'][0],'web_scripts',path)
-    if web_scriptsPath.endswith('/.'):
-        web_scriptsPath = web_scriptsPath[:-2]
-    if web_scriptsPath.endswith('/'):
-        web_scriptsPath = web_scriptsPath[:-1]
-    return web_scriptsPath
-
 def get_uid_gid(locker):
     """Get the scripts uid and gid for a locker."""
     p = pwd.getpwnam(locker)
@@ -308,24 +295,13 @@ def actually_create_vhost(locker,hostname,path):
     
     check_if_already_exists(hostname,locker)
     scriptsVhostName = ldap.filter.filter_format("scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
-    apacheServerName = ldap.filter.filter_format("apacheServerName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",[hostname])
     if hostname.endswith('.mit.edu'):
         alias = hostname[:-len('.mit.edu')]
     else:
         alias = None
-    web_scriptsPath = get_web_scripts_path(locker,path)
     uid,gid = get_uid_gid(locker)
     account = ldap.filter.filter_format('uid=%s,ou=People,dc=scripts,dc=mit,dc=edu',[locker])
 
-    conn.add_s(apacheServerName,
-               [('objectClass',['apacheConfig','top']),
-                ('apacheServerName',[hostname])]
-               +
-               ([('apacheServerAlias',alias)] if alias else [])
-               +
-               [('apacheDocumentRoot',[web_scriptsPath]),
-                ('apacheSuexecUid',[str(uid)]),
-                ('apacheSuexecGid',[str(gid)])])
     conn.add_s(scriptsVhostName,
                [('objectClass',['scriptsVhost','top']),
                 ('scriptsVhostName',[hostname])]
@@ -352,22 +328,16 @@ def add_alias(locker,hostname,alias):
     check_if_already_exists(alias,locker)
 
     # If we got here, we're good
-    scriptsVhostName,apacheVhostName = get_vhost_names(locker,hostname)
+    scriptsVhostName = get_vhost_name(locker,hostname)
     conn.modify_s(scriptsVhostName,[(ldap.MOD_ADD,'scriptsVhostAlias',
-                                     [alias])])
-    conn.modify_s(apacheVhostName,[(ldap.MOD_ADD,'apacheServerAlias',
                                      [alias])])
     log.info("%s added alias '%s' to '%s' (locker '%s')."
              % (current_user(),alias,hostname,locker))
 
 @reconnecting
-def get_vhost_names(locker,vhost):
+def get_vhost_name(locker,vhost):
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
                       ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))',[locker,vhost]),['scriptsVhostDirectory'],False)
     scriptsVhostName = res[0][0]
-    res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
-                      ldap.SCOPE_ONELEVEL,
-                      ldap.filter.filter_format('(&(objectClass=apacheConfig)(apacheServerName=%s))',[vhost]),['apacheDocumentRoot'],False)
-    apacheVhostName = res[0][0]
-    return (scriptsVhostName,apacheVhostName)
+    return scriptsVhostName
