@@ -83,8 +83,6 @@ def set_path(locker,vhost,path):
     path = validate_path(path)
     if vhost == locker+'.scripts.mit.edu':
         raise UserError("You cannot reconfigure "+vhost+"!")
-    if is_host_reified(vhost):
-        raise UserError("The host '%s' has special configuration; email scripts@mit.edu to make changes to it.")
     path = path.encode('utf-8')
     locker = locker.encode('utf-8')
     scriptsVhostName = get_vhost_name(locker,vhost)
@@ -253,15 +251,6 @@ def get_uid_gid(locker):
     """Get the scripts uid and gid for a locker."""
     p = pwd.getpwnam(locker)
     return (p.pw_uid,p.pw_gid)
-
-@log.exceptions
-def is_host_reified(hostname):
-    """Return true if the given hostname is reified."""
-    httpd = subprocess.Popen(["/usr/sbin/httpd","-S"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    out,err = httpd.communicate()
-    if httpd.returncode != 0:
-        log.err("Pony: httpd -S returned %d!" % httpd.returncode)
-    return ("namevhost %s " % hostname) in out
 
 class UserError(log.ExpectedException):
     pass

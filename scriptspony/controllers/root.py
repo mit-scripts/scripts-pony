@@ -104,9 +104,6 @@ class RootController(BaseController):
     def edit(self,locker,hostname,path=None,token=None,alias=''):
         if pylons.request.response_ext:
             hostname += pylons.request.response_ext
-        if vhosts.is_host_reified(hostname):
-            flash("The host '%s' has special configuration; email scripts@mit.edu to make changes to it." % hostname)
-            redirect('/index/'+locker)
         if path is not None:
             if token != auth.token():
                 flash("Invalid token!")
