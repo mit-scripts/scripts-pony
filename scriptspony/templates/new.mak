@@ -5,7 +5,7 @@ from socket import gethostbyname
 from scripts.auth import token
 %>
 
-<div><a href="${tg.url('/index/'+locker)}">Back to list</a></div>
+<div><a href="${tg.url('/index/'+locker)}">&laquo; Back to list</a></div>
 
 <form method="post">
   %if confirmed:
@@ -26,7 +26,7 @@ from scripts.auth import token
       <li><b>Purpose</b>: <textarea name="desc" placeholder="I want this hostname for my student group / course / annual event / pony.">${desc}</textarea></li>
     %endif
   </ul>
-  <input type="submit" value="Request Hostname" />
+  <button class="btn"><span class="fa fa-plus"></span> Request Hostname</button>
   <input type="hidden" name="token" value="${token()}" />
   %if confirmed:
     <input type="hidden" name="confirmed" value="1" />

@@ -4,7 +4,7 @@
 from scripts.auth import token
 %>
 
-<div><a href="${tg.url('/')}">Back to list</a></div>
+<div><a href="${tg.url('/')}">&laquo; Back to list</a></div>
 
 <form method="post">
   <ul>
@@ -12,7 +12,7 @@ from scripts.auth import token
     <li>Locker: ${locker}</li>
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
   </ul>
-  <input type="submit" value="Save Path" />
+  <button class="btn"><span class="fa fa-save"></span> Save Path</button>
   <input type="hidden" name="token" value="${token()}" />
 </form>
 
@@ -30,7 +30,7 @@ from scripts.auth import token
   %if not hostname.endswith('mit.edu'):
     <form method="post">
       <input type="text" name="alias" value="${alias}" />
-      <input type="submit" value="Add Alias" />
+      <button class="btn"><span class="fa fa-plus"></span> Add Alias</button>
       <input type="hidden" name="token" value="${token()}" />
     </form>
   %endif

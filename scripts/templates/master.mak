@@ -48,8 +48,17 @@ else:
       <link rel="stylesheet" href="${tg.url('/scripts/style.css')}" type="text/css" />
     %endif
     <link rel="stylesheet" href="${tg.url('/scripts/server.css')}" type="text/css" />
+    <link rel="stylesheet" href="${tg.url('/font-awesome/css/font-awesome.min.css')}" type="text/css" />
     <style type="text/css">
-      table {width: 100%; margin-bottom: 10px}
+      table {width: 100%; margin-bottom: 10px; word-break: break-all; border-collapse: collapse;}
+      table th { word-break: normal; }
+      tr:nth-child(even) {background: #eee;}
+      td, th {
+        border-width: 1px 0;
+        border-color: #ccc;
+        margin: 0;
+        padding: 0.25em;
+      }
       textarea {width: 100%; height: 250px}
       input[type=text] {width: 200px}
       input[type=text].wide {width: 400px}
@@ -57,9 +66,43 @@ else:
       .alarming {font-size: large; color: red; line-height:1.2}
       h1.alarming {font-size: xx-large; text-align: left;}
       ul.form {
-	list-style-type: none;
-	padding:0;
-	margin:0;
+        list-style-type: none;
+        padding:0;
+        margin:0;
+      }
+      a.btn, button.btn {
+        display: inline-block;
+        padding: 0.4em 0.6em;
+        background-color: #2050A0;
+        border-radius: 0.5em;
+        border-width: 0;
+        color: #F2EEEC;
+        font-family: inherit;
+        font-size: 100%;
+        font-weight: normal;
+        line-height: normal;
+        cursor: pointer;
+      }
+      a.btn:hover, button.btn:hover {
+        background-color: #5481D0;
+        color: white;
+        text-decoration: none;
+      }
+      a.btn.edit-btn, span.edit-btn-disabled {
+        display: inline-block;
+        padding: 0.25em 0.5em;
+        border-radius: 0.4em;
+      }
+      span.edit-btn-disabled {
+        background-color: #bbb;
+        color: #ddd;
+      }
+
+      /* FFS firefox http://stackoverflow.com/questions/8859908/buttons-too-tall-on-firefox */
+      /* (normalize.css contains this line so it's probably reasonable) */
+      input::-moz-focus-inner, button::-moz-focus-inner {
+        border: 0;
+        padding: 0;
       }
     </style>
     <title>${lockertag}${tg.config['title']}</title>
@@ -103,16 +146,16 @@ else:
 				<div id="hnav">
 				  <ul id="navlist"><li id="pageLogin">
       %if not auth.current_user():
-        <a href="${set_port(pylons.request.application_url,444)}">Login with MIT Certificates</a>
+        <a href="${set_port(pylons.request.application_url,444)}"><span class="fa fa-user"></span> Login with MIT Certificates</a>
       %else:
         Welcome ${auth.first_name()}.
-        <a href="${set_port(pylons.request.application_url,80)}">Logout</a>
+        <a href="${set_port(pylons.request.application_url,80)}"><span class="fa fa-sign-out"></span> Logout</a>
       %endif
     </li>
     %if auth.on_scripts_team():
       <li><a href="${tg.url('/queue')}">Admin Queue</a></li>
     %endif    
-    <li><a href="http://scripts.mit.edu/">scripts.mit.edu home</a></li>
+    <li><a href="http://scripts.mit.edu/"><span class="fa fa-home"></span> scripts.mit.edu home</a></li>
 </ul>
 
 				</div>
@@ -145,7 +188,7 @@ You are currently connected to ${scriptshost}.</small></center>
 
 <h2>Contact</h2>
 Feel free to contact us with any questions, comments, or suggestions.
-<ul><li><a href="mailto:scripts@mit.edu">scripts@mit.edu</a></li>
+<ul><li><a href="mailto:scripts@mit.edu"><span class="fa fa-envelope"></span> scripts@mit.edu</a></li>
 </ul>
 
 <a class="nobutt" href="http://scripts.mit.edu/faq/45/"><img src="${tg.url('/scripts/media/powered_by-trans.gif')}" alt="powered by scripts.mit.edu"/></a>

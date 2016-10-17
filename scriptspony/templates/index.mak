@@ -9,7 +9,7 @@ from scripts import auth
 
   <p>
     <table border="1">
-      <tr><th>Hostname</th><th>Path</th></tr>
+      <tr><th>Hostname</th><th>Path</th><th>Edit</th></tr>
       %for host,aliases,path in hosts:
         <tr>
           <td>
@@ -22,7 +22,9 @@ from scripts import auth
 	    <small>/mit/${locker}/web_scripts/</small>${path}
 	  </td>
           %if host not in (locker+'.scripts.mit.edu',):
-            <td><a href="${tg.url('/edit/'+locker+'/'+host)}">edit</a></td>
+            <td class="nbr"><a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn edit-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a></td>
+          %else:
+            <td><span class="edit-btn-disabled"><span class="fa fa-ban"></span></span></td>
           %endif
         </tr>
       %endfor
@@ -34,7 +36,7 @@ from scripts import auth
     <tt>/mit/${locker}/Scripts/svn/</tt> for <a href="http://scripts.mit.edu/faq/93/">Subversion</a>.
   </p>
   <p>
-    <a href="${tg.url('/new/'+locker)}">Request a new hostname</a> for the ${locker} locker
+    <a href="${tg.url('/new/'+locker)}" class="btn"><span class="fa fa-plus"></span> Request a new hostname</a> for the ${locker} locker
 
 <hr />
   <p> You can switch to managing a different locker: </p>
@@ -55,7 +57,7 @@ from scripts import auth
   </p>
   <form action="${tg.url('/index')}">
    Switch to managing the <input type="text" name="locker" value="${locker}" /> locker
-    <input type="submit" value="Switch" />
+    <button class="btn"><span class="fa fa-exchange"></span> Switch</button>
     %if auth.on_scripts_team():
       <input type="submit" value="Request as Scripts Team" name="sudo" />
     %endif
