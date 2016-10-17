@@ -48,7 +48,7 @@ else:
       <link rel="stylesheet" href="${tg.url('/scripts/style.css')}" type="text/css" />
     %endif
     <link rel="stylesheet" href="${tg.url('/scripts/server.css')}" type="text/css" />
-    <link rel="stylesheet" href="${tg.url('/font-awesome/css/font-awesome.min.css')}" type="text/css" />
+    <link rel="stylesheet" href="${tg.url('/font-awesome-4.6.3/css/font-awesome.min.css')}" type="text/css" />
     <style type="text/css">
       table {width: 100%; margin-bottom: 10px; word-break: break-all; border-collapse: collapse;}
       table th { word-break: normal; }
