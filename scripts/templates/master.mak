@@ -88,7 +88,7 @@ else:
         color: white;
         text-decoration: none;
       }
-      a.btn.edit-btn, span.edit-btn-disabled {
+      a.btn.sm-btn, span.edit-btn-disabled {
         display: inline-block;
         padding: 0.25em 0.5em;
         border-radius: 0.4em;
@@ -153,7 +153,7 @@ else:
       %endif
     </li>
     %if auth.on_scripts_team():
-      <li><a href="${tg.url('/queue')}">Admin Queue</a></li>
+      <li><a href="${tg.url('/queue')}"><span class="fa fa-th-list"></span> Admin Queue</a></li>
     %endif    
     <li><a href="http://scripts.mit.edu/"><span class="fa fa-home"></span> scripts.mit.edu home</a></li>
 </ul>
