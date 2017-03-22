@@ -26,7 +26,7 @@ class Ticket(DeclarativeBase):
     path = Column(Unicode(255))
     # "open" or "moira" or "dns" or "resolved"
     state = Column(Unicode(32))
-    rtid = Column(Integer)
+    rtid = Column(Integer, index=True, unique=True)
     # Purpose
     purpose = Column(UnicodeText())
 

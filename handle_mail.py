@@ -31,23 +31,26 @@ def handle_mail():
     toname, to = parseaddr(unicode(make_header(decode_header(message["delivered-to"]))))
     m = ID_PATTERN.search(to)
     if m is None:
-        return
-    id = int(m.group(1))
+        t = None
+    else:
+        t = queue.Ticket.get(int(m.group(1)))
 
     byname, by = parseaddr(unicode(make_header(decode_header(message["from"]))))
     by = by.lower()
     if by.endswith(u"@mit.edu"):
         by = by[: -len(u"@mit.edu")]
 
-    t = queue.Ticket.get(id)
-
     RTID_PATTERN = re.compile(r"\[help.mit.edu\s+\#(\d+)\]")
     subject = unicode(make_header(decode_header(message["subject"])))
     m = RTID_PATTERN.search(subject)
     if m:
-        if t.rtid is None:
-            by = u"rt"
-        t.rtid = int(m.group(1))
+        rtid = int(m.group(1))
+        if t is None:
+            t = queue.Ticket.query.filter_by(rtid=rtid).one()
+        else:
+            if t.rtid is None:
+                by = u"rt"
+            t.rtid = rtid
 
     newstate = t.state
     # TODO: blanche accounts-internal
