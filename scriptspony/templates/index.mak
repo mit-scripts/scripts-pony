@@ -62,6 +62,7 @@ from scripts import auth
       <input type="submit" value="Request as Scripts Team" name="sudo" />
     %endif
   </form>
+  <p>MIT courses, UROPs, organizations, and student activities may <a href="https://ist.mit.edu/lockers">Request a new locker from IS&amp;T</a>.</p>
 %elif https:
   <p>You don't seem to be presenting a valid certificate.  You may
     wish to consult

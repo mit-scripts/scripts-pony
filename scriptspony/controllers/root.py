@@ -139,7 +139,8 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path='',desc='',token=None,
-            confirmed=False,requestor=None):
+            confirmed=False,personal_ok=False,requestor=None):
+        personal = locker == auth.current_user()
         if confirmed:
             auth.scripts_team_sudo()
         else:
@@ -153,6 +154,8 @@ class RootController(BaseController):
                 flash("Please specify the purpose of this hostname.")
             elif requestor is not None and not requestor.strip():
                 flash("Please specify requestor.")
+            elif personal and not personal_ok:
+                flash("Please acknowledge that your hostname will be served from your personal locker and will be deleted when you leave MIT.")
             else:
                 try:
                     status = vhosts.request_vhost(locker,hostname,path,
@@ -174,7 +177,7 @@ class RootController(BaseController):
                 redirect('/')
 
         return dict(locker=locker,hostname=hostname,path=path,desc=desc,
-                    confirmed=confirmed)
+                    confirmed=confirmed,personal=personal)
 
     @expose('scriptspony.templates.queue')
     @scripts_team_only

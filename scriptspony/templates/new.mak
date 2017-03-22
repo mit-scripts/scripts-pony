@@ -26,6 +26,9 @@ from scripts.auth import token
       <li><b>Purpose</b>: <textarea name="desc" placeholder="I want this hostname for my student group / course / annual event / pony.">${desc}</textarea></li>
     %endif
   </ul>
+  %if personal:
+    <p><label><input type="checkbox" name="personal_ok" /> I acknowledge that this hostname will be served from my personal <b>${locker}</b> locker and <strong>will be deleted when I leave MIT</strong>.</label>  (To create a group hostname, <a href="${tg.url('/index/'+locker)}">go back</a> and switch to a different locker.)</p>
+  %endif
   <button class="btn"><span class="fa fa-plus"></span> Request Hostname</button>
   <input type="hidden" name="token" value="${token()}" />
   %if confirmed:
