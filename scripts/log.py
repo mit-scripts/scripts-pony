@@ -35,7 +35,7 @@ def err(mess,level=LOG_ERR):
     if user:
         zwrite(mess,recip=user,zsig=str(level))
     else:
-        syslog(level|LOG_AUTHPRIV,"%s: %s"%(tag,mess))
+        syslog(level|LOG_AUTHPRIV, ("%s: %s"%(tag,mess)).encode('utf-8'))
 def info(mess):
     err(mess,level=LOG_INFO)
 
