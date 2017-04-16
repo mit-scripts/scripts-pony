@@ -75,9 +75,9 @@ def zwrite(message,zclass="scripts",instance="",zsig="",recip=None):
     if recip:
         procness += [recip]
     else:
-        procness += ["-c",zclass,
-                     "-i",instance]
+        procness += ["-c",zclass.encode('utf-8'),
+                     "-i",instance.encode('utf-8')]
     procness += ["-q",
-                 "-s",zsig,
-                 "-m",message]
+                 "-s",zsig.encode('utf-8'),
+                 "-m",message.encode('utf-8')]
     zwrite = subprocess.Popen(procness)
