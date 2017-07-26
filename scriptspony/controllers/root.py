@@ -137,6 +137,76 @@ class RootController(BaseController):
         return dict(locker=locker, hostname=hostname,
                     path=path, aliases=aliases, alias=alias)
 
+    @expose('scriptspony.templates.request_cert')
+    def request_cert(self,locker,hostname,token=None,certificate=None, **kwargs):
+        if pylons.request.response_ext:
+            hostname += pylons.request.response_ext
+            
+        show_only_csr = False
+        csr_success = False
+        csr_contents = ""
+        if token is not None:
+            if token != auth.token():
+                flash("Invalid token!")
+            else:
+                if certificate is not None: # form is for certificate
+                    # parse the certificate (vhostcert import )
+                    importcert = subprocess.Popen(['/mit/scripts/sbin/vhostcert', 'import'],stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                    certstring, err = importcert.communicate(input=certificate.strip())
+                    if importcert.returncode:
+                        flash("Error installing cert, is it malformed: "+err)
+                        redirect('/index/'+locker)
+                    # make sure it is the right cert
+                    check_certs_cmd = ['/mit/jakobw/arch/common/bin/verify-certs','-hostname='+hostname]
+                    check_certs = subprocess.Popen(check_certs_cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
+                    out, err = check_certs.communicate(input=certificate)
+                    if check_certs.returncode:
+                       flash("Certificate chain invalid: "+err)
+                       redirect('/index/' + locker)
+                    
+                    # put it into LDAP
+                    vhosts.set_cert(locker, hostname, importcert)
+                    flash("Added certificate for %s - it will become active within an hour." % hostname)
+                else: # form is for CSR generation
+                    try:
+                        path,aliases=vhosts.get_vhost_info(locker,hostname)
+                    except vhosts.UserError,e:
+                        flash(e.message)
+                        redirect('/index/'+locker)
+                    else:
+                        if hostname.endswith('.mit.edu') and not auth.on_scripts_team():
+                            flash("You can't request a CSR for an MIT.edu host - please contact the scripts team for help.")
+                            redirect('/index/'+locker)
+                        
+                        # TODO: remove echo
+                        csr_req_cmd = ['echo','/bin/sudo', '/etc/pki/tls/gencsr-pony',locker,hostname]
+                        for arg,value in kwargs:
+                            if arg[:5] == 'alias':
+                                if value in aliases:
+                                    csr_req_cmd.append(value)
+                        csr_req = subprocess.Popen(csr_req_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                        out, err = csr_req.communicate()
+                        if err:
+                            # TODO: determine if this is a security risk, if err could somehow contain privatekey material
+                            csr_success = False
+                            csr_contents = err
+                        else:
+                            csr_success = True
+                            csr_contents = out
+                        show_only_csr = True
+            _,aliases=vhosts.get_vhost_info(locker,hostname)
+        else:
+            try:
+                _,aliases=vhosts.get_vhost_info(locker,hostname)
+            except vhosts.UserError,e:
+                flash(e.message)
+                redirect('/index/'+locker)
+        return dict(locker=locker, hostname=hostname,
+                    aliases=aliases,show_only_csr=show_only_csr,
+                    csr_success=csr_success,csr_contents=csr_contents)
+
+
+
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path='',desc='',token=None,
             confirmed=False,personal_ok=False,requestor=None):

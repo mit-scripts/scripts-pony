@@ -1,0 +1,62 @@
+<%inherit file="scripts.templates.master"/>
+
+<%!
+from scripts.auth import token
+
+
+%>
+
+<div><a href="${tg.url('/')}">&laquo; Back to list</a></div>
+
+<h3> The TLS Certificate Process</h3>
+<p>
+    The process to get a TLS certificate in order to use HTTPS on your scripts domain is currently as follows: 
+    <ul>
+        <li> You generate a certificate-signing request (CSR) for your host by filling out the form below.</li>
+        <li> You get a certificate from a certificate authority (CA) using this CSR.<!-- For MIT domains (*.mit.edu), you can send an email to <a href="mailto:mitcert@mit.edu">mitcert@mit.edu</a> and include the CSR in the contents of your email.--></li>
+        <li> Once you have a certificate, paste it below and submit the second form.
+        <li> In the future, we will support Let's Encrypt certificates when this process becomes more automated. Until then, only certificates valid for at least one year are supported.
+    </ul>
+</p>
+
+%if show_only_csr:
+<h3> CSR Request Results </h3>
+
+    % if csr_success:
+        <p> Your CSR was successfully generated and appears below.</p>
+    % else:
+        <p> The following error was generated. Please contact us for help.</p>
+    % endif
+    <pre>${csr_contents}</pre>
+%else:
+
+<h3> Request a CSR</h3>
+<p>
+Choose which aliases to include:<br><ul>
+    <input type="checkbox" name="hostname" value="${hostname}" checked disabled="true"> ${hostname}</input><br>
+<form method="post">
+    %if not hostname.endswith('mit.edu'):
+      %for i,a in enumerate(aliases):
+        <input type="checkbox" name="alias${i}" value="${a}">${a}<br>
+      %endfor
+ %endif
+</ul>
+  <button class="btn"><span class="fa fa-send"></span> Generate CSR</button>
+  <input type="hidden" name="token" value="${token()}" />
+</form>
+</p>
+
+%endif
+
+
+<h3> Submit a Certificate</h3>
+<i>This step comes after you have requested a cert from a CA using the CSR generated above.</i>
+<p>
+    Once you have a certificate, you can submit it below. After a certificate is submitted,
+    if it is valid, it will take around an hour for the changes to propograte through our system.
+</p>
+<form method="post" id="certform">
+  <textarea name="certificate" form="certform" placeholder="-----BEGIN CERTIFICATE-----..."></textarea>
+  <input type="hidden" name="token" value="${token()}" />
+  <button class="btn"><span class="fa fa-handshake-o"></span> Submit certificate</button>
+</form>

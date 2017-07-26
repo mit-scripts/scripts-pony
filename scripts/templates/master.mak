@@ -88,7 +88,7 @@ else:
         color: white;
         text-decoration: none;
       }
-      a.btn.sm-btn, span.edit-btn-disabled {
+      a.btn.sm-btn, span.edit-btn-disabled, span.secure-btn-disabled {
         display: inline-block;
         padding: 0.25em 0.5em;
         border-radius: 0.4em;
@@ -96,6 +96,10 @@ else:
       span.edit-btn-disabled {
         background-color: #bbb;
         color: #ddd;
+      }
+      span.secure-btn-disabled {
+        background-color: #08bd19 ;
+        color: white;
       }
 
       /* FFS firefox http://stackoverflow.com/questions/8859908/buttons-too-tall-on-firefox */

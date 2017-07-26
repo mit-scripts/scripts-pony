@@ -12,7 +12,7 @@ tg_load_environment = base_config.make_load_environment()
 
 def load_environment(global_conf,app_conf):
     ## Hack to make our sqlalchemy config depend on scripts user
-    url = ('mysql://sql.mit.edu/%s+scripts-pony?read_default_file=~/.my.cnf'
+    url = ('mysql://sql.mit.edu/%s+scripts-pony?read_default_file=~/.sql/my.cnf'
            % getpass.getuser())
     global_conf['sqlalchemy.url'] = app_conf['sqlalchemy.url'] = url
     # Hack to make our mail recipient depend on scripts user

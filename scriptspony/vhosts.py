@@ -42,13 +42,13 @@ def reconnecting(func,*args,**kw):
 @log.exceptions
 @reconnecting
 def list_vhosts(locker):
-    """Return a list of (vhost,aliases,directory) for the given locker.
+    """Return a list of (vhost,aliases,directory,has_TLS_cert_in_LDAP) for the given locker.
 
     The directory is relative to web_scripts or Scripts/*/"""
     res=conn.search_s('ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
                       ldap.SCOPE_ONELEVEL,
-                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))',[locker]),['scriptsVhostName','scriptsVhostDirectory','scriptsVhostAlias'])
-    return [(m['scriptsVhostName'][0],m.get('scriptsVhostAlias',[]),m['scriptsVhostDirectory'][0])
+                      ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))',[locker]),['scriptsVhostName','scriptsVhostDirectory','scriptsVhostAlias','scriptsVhostCertificate'])
+    return [(m['scriptsVhostName'][0],m.get('scriptsVhostAlias',[]),m['scriptsVhostDirectory'][0],('scriptsVhostCertificate' in m))
             for i,m in res]
 
 
@@ -94,6 +94,27 @@ def set_path(locker,vhost,path):
     # TODO: Check path existance and warn if we know the web_scripts path
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
+
+
+# TODO: should this be @sudo_sensitive instead so that scripts team members can request
+# CSRs and install certs for .mit.edu domains?
+@sensitive
+@log.exceptions
+@reconnecting
+def set_cert(locker, vhost, cert):
+    """Puts the certificate provided into LDAP for the provided host.
+       @cert should already be serialized in the format LDAP wants."""
+
+    locker = locker.encode('utf-8')
+    cert = cert.encode('utf-8')
+    scriptsVhostName = get_vhost_name(locker,vhost)
+    # not sure if scripts-2048.key needs to be encoded since I don't really get how
+    # python handles unicode.
+    conn.modify_s(scriptsVhostName, [(ldap.MOD_REPLACE, 'scriptsVhostCertificate',[cert]),
+             (ldap.MOD_REPLACE, 'scriptsVhostCertificateKeyFile', ['scripts-2048.key'.encode('utf-8')])])
+
+    log.info("%s set cert for vhost '%s' (locker '%s') to '%s'."
+                  % (current_user(),vhost,locker,cert))
 
 HOSTNAME_PATTERN = re.compile(r'^(?:[*][.])?(?:[\w-]+[.])+[a-z]+$')
 
@@ -330,3 +351,13 @@ def get_vhost_name(locker,vhost):
                       ldap.filter.filter_format('(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))',[locker,vhost]),['scriptsVhostDirectory'],False)
     scriptsVhostName = res[0][0]
     return scriptsVhostName
+
+
+
+# TODO: what is @sensitive?
+# TODO: probably log things?
+def set_certificate(locker, vhost):
+    #TODO: some sort of validation
+    
+    
+    pass

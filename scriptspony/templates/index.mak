@@ -9,8 +9,8 @@ from scripts import auth
 
   <p>
     <table border="1">
-      <tr><th>Hostname</th><th>Path</th><th>Edit</th></tr>
-      %for host,aliases,path in hosts:
+      <tr><th>Hostname</th><th>Path</th><th>Edit</th><th>HTTPS</th></tr>
+      %for host,aliases,path,has_cert in hosts:
         <tr>
           <td>
 	  <a href="http://${host}">${host}</a>
@@ -23,8 +23,16 @@ from scripts import auth
 	  </td>
           %if host not in (locker+'.scripts.mit.edu',):
             <td class="nbr"><a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a></td>
+              %if has_cert:
+                  <td><span class="secure-btn-disabled"><span class="fa fa-lock"></span></span></td>
+              %elif (not host.endswith('.mit.edu')) or auth.on_scripts_team():
+                  <td class="nbr"><a href="${tg.url('/request_cert/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Add HTTPS"><span class="fa fa-plus"></span></a></td>
+              %else:
+                  <td><span class="edit-btn-disabled"><span class="fa fa-ban"></span></span></td>
+              %endif
           %else:
             <td><span class="edit-btn-disabled"><span class="fa fa-ban"></span></span></td>
+            <td><span class="secure-btn-disabled"><span class="fa fa-lock"></span></span></td>
           %endif
         </tr>
       %endfor
