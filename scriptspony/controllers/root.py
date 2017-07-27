@@ -151,13 +151,14 @@ class RootController(BaseController):
             else:
                 if certificate is not None: # form is for certificate
                     # parse the certificate (vhostcert import )
-                    importcert = subprocess.Popen(['/mit/scripts/sbin/vhostcert', 'import'],stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                    importcert = subprocess.Popen(['/afs/athena.mit.edu/contrib/scripts/sbin/vhostcert', 'import'],stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=subprocess.PIPE)
                     certstring, err = importcert.communicate(input=certificate.strip())
                     if importcert.returncode:
                         flash("Error installing cert, is it malformed: "+err)
                         redirect('/index/'+locker)
                     # make sure it is the right cert
-                    check_certs_cmd = ['/mit/jakobw/arch/common/bin/verify-certs','-hostname='+hostname]
+                    # TODO: move this somewhere scripts-ey. Source is in this repo.
+                    check_certs_cmd = ['/afs/athena.mit.edu/user/j/a/jakobw/arch/common/bin/verify-certs','-hostname='+hostname]
                     check_certs = subprocess.Popen(check_certs_cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
                     out, err = check_certs.communicate(input=certificate)
                     if check_certs.returncode:

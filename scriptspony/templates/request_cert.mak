@@ -11,13 +11,13 @@ from scripts.auth import token
 <h3> The TLS Certificate Process</h3>
 <p>
     The process to get a TLS certificate in order to use HTTPS on your scripts domain is currently as follows: 
-    <ul>
-        <li> You generate a certificate-signing request (CSR) for your host by filling out the form below.</li>
-        <li> You get a certificate from a certificate authority (CA) using this CSR.<!-- For MIT domains (*.mit.edu), you can send an email to <a href="mailto:mitcert@mit.edu">mitcert@mit.edu</a> and include the CSR in the contents of your email.--></li>
-        <li> Once you have a certificate, paste it below and submit the second form.
-        <li> In the future, we will support Let's Encrypt certificates when this process becomes more automated. Until then, only certificates valid for at least one year are supported.
-    </ul>
 </p>
+<ul>
+    <li> You generate a certificate-signing request (CSR) for your host by filling out the form below.</li>
+    <li> You get a certificate from a certificate authority (CA) using this CSR.</li>
+    <li> Once you have a certificate, paste it below and submit the second form.</li>
+</ul>
+
 
 %if show_only_csr:
 <h3> CSR Request Results </h3>
@@ -54,6 +54,10 @@ Choose which aliases to include:<br><ul>
 <p>
     Once you have a certificate, you can submit it below. After a certificate is submitted,
     if it is valid, it will take around an hour for the changes to propograte through our system.
+</p>
+<p>
+    If your chain includes multiple certificates to a root CA, please submit them all at once, with
+    the end of the chain first.
 </p>
 <form method="post" id="certform">
   <textarea name="certificate" form="certform" placeholder="-----BEGIN CERTIFICATE-----..."></textarea>
