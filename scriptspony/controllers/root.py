@@ -186,7 +186,7 @@ class RootController(BaseController):
                                     csr_req_cmd.append(value)
                         csr_req = subprocess.Popen(csr_req_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
                         out, err = csr_req.communicate()
-                        if err:
+                        if csr_req.returncode:
                             # TODO: determine if this is a security risk, if err could somehow contain privatekey material
                             csr_success = False
                             csr_contents = err
