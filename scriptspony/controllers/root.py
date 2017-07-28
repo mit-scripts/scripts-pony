@@ -179,8 +179,7 @@ class RootController(BaseController):
                             flash("You can't request a CSR for an MIT.edu host - please contact the scripts team for help.")
                             redirect('/index/'+locker)
                         
-                        # TODO: remove echo
-                        csr_req_cmd = ['echo','/bin/sudo', '/etc/pki/tls/gencsr-pony',locker,hostname]
+                        csr_req_cmd = ['/bin/sudo', '/etc/pki/tls/gencsr-pony',locker,hostname]
                         for arg,value in kwargs:
                             if arg[:5] == 'alias':
                                 if value in aliases:
