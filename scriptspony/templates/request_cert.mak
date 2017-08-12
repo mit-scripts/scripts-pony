@@ -32,15 +32,13 @@ from scripts.auth import token
 
 <h3> Request a CSR</h3>
 <p>
-Choose which aliases to include:<br><ul>
-    <input type="checkbox" name="hostname" value="${hostname}" checked disabled="true"> ${hostname}</input><br>
-<form method="post">
+<form method="post" action="/request_cert/${locker}/${hostname}">
+    <input type="checkbox" name="hostname" value="${hostname}" checked="checked" disabled="disabled" id="mainhostname" /><label for="mainhostname">${hostname}</label><br />
     %if not hostname.endswith('mit.edu'):
       %for i,a in enumerate(aliases):
-        <input type="checkbox" name="alias${i}" value="${a}">${a}<br>
+        <input type="checkbox" name="alias${i}" value="${a}" id="alias${i}"><label for="alias${i}">${a}</label><br />
       %endfor
  %endif
-</ul>
   <button class="btn"><span class="fa fa-send"></span> Generate CSR</button>
   <input type="hidden" name="token" value="${token()}" />
 </form>
@@ -59,8 +57,8 @@ Choose which aliases to include:<br><ul>
     If your chain includes multiple certificates to a root CA, please submit them all at once, with
     the end of the chain first.
 </p>
-<form method="post" id="certform">
-  <textarea name="certificate" form="certform" placeholder="-----BEGIN CERTIFICATE-----..."></textarea>
+<form method="post" id="certform" action="/request_cert/${locker}/${hostname}">
+  <textarea name="certificate" rows="20" cols="80" form="certform" placeholder="-----BEGIN CERTIFICATE-----..."></textarea>
   <input type="hidden" name="token" value="${token()}" />
   <button class="btn"><span class="fa fa-handshake-o"></span> Submit certificate</button>
 </form>

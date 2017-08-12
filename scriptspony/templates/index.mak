@@ -23,12 +23,16 @@ from scripts import auth
 	  </td>
           %if host not in (locker+'.scripts.mit.edu',):
             <td class="nbr"><a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a></td>
-              %if has_cert:
-                  <td><span class="secure-btn-disabled"><span class="fa fa-lock"></span></span></td>
-              %elif (not host.endswith('.mit.edu')) or auth.on_scripts_team():
-                  <td class="nbr"><a href="${tg.url('/request_cert/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Add HTTPS"><span class="fa fa-plus"></span></a></td>
-              %else:
-                  <td><span class="edit-btn-disabled"><span class="fa fa-ban"></span></span></td>
+            %if (host.endswith('.mit.edu')) and not auth.on_scripts_team():
+                %if has_cert: # .mit.edu, has cert, offer refresh by FAQ
+                  <td><span class=""><a href="https://scripts.mit.edu/faq/163/how-do-i-get-an-ssl-tls-certificate-for-my-custom-domain-on-scripts"><span class="secure-btn-disabled fa fa-question-circle"></span></a></td>
+                %else: # .mit.edu, no cert, offer acquire by FAQ
+                  <td><a href="https://scripts.mit.edu/faq/163/how-do-i-get-an-ssl-tls-certificate-for-my-custom-domain-on-scripts" class="btn sm-btn"><span class="fa fa-question-circle"></span></a></td>
+                %endif
+              %elif has_cert: # not .mit.edu, has cert, offer refresh
+                  <td class="nbr"><a href="${tg.url('/request_cert/'+locker+'/'+host)}" aria-label="Renew HTTPS"><span class="fa fa-refresh secure-btn-disabled"></span></a></td>
+              %else: #not .mit.edu, no cert, offer get cert
+                  <td class="nbr"><a class="btn sm-btn" href="${tg.url('/request_cert/'+locker+'/'+host)}" aria-label="Renew HTTPS"><span class="fa fa-plus"></span></a></td>
               %endif
           %else:
             <td><span class="edit-btn-disabled"><span class="fa fa-ban"></span></span></td>
