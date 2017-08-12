@@ -96,9 +96,7 @@ def set_path(locker,vhost,path):
     # TODO: also check for index files or .htaccess and warn if none are there
 
 
-# TODO: should this be @sudo_sensitive instead so that scripts team members can request
-# CSRs and install certs for .mit.edu domains?
-@sensitive
+@sudo_sensitive
 @log.exceptions
 @reconnecting
 def set_cert(locker, vhost, cert):
@@ -354,10 +352,3 @@ def get_vhost_name(locker,vhost):
 
 
 
-# TODO: what is @sensitive?
-# TODO: probably log things?
-def set_certificate(locker, vhost):
-    #TODO: some sort of validation
-    
-    
-    pass
