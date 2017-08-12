@@ -59,26 +59,7 @@ func verifyCerts(certs []byte, hostname string) error {
 	if len(chains) == 0 {
 		return errors.New("chain invalid or missing a component")
 	}
-	var correctChain bool
-	for _, chain := range chains {
-		// fmt.Printf("checking chain #%d\n", idx)
-		// check if this chain is in the order presented by the user
-		correctChain = true
-		for idx2, cert := range chain[:len(chain)-1] {
-			if idx2 >= len(inputCertificates) {
-				// fmt.Println("  too many")
-				correctChain = false
-				break
-			}
-			correctCert := cert.Equal(inputCertificates[idx2])
-			// fmt.Printf("  cert #%d: %t\n", idx2, correctCert)
-			correctChain = correctChain && correctCert
-		}
-		if correctChain {
-			return nil
-		}
-	}
-	return errors.New("certificate chain as presented is out of order")
+    return nil
 }
 
 func main() {
