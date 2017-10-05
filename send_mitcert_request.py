@@ -8,9 +8,13 @@ import subprocess
 import sys
 
 locker = sys.argv[1]
-hostnames = sys.argv[2:]
-hostnames = [hostname.lower() for hostname in hostnames]
-hostnames = [hostname if hostname.endswith('.mit.edu') else hostname + '.mit.edu' for hostname in hostnames]
+hostnames = []
+for hostname in sys.argv[2:]:
+    hostname = hostname.lower()
+    if not hostname.endswith('.mit.edu'):
+        hostname += '.mit.edu'
+    if hostname not in hostnames:
+        hostnames.append(hostname)
 
 for hostname in hostnames:
     assert socket.gethostbyname(hostname) == '18.181.0.46'
