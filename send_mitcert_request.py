@@ -17,7 +17,9 @@ for hostname in sys.argv[2:]:
         hostnames.append(hostname)
 
 for hostname in hostnames:
-    assert socket.gethostbyname(hostname) == '18.181.0.46'
+    assert hostname.endswith('.mit.edu'), hostname
+    assert '.' not in hostname[:-len('.mit.edu')], hostname
+    assert socket.gethostbyname(hostname) == '18.181.0.46', hostname
 
 csr = subprocess.check_output(['sudo', '/etc/pki/tls/gencsr-pony', locker] + hostnames)
 assert(csr.startswith('-----BEGIN CERTIFICATE REQUEST-----\n'))
