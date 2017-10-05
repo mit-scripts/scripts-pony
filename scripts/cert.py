@@ -85,6 +85,9 @@ def chain_should_install(new_chain, old_chain=None):
     return True
 
 def msg_to_pem(msg):
-    url, = set(re.findall(r'https://cert-manager\.com/customer/InCommon/ssl\?action=download&sslId=\d+&format=x509', msg))
+    urls = set(re.findall(r'https://cert-manager\.com/customer/InCommon/ssl\?action=download&sslId=\d+&format=x509', msg))
+    if not urls:
+        return None
+    url, = urls
     r = requests.get(url)
     return r.text if r.status_code == 200 else None
