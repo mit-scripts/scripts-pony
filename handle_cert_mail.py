@@ -6,7 +6,7 @@ import ldap.filter
 from scripts import cert, log
 from scriptspony import vhosts
 
-BLACKLIST = ['scripts.mit.edu', '*.scripts.mit.edu']
+BLACKLIST = ['scripts.mit.edu', 'notfound.example.com']
 
 @log.exceptions
 def main():
