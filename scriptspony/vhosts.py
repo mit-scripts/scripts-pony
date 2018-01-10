@@ -173,7 +173,7 @@ def generate_random_hostname():
 
 def validate_hostname(hostname,locker):
     hostname = hostname.lower().encode('utf-8')
-    if not HOSTNAME_PATTERN.search(hostname):
+    if not HOSTNAME_PATTERN.search(hostname) or hostname.endswith(".invalid"):
         if '.' not in hostname:
             raise UserError("'%s' is not an absolute hostname.  Do you mean '%s.mit.edu'?" % (hostname,hostname))
         else:
