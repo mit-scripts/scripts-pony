@@ -18,7 +18,7 @@ def check_dns():
 
     # Use a list so all the ids are resolved early and transactions aren't
     # a problem
-    for tid in [t.id for t in queue.Ticket.query.filter_by(state=u'dns')]:
+    for tid in [t.id for t in queue.Ticket.query.filter(queue.Ticket.state.in_([u'moira', u'dns'])).all()]:
         t = queue.Ticket.get(tid)
         
         if hosts.points_at_scripts(t.hostname):
