@@ -1,3 +1,4 @@
+import getpass
 import smtplib
 from email.mime.text import MIMEText
 
@@ -31,7 +32,7 @@ def sendmail(subject,body,fromaddr,toaddr,cc=None,rtcc=None,replyto=None):
         
     s = smtplib.SMTP()
     s.connect()
-    s.sendmail(fromaddr,dests,msg.as_string())
+    s.sendmail(getpass.getuser()+'@scripts.mit.edu',dests,msg.as_string())
     s.quit()
 
 def create_ticket(subject,body,rtcc,requestor):

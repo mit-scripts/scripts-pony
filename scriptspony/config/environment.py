@@ -16,6 +16,7 @@ def load_environment(global_conf,app_conf):
            % getpass.getuser())
     global_conf['sqlalchemy.url'] = app_conf['sqlalchemy.url'] = url
     # Hack to make our mail recipient depend on scripts user
+    global_conf['error_email_from'] = getpass.getuser()+'@scripts.mit.edu'
     if os.getuid() != os.getgid():
         global_conf['email_to'] = getpass.getuser()+'@mit.edu'
     #print "Overriding sqlalchemy.url to: %s" % url
