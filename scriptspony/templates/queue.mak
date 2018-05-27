@@ -13,7 +13,7 @@
       <td>${t.requestor}</td><td>${t.locker}</td><td>${t.hostname}</td><td>${t.state}</td>
       %if t.state == 'open':
         <td><a href="${tg.url('/approve/%s'%t.id)}" class="btn sm-btn" aria-label="Approve" title="Approve"><span class="fa fa-check" aria-hidden="true"></span></a></td>
-        <td><a href="${tg.url('/reject/%s'%t.id)}" class="btn sm-btn" aria-label="Reject" title="Reject"><span class="fa fa-ban" aria-hidden="true"></span></a></td>
+        <td><a href="${tg.url('/reject/%s'%t.id)}" class="btn btn-danger sm-btn" aria-label="Reject" title="Reject"><span class="fa fa-ban" aria-hidden="true"></span></a></td>
       %else:
         <td></td><td></td>
       %endif

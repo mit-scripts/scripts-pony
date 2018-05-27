@@ -22,7 +22,12 @@ from scripts import auth
 	    <small>/mit/${locker}/web_scripts/</small>${path}
 	  </td>
           %if host not in (locker+'.scripts.mit.edu',):
-            <td class="nbr"><a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a></td>
+            <td class="nbr">
+              <a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a>
+              %if host.lower().endswith('.'+locker+'.scripts.mit.edu') or not host.lower().endswith('.mit.edu'):
+                <a href="${tg.url('/delete/'+locker+'/'+host)}" class="btn btn-danger sm-btn" aria-label="Delete"><span class="fa fa-times-circle" aria-hidden="true"></span></a>
+              %endif
+            </td>
           %else:
             <td><span class="edit-btn-disabled"><span class="fa fa-ban"></span></span></td>
           %endif

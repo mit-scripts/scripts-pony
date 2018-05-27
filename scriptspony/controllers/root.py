@@ -137,6 +137,31 @@ class RootController(BaseController):
         return dict(locker=locker, hostname=hostname,
                     path=path, aliases=aliases, alias=alias)
 
+    @expose('scriptspony.templates.delete')
+    def delete(self,locker,hostname,confirm=False,token=None):
+        if pylons.request.response_ext:
+            hostname += pylons.request.response_ext
+        if confirm:
+            if token != auth.token():
+                flash("Invalid token!")
+            else:
+                try:
+                    vhosts.delete(locker,hostname)
+                except vhosts.UserError,e:
+                    flash(e.message)
+                else:
+                    flash("Host '%s' deleted."%hostname)
+                    redirect('/index/'+locker)
+            _,aliases=vhosts.get_vhost_info(locker,hostname)
+        else:
+            try:
+                path,aliases=vhosts.get_vhost_info(locker,hostname)
+            except vhosts.UserError,e:
+                flash(e.message)
+                redirect('/index/'+locker)
+        return dict(locker=locker, hostname=hostname,
+                    path=path, aliases=aliases)
+
     @expose('scriptspony.templates.new')
     def new(self,locker,hostname='',path='',desc='',token=None,
             confirmed=False,personal_ok=False,requestor=None):

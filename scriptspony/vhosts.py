@@ -95,6 +95,21 @@ def set_path(locker,vhost,path):
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
 
+@sensitive
+@log.exceptions
+@reconnecting
+def delete(locker,vhost):
+    """Deletes an existing vhost owned by the locker."""
+    if vhost.lower().endswith('.mit.edu') and not vhost.lower().endswith('.'+locker+'.scripts.mit.edu'):
+        raise UserError("You cannot delete "+vhost+"!")
+    locker = locker.encode('utf-8')
+    scriptsVhostName = get_vhost_name(locker,vhost)
+
+    conn.delete_s(scriptsVhostName)
+
+    log.info("%s deleted vhost '%s' (locker '%s')."
+             % (current_user(),vhost,locker))
+
 HOSTNAME_PATTERN = re.compile(r'^(?:[*][.])?(?:[\w-]+[.])+[a-z]+$')
 
 @sudo_sensitive

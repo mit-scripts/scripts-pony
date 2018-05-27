@@ -13,6 +13,9 @@ from scripts.auth import token
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
   </ul>
   <button class="btn"><span class="fa fa-save"></span> Save Path</button>
+  %if hostname.lower().endswith('.'+locker+'.scripts.mit.edu') or not hostname.lower().endswith('.mit.edu'):
+    <a class="btn btn-danger" href="${tg.url('/delete/'+locker+'/'+hostname)}"><span class="fa fa-times-circle"></span> Delete</a>
+  %endif
   <input type="hidden" name="token" value="${token()}" />
 </form>
 
@@ -27,7 +30,7 @@ from scripts.auth import token
       <li>None</li>
     %endif
   </ul>
-  %if not hostname.endswith('mit.edu'):
+  %if hostname.lower().endswith('.'+locker+'.scripts.mit.edu') or not hostname.lower().endswith('.mit.edu'):
     <form method="post">
       <input type="text" name="alias" value="${alias}" />
       <button class="btn"><span class="fa fa-plus"></span> Add Alias</button>

@@ -48,7 +48,7 @@ Scripts Pony's LDAP user needs the following ACI on
 ou=VirtualHosts,dc=scripts,dc=mit,dc=edu in order to make changes in
 LDAP:
 
-(target="ldap:///ou=VirtualHosts,dc=scripts,dc=mit,dc=edu")(targetattr="scriptsVhostDirectory || scriptsVhostAlias || scriptsVhostCertificate || scriptsVhostCertificateKeyFile")(version 3.0;acl "pony";allow (add, write) userdn="ldap:///uid=daemon/scripts-pony.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu";)
+(target="ldap:///ou=VirtualHosts,dc=scripts,dc=mit,dc=edu")(targetattr="scriptsVhostDirectory || scriptsVhostAlias || scriptsVhostCertificate || scriptsVhostCertificateKeyFile")(version 3.0;acl "pony";allow (add, write, delete) userdn="ldap:///uid=daemon/scripts-pony.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu";)
 
 This assumes that the user in LDAP looks like:
 
