@@ -321,12 +321,12 @@ def actually_create_vhost(locker,hostname,path):
 def add_alias(locker,hostname,alias):
     locker = locker.encode('utf-8')
     hostname = hostname.lower().encode('utf-8')
-    if hostname.endswith('.mit.edu'):
+    if not hostname.endswith('.'+locker+'.scripts.mit.edu') and hostname.endswith('.mit.edu'):
         raise UserError("You can't add aliases to .mit.edu hostnames!")
-    if alias.lower().encode('utf-8').endswith('.mit.edu'):
+    if not alias.lower().endswith('.'+locker+'.scripts.mit.edu') and alias.lower().endswith('.mit.edu'):
         raise UserError("You can't add .mit.edu aliases to non-.mit.edu hostnames!")
     alias,reqtype = validate_hostname(alias,locker)
-    if reqtype != 'external':
+    if reqtype not in ['subscripts', 'external']:
         raise RuntimeError("We didn't catch that something wasn't a .mit.edu hostname.")
     
     check_if_already_exists(alias,locker)
