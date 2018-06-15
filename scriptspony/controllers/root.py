@@ -78,7 +78,7 @@ class RootController(BaseController):
             try:
                 hosts = vhosts.list_vhosts(locker)
                 hosts.sort(key=lambda k:k[0])
-            except auth.AuthError,e:
+            except auth.AuthError as e:
                 flash(e.message)
                 # User has been deauthorized from this locker
                 if locker in user_info.lockers:
@@ -108,7 +108,7 @@ class RootController(BaseController):
             else:
                 try:
                     vhosts.set_path(locker,hostname,path)
-                except vhosts.UserError,e:
+                except vhosts.UserError as e:
                     flash(e.message)
                 else:
                     flash("Host '%s' reconfigured."%hostname)
@@ -121,7 +121,7 @@ class RootController(BaseController):
                 else:
                     try:
                         vhosts.add_alias(locker,hostname,alias)
-                    except vhosts.UserError,e:
+                    except vhosts.UserError as e:
                         flash(e.message)
                     else:
                         flash("Alias '%s' added to hostname '%s'."
@@ -129,7 +129,7 @@ class RootController(BaseController):
                         redirect('/index/'+locker)
             try:
                 path,aliases=vhosts.get_vhost_info(locker,hostname)
-            except vhosts.UserError,e:
+            except vhosts.UserError as e:
                 flash(e.message)
                 redirect('/index/'+locker)
         return dict(locker=locker, hostname=hostname,
@@ -145,7 +145,7 @@ class RootController(BaseController):
             else:
                 try:
                     vhosts.delete(locker,hostname)
-                except vhosts.UserError,e:
+                except vhosts.UserError as e:
                     flash(e.message)
                 else:
                     flash("Host '%s' deleted."%hostname)
@@ -154,7 +154,7 @@ class RootController(BaseController):
         else:
             try:
                 path,aliases=vhosts.get_vhost_info(locker,hostname)
-            except vhosts.UserError,e:
+            except vhosts.UserError as e:
                 flash(e.message)
                 redirect('/index/'+locker)
         return dict(locker=locker, hostname=hostname,
@@ -184,7 +184,7 @@ class RootController(BaseController):
                     status = vhosts.request_vhost(locker,hostname,path,
                                                   user=requestor,
                                                   desc=desc)
-                except vhosts.UserError,e:
+                except vhosts.UserError as e:
                     flash(e.message)
                 else:
                     flash(status)
@@ -195,7 +195,7 @@ class RootController(BaseController):
         else:
             try:
                 auth.validate_locker(locker,sudo_ok=True)
-            except auth.AuthError,e:
+            except auth.AuthError as e:
                 flash(e.message)
                 redirect('/')
 
@@ -235,7 +235,7 @@ class RootController(BaseController):
             else:
                 try:
                     vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
-                except vhosts.UserError,e:
+                except vhosts.UserError as e:
                     flash(e.message)
                 else:
                     if not silent:

@@ -53,7 +53,7 @@ def exceptions(func,*args,**kw):
         raise
     except ExpectedException:
         raise
-    except Exception,e:
+    except Exception as e:
         if not getattr(e,'already_syslogged',False):
             from .auth import current_user
             argness = ', '.join(repr(a) for a in args)
@@ -61,7 +61,7 @@ def exceptions(func,*args,**kw):
                 argness += ', '
             argness += ', '.join('%s=%s'%(k,repr(kw[k])) for k in kw)
             err("%s called %s(%s) but got: %s"
-                % (current_user(),func.func_name,argness,e))
+                % (current_user(),func.__name__,argness,e))
             e.already_syslogged = True
         raise
 

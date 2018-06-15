@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """The application's model objects"""
+from __future__ import absolute_import
 
 from zope.sqlalchemy import ZopeTransactionExtension
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -64,6 +65,6 @@ import elixir
 elixir.metadata, elixir.session = metadata, DBSession
 
 # Import your model modules here.
-import user
-import queue
+from . import user
+from . import queue
 from scripts.model import meta

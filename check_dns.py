@@ -35,7 +35,7 @@ def check_dns():
                     sitestatus = wordpress
                 else:
                     sitestatus = "Your site appears to be working properly.  Have fun!"
-            except urllib2.HTTPError,e:
+            except urllib2.HTTPError as e:
                 if 'wp-login' in e.geturl():
                     sitestatus = wordpress
                 elif e.code == 404:
