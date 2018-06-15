@@ -3,6 +3,7 @@ import threading
 from decorator import decorator
 import pwd, os
 import re
+import cgi
 
 import webob.exc
 
@@ -14,9 +15,8 @@ state = threading.local()
 def html(s):
     return '<html>'+s
 # Monkeypatch to prevent webflash from escaping HTML conditionally
-import webflash
-html_escape = webflash.html_escape
-webflash.html_escape = lambda s: s[len('<html>'):] if s.startswith('<html>') else html_escape(s)
+import sys, tg.flash
+sys.modules['tg.flash'].escape = lambda s: s[len('<html>'):] if s.startswith('<html>') else cgi.escape(s)
 
 def current_user():
     return getattr(state,'username',None)
@@ -70,7 +70,7 @@ def validate_locker(locker,team_ok=False,sudo_ok=False):
         try:
             pwd.getpwnam(locker)
         except KeyError:
-            raise AuthError(html("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%locker))
+            raise AuthError(html("""The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""%cgi.escape(locker)))
         if ((not team_ok or not on_scripts_team())
             and (not sudo_ok or not getattr(state,'sudo',False))
             and not can_admin(locker)):
