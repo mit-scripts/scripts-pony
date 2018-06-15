@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
 """Models relating to tracking information on .mit.edu hostname requests."""
 
-from sqlalchemy import Binary
+from sqlalchemy import Binary, Column, Integer
 from sqlalchemy.orm.exc import NoResultFound
-import sqlalchemy.orm
 
-sqlalchemy.orm.ScopedSession = sqlalchemy.orm.scoped_session
-from elixir import Entity, Field, using_options, using_table_options, setup_all
 import random, hmac, hashlib
 
-
-def tname(typ):
-    return typ.__name__.lower()
+from . import DBSession, DeclarativeBase
 
 
-class Meta(Entity):
-    using_options(tablename=tname)
-    using_table_options(mysql_engine="InnoDB", mysql_charset="utf8")
+class Meta(DeclarativeBase):
+    __tablename__ = "meta"
+    __table_args__ = {"mysql_engine": "InnoDB", "mysql_charset": "utf8"}
+
+    id = Column(Integer, primary_key=True)
 
     # Secret key
-    secret = Field(Binary(8), required=True)
+    secret = Column(Binary(8), nullable=False)
 
     def __init__(self):
         self.secret = "".join(chr(random.randint(0, 255)) for x in xrange(8))
@@ -33,7 +30,6 @@ class Meta(Entity):
         try:
             return Meta.query.one()
         except NoResultFound:
-            return Meta()
-
-
-setup_all()
+            meta = Meta()
+            DBSession.add(meta)
+            return meta

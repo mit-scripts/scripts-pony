@@ -1,50 +1,36 @@
 # -*- coding: utf-8 -*-
 """Models relating to tracking information on .mit.edu hostname requests."""
 
-from sqlalchemy import DateTime, Integer, Unicode, UnicodeText
-import sqlalchemy.orm
-
-sqlalchemy.orm.ScopedSession = sqlalchemy.orm.scoped_session
-from elixir import (
-    ManyToOne,
-    Entity,
-    Field,
-    OneToMany,
-    using_options,
-    using_table_options,
-    setup_all,
-    session,
-)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, UnicodeText
+from sqlalchemy.orm import relationship
 import datetime
 
 import tg
 
 from scripts import auth, log
+from scriptspony.model import DBSession, DeclarativeBase
 
 
-def tname(typ):
-    return typ.__name__.lower()
+class Ticket(DeclarativeBase):
+    __tablename__ = "ticket"
+    __table_args__ = {"mysql_engine": "InnoDB", "mysql_charset": "utf8"}
 
-
-class Ticket(Entity):
-    using_options(tablename=tname)
-    using_table_options(mysql_engine="InnoDB", mysql_charset="utf8")
-
+    id = Column(Integer, primary_key=True)
     # Athena username
-    requestor = Field(Unicode(255), index=True)
+    requestor = Column(Unicode(255), index=True)
     # Locker name
-    locker = Field(Unicode(255), index=True)
+    locker = Column(Unicode(255), index=True)
     # Hostname involved
-    hostname = Field(Unicode(255), index=True)
+    hostname = Column(Unicode(255), index=True)
     # path
-    path = Field(Unicode(255))
+    path = Column(Unicode(255))
     # "open" or "moira" or "dns" or "resolved"
-    state = Field(Unicode(32))
-    rtid = Field(Integer)
+    state = Column(Unicode(32))
+    rtid = Column(Integer)
     # Purpose
-    purpose = Field(UnicodeText())
+    purpose = Column(UnicodeText())
 
-    events = OneToMany("Event", order_by="timestamp")
+    events = relationship("Event", order_by="Event.timestamp", back_populates="ticket")
 
     @staticmethod
     def create(locker, hostname, path, requestor=None, purpose=""):
@@ -58,14 +44,17 @@ class Ticket(Entity):
             state="open",
             purpose=purpose,
         )
-        session.flush()
+        DBSession.add(t)
         t.addEvent(type="request", state="open", target="us")
         return t
 
     def addEvent(self, type, state, by=None, target=None, subject=None, body=None):
         if by is None:
             by = auth.current_user()
-        Event(ticket=self, type=type, target=target, subject=subject, body=body, by=by)
+        event = Event(
+            ticket=self, type=type, target=target, subject=subject, body=body, by=by
+        )
+        DBSession.add(event)
         if state != self.state:
             self.state = state
             pat = "%s's %s changed the ticket re: %s to %s"
@@ -84,19 +73,18 @@ class Ticket(Entity):
         return Ticket.query.all()
 
 
-class Event(Entity):
-    using_options(tablename=tname)
-    using_table_options(mysql_engine="InnoDB", mysql_charset="utf8")
+class Event(DeclarativeBase):
+    __tablename__ = "event"
+    __table_args__ = {"mysql_engine": "InnoDB", "mysql_charset": "utf8"}
 
-    ticket = ManyToOne("Ticket", required=True)
+    id = Column(Integer, primary_key=True)
+    ticket_id = Column(Integer, ForeignKey("ticket.id"), nullable=False)
+    ticket = relationship("Ticket", back_populates="events")
     # 'mail' or 'dns' or 'request'
-    type = Field(Unicode(32))
+    type = Column(Unicode(32))
     # 'accounts-internal' or 'us' or 'user'
-    target = Field(Unicode(32))
-    by = Field(Unicode(255))
-    timestamp = Field(DateTime, default=datetime.datetime.now)
-    subject = Field(UnicodeText())
-    body = Field(UnicodeText())
-
-
-setup_all()
+    target = Column(Unicode(32))
+    by = Column(Unicode(255))
+    timestamp = Column(DateTime, default=datetime.datetime.now)
+    subject = Column(UnicodeText())
+    body = Column(UnicodeText())

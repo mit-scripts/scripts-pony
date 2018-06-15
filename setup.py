@@ -11,7 +11,6 @@ setup(
     install_requires=[
         "decorator >= 3.4",
         "dnspython >= 1.11",
-        "elixir >= 0.7",
         "mako >= 1.0",
         "nose >= 1.0",
         "paste >= 1.7",
