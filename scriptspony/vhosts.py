@@ -19,6 +19,8 @@ from .model import queue
 
 LDAP_SERVERS = ['doppelganger', 'alter-ego', 'body-double']
 
+conn = None
+
 def connect():
     global conn
     hostname = "{0}.mit.edu".format(LDAP_SERVERS[random.randint(0,2)])
@@ -33,11 +35,13 @@ def connect():
 
 @decorator
 def reconnecting(func,*args,**kw):
-    try:
-        return func(*args,**kw)
-    except ldap.SERVER_DOWN:
-        connect()
-        return func(*args,**kw)
+    if conn is not None:
+        try:
+            return func(*args,**kw)
+        except ldap.SERVER_DOWN:
+            pass
+    connect()
+    return func(*args,**kw)
 
 @sensitive
 @log.exceptions

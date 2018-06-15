@@ -26,8 +26,6 @@ base_config.renderers = []
 
 base_config.package = scriptspony
 
-base_config.call_on_startup = [vhosts.connect]
-
 #Set the default renderer
 base_config.default_renderer = 'mako'
 base_config.renderers.append('mako')

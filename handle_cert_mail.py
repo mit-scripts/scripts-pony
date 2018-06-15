@@ -29,7 +29,6 @@ def main():
         list(names) +
         BLACKLIST)
 
-    vhosts.connect()
     res = vhosts.conn.search_s(
         'ou=VirtualHosts,dc=scripts,dc=mit,dc=edu',
         ldap.SCOPE_ONELEVEL,
