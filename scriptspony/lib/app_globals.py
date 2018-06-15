@@ -2,7 +2,7 @@
 
 """The application's Globals object"""
 
-__all__ = ['Globals']
+__all__ = ["Globals"]
 
 
 class Globals(object):

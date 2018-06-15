@@ -6,7 +6,7 @@ from tg import TGController, tmpl_context
 from tg.render import render
 import scriptspony.model as model
 
-__all__ = ['Controller', 'BaseController']
+__all__ = ["Controller", "BaseController"]
 
 
 class BaseController(TGController):

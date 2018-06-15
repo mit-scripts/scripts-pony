@@ -15,19 +15,20 @@ import subprocess
 import cgi
 
 from scripts import auth
-from .. import mail,vhosts
+from .. import mail, vhosts
 from ..model import queue
 
-__all__ = ['RootController']
+__all__ = ["RootController"]
 
 # Not in auth because it depends on TG
 @decorator
-def scripts_team_only(func,*args,**kw):
+def scripts_team_only(func, *args, **kw):
     if not auth.on_scripts_team():
         flash("You are not authorized for this area!")
-        redirect('/')
+        redirect("/")
     else:
-        return func(*args,**kw)
+        return func(*args, **kw)
+
 
 class RootController(BaseController):
     """
@@ -43,15 +44,15 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
     
     """
-    
+
     error = ErrorController()
 
-    @expose('scriptspony.templates.index')
-    def index(self,locker=None,sudo=False):
+    @expose("scriptspony.templates.index")
+    def index(self, locker=None, sudo=False):
         """Handle the front-page."""
         if locker is not None and request.response_ext:
             locker += request.response_ext
-        
+
         olocker = locker
         hosts = None
         user = auth.current_user()
@@ -60,12 +61,14 @@ class RootController(BaseController):
         # TODO: is there a find_or_create sqlalchemy method?
         if user:
             if sudo and auth.on_scripts_team():
-                #override_template(self.index, 'mako:scripts.templates.confirm')
-                #return dict(action=url('/new/'+locker),title="Really use Scripts Team bits to request a hostname as locker '%s'?"%locker,question="Only do this in response to a user support request, and after checking to make sure that the request comes from someone authorized to make requests for the locker.",
+                # override_template(self.index, 'mako:scripts.templates.confirm')
+                # return dict(action=url('/new/'+locker),title="Really use Scripts Team bits to request a hostname as locker '%s'?"%locker,question="Only do this in response to a user support request, and after checking to make sure that the request comes from someone authorized to make requests for the locker.",
                 #           backurl=url('/index'))
-                redirect('/new/%s?confirmed=true'%locker)
+                redirect("/new/%s?confirmed=true" % locker)
             try:
-                user_info = DBSession.query(UserInfo).filter(UserInfo.user==user).one()
+                user_info = (
+                    DBSession.query(UserInfo).filter(UserInfo.user == user).one()
+                )
             except NoResultFound:
                 user_info = UserInfo(user)
                 DBSession.add(user_info)
@@ -77,7 +80,7 @@ class RootController(BaseController):
                 locker = user
             try:
                 hosts = vhosts.list_vhosts(locker)
-                hosts.sort(key=lambda k:k[0])
+                hosts.sort(key=lambda k: k[0])
             except auth.AuthError as e:
                 flash(e.message)
                 # User has been deauthorized from this locker
@@ -87,7 +90,7 @@ class RootController(BaseController):
                 if olocker is not None:
                     return self.index()
                 else:
-                    return dict(hosts={},locker=locker,user_info=user_info)
+                    return dict(hosts={}, locker=locker, user_info=user_info)
             else:
                 # Append locker to the list in user_info if it's not there
                 if not locker in user_info.lockers:
@@ -95,11 +98,10 @@ class RootController(BaseController):
                     user_info.lockers.sort()
                     DBSession.add(user_info)
                     flash('You can administer the "%s" locker.' % locker)
-        return dict(hosts=hosts, locker=locker, user_info=user_info,
-                    https=https)
+        return dict(hosts=hosts, locker=locker, user_info=user_info, https=https)
 
-    @expose('scriptspony.templates.edit')
-    def edit(self,locker,hostname,path=None,token=None,alias=''):
+    @expose("scriptspony.templates.edit")
+    def edit(self, locker, hostname, path=None, token=None, alias=""):
         if request.response_ext:
             hostname += request.response_ext
         if path is not None:
@@ -107,36 +109,36 @@ class RootController(BaseController):
                 flash("Invalid token!")
             else:
                 try:
-                    vhosts.set_path(locker,hostname,path)
+                    vhosts.set_path(locker, hostname, path)
                 except vhosts.UserError as e:
                     flash(e.message)
                 else:
-                    flash("Host '%s' reconfigured."%hostname)
-                    redirect('/index/'+locker)
-            _,aliases=vhosts.get_vhost_info(locker,hostname)
+                    flash("Host '%s' reconfigured." % hostname)
+                    redirect("/index/" + locker)
+            _, aliases = vhosts.get_vhost_info(locker, hostname)
         else:
             if alias:
                 if token != auth.token():
                     flash("Invalid token!")
                 else:
                     try:
-                        vhosts.add_alias(locker,hostname,alias)
+                        vhosts.add_alias(locker, hostname, alias)
                     except vhosts.UserError as e:
                         flash(e.message)
                     else:
-                        flash("Alias '%s' added to hostname '%s'."
-                              % (alias,hostname))
-                        redirect('/index/'+locker)
+                        flash("Alias '%s' added to hostname '%s'." % (alias, hostname))
+                        redirect("/index/" + locker)
             try:
-                path,aliases=vhosts.get_vhost_info(locker,hostname)
+                path, aliases = vhosts.get_vhost_info(locker, hostname)
             except vhosts.UserError as e:
                 flash(e.message)
-                redirect('/index/'+locker)
-        return dict(locker=locker, hostname=hostname,
-                    path=path, aliases=aliases, alias=alias)
+                redirect("/index/" + locker)
+        return dict(
+            locker=locker, hostname=hostname, path=path, aliases=aliases, alias=alias
+        )
 
-    @expose('scriptspony.templates.delete')
-    def delete(self,locker,hostname,confirm=False,token=None):
+    @expose("scriptspony.templates.delete")
+    def delete(self, locker, hostname, confirm=False, token=None):
         if request.response_ext:
             hostname += request.response_ext
         if confirm:
@@ -144,25 +146,33 @@ class RootController(BaseController):
                 flash("Invalid token!")
             else:
                 try:
-                    vhosts.delete(locker,hostname)
+                    vhosts.delete(locker, hostname)
                 except vhosts.UserError as e:
                     flash(e.message)
                 else:
-                    flash("Host '%s' deleted."%hostname)
-                    redirect('/index/'+locker)
-            _,aliases=vhosts.get_vhost_info(locker,hostname)
+                    flash("Host '%s' deleted." % hostname)
+                    redirect("/index/" + locker)
+            _, aliases = vhosts.get_vhost_info(locker, hostname)
         else:
             try:
-                path,aliases=vhosts.get_vhost_info(locker,hostname)
+                path, aliases = vhosts.get_vhost_info(locker, hostname)
             except vhosts.UserError as e:
                 flash(e.message)
-                redirect('/index/'+locker)
-        return dict(locker=locker, hostname=hostname,
-                    path=path, aliases=aliases)
+                redirect("/index/" + locker)
+        return dict(locker=locker, hostname=hostname, path=path, aliases=aliases)
 
-    @expose('scriptspony.templates.new')
-    def new(self,locker,hostname='',path='',desc='',token=None,
-            confirmed=False,personal_ok=False,requestor=None):
+    @expose("scriptspony.templates.new")
+    def new(
+        self,
+        locker,
+        hostname="",
+        path="",
+        desc="",
+        token=None,
+        confirmed=False,
+        personal_ok=False,
+        requestor=None,
+    ):
         personal = locker == auth.current_user()
         if confirmed:
             auth.scripts_team_sudo()
@@ -178,87 +188,116 @@ class RootController(BaseController):
             elif requestor is not None and not requestor.strip():
                 flash("Please specify requestor.")
             elif personal and not personal_ok:
-                flash("Please acknowledge that your hostname will be served from your personal locker and will be deleted when you leave MIT.")
+                flash(
+                    "Please acknowledge that your hostname will be served from your personal locker and will be deleted when you leave MIT."
+                )
             else:
                 try:
-                    status = vhosts.request_vhost(locker,hostname,path,
-                                                  user=requestor,
-                                                  desc=desc)
+                    status = vhosts.request_vhost(
+                        locker, hostname, path, user=requestor, desc=desc
+                    )
                 except vhosts.UserError as e:
                     flash(e.message)
                 else:
                     flash(status)
                     if confirmed:
-                        redirect('/queue')
+                        redirect("/queue")
                     else:
-                        redirect('/index/'+locker)
+                        redirect("/index/" + locker)
         else:
             try:
-                auth.validate_locker(locker,sudo_ok=True)
+                auth.validate_locker(locker, sudo_ok=True)
             except auth.AuthError as e:
                 flash(e.message)
-                redirect('/')
+                redirect("/")
 
-        return dict(locker=locker,hostname=hostname,path=path,desc=desc,
-                    confirmed=confirmed,personal=personal)
+        return dict(
+            locker=locker,
+            hostname=hostname,
+            path=path,
+            desc=desc,
+            confirmed=confirmed,
+            personal=personal,
+        )
 
-    @expose('scriptspony.templates.queue')
+    @expose("scriptspony.templates.queue")
     @scripts_team_only
-    def queue(self,**kw):
-        all = ('open','moira','dns','resolved','rejected')
+    def queue(self, **kw):
+        all = ("open", "moira", "dns", "resolved", "rejected")
         if len(kw) <= 0:
-            kw = dict(open='1',moira='1',dns='1')
+            kw = dict(open="1", moira="1", dns="1")
         query = queue.Ticket.query
         for k in all:
             if k not in kw:
                 query = query.filter(queue.Ticket.state != k)
-        return dict(tickets=query.all(),all=all,included=kw)
+        return dict(tickets=query.all(), all=all, included=kw)
 
-    @expose('scriptspony.templates.ticket')
+    @expose("scriptspony.templates.ticket")
     @scripts_team_only
-    def ticket(self,id):
+    def ticket(self, id):
         return dict(tickets=[queue.Ticket.get(int(id))])
 
-    @expose('scriptspony.templates.message')
+    @expose("scriptspony.templates.message")
     @scripts_team_only
-    def approve(self,id,subject=None,body=None,token=None,silent=False):
+    def approve(self, id, subject=None, body=None, token=None, silent=False):
         t = queue.Ticket.get(int(id))
-        if t.state != 'open':
+        if t.state != "open":
             flash("This ticket's not open!")
-            redirect('/ticket/%s'%id)
+            redirect("/ticket/%s" % id)
         if t.rtid is None:
             flash("This ticket has no RT ID!")
-            redirect('/ticket/%s'%id)
+            redirect("/ticket/%s" % id)
         if subject and body:
             if token != auth.token():
                 flash("Invalid token!")
             else:
                 try:
-                    vhosts.actually_create_vhost(t.locker,t.hostname,t.path)
+                    vhosts.actually_create_vhost(t.locker, t.hostname, t.path)
                 except vhosts.UserError as e:
                     flash(e.message)
                 else:
                     if not silent:
                         # Send mail and records it as an event
-                        mail.send_comment(subject,body,t.id,t.rtid,
-                                          auth.current_user(),'accounts-internal')
-                        t.addEvent(type='mail',state='moira',target='accounts-internal',
-                                   subject=subject,body=body)
+                        mail.send_comment(
+                            subject,
+                            body,
+                            t.id,
+                            t.rtid,
+                            auth.current_user(),
+                            "accounts-internal",
+                        )
+                        t.addEvent(
+                            type="mail",
+                            state="moira",
+                            target="accounts-internal",
+                            subject=subject,
+                            body=body,
+                        )
                         flash("Ticket approved; mail sent to accounts-internal.")
                     else:
-                        mail.send_comment(subject,"Ticket approved silently.\n\n"+body,t.id,t.rtid,
-                                          auth.current_user())
-                        t.addEvent(type='mail',state='dns',
-                                   target='us')
+                        mail.send_comment(
+                            subject,
+                            "Ticket approved silently.\n\n" + body,
+                            t.id,
+                            t.rtid,
+                            auth.current_user(),
+                        )
+                        t.addEvent(type="mail", state="dns", target="us")
                         flash("Ticket approved silently.")
-                    redirect('/queue')
-        short = t.hostname[:-len('.mit.edu')]
-        assert t.hostname[0] != '-'
-        stella = subprocess.Popen(["/usr/bin/stella",t.hostname],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        out,err = stella.communicate()
-        return dict(tickets=[t],action=url('/approve/%s'%id),
-                    subject="scripts-vhosts CNAME request: %s"%short,
-                    body="""Hi accounts-internal,
+                    redirect("/queue")
+        short = t.hostname[: -len(".mit.edu")]
+        assert t.hostname[0] != "-"
+        stella = subprocess.Popen(
+            ["/usr/bin/stella", t.hostname],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        out, err = stella.communicate()
+        return dict(
+            tickets=[t],
+            action=url("/approve/%s" % id),
+            subject="scripts-vhosts CNAME request: %s" % short,
+            body="""Hi accounts-internal,
 
 At your convenience, please make %(short)s an alias of scripts-vhosts.
 
@@ -269,41 +308,60 @@ Thanks!
 SIPB Scripts Team
 
 /set status=stalled
-""" % dict(short=short,first=auth.first_name()),
-      help_text_html="<p>Make sure the host name is not being used:</p><pre>$ stella %s\n%s\n%s</pre><p>If it's DELETED, you need to forward explicit confirmation that it's OK to reuse (from owner/contact/billing contact, or rccsuper for dorms, or a FSILG's net contact, or similar).</p>" % (cgi.escape(t.hostname),cgi.escape(out),cgi.escape(err)),
-                    extra_buttons={'silent':'Approve without mailing accounts-internal'})
-            
-    @expose('scriptspony.templates.message')
+"""
+            % dict(short=short, first=auth.first_name()),
+            help_text_html="<p>Make sure the host name is not being used:</p><pre>$ stella %s\n%s\n%s</pre><p>If it's DELETED, you need to forward explicit confirmation that it's OK to reuse (from owner/contact/billing contact, or rccsuper for dorms, or a FSILG's net contact, or similar).</p>"
+            % (cgi.escape(t.hostname), cgi.escape(out), cgi.escape(err)),
+            extra_buttons={"silent": "Approve without mailing accounts-internal"},
+        )
+
+    @expose("scriptspony.templates.message")
     @scripts_team_only
-    def reject(self,id,subject=None,body=None,token=None,silent=False):
+    def reject(self, id, subject=None, body=None, token=None, silent=False):
         t = queue.Ticket.get(int(id))
-        if t.state != 'open':
+        if t.state != "open":
             flash("This ticket's not open!")
-            redirect('/ticket/%s'%id)
+            redirect("/ticket/%s" % id)
         if t.rtid is None:
             flash("This ticket has no RT ID!")
-            redirect('/ticket/%s'%id)
+            redirect("/ticket/%s" % id)
         if (subject and body) or silent:
             if token != auth.token():
                 flash("Invalid token!")
             else:
                 # Send mail and records it as an event
                 if not silent:
-                    mail.send_correspondence(subject,body,
-                                             t.rtid, auth.current_user())
-                    t.addEvent(type=u'mail',state=u'rejected',target=u'user',
-                               subject=subject,body=body)
+                    mail.send_correspondence(subject, body, t.rtid, auth.current_user())
+                    t.addEvent(
+                        type=u"mail",
+                        state=u"rejected",
+                        target=u"user",
+                        subject=subject,
+                        body=body,
+                    )
                     flash("Ticket rejected; mail sent to user.")
                 else:
-                    mail.send_comment(subject,"Ticket rejected silently.\n\n"+body,t.id,t.rtid,
-                                      auth.current_user())
-                    t.addEvent(type=u'mail',state=u'rejected',
-                               target=u'rt', subject=subject,body=body)
+                    mail.send_comment(
+                        subject,
+                        "Ticket rejected silently.\n\n" + body,
+                        t.id,
+                        t.rtid,
+                        auth.current_user(),
+                    )
+                    t.addEvent(
+                        type=u"mail",
+                        state=u"rejected",
+                        target=u"rt",
+                        subject=subject,
+                        body=body,
+                    )
                     flash("Ticket rejected silently.")
-                redirect('/queue')
-        return dict(tickets=[t],action=url('/reject/%s'%id),
-                    subject="Re: Request for hostname %s"%t.hostname,
-                    body="""Hello,
+                redirect("/queue")
+        return dict(
+            tickets=[t],
+            action=url("/reject/%s" % id),
+            subject="Re: Request for hostname %s" % t.hostname,
+            body="""Hello,
 
 Unfortunately, the hostname %(hostname)s is not available.  You can go to http://pony.scripts.mit.edu/ to request a different one.
 
@@ -311,6 +369,8 @@ Sorry for the inconvenience,
 -%(first)s
 
 /set status=rejected
-""" % dict(hostname=t.hostname,first=auth.first_name()),
-                    submit='Send to %s' % t.requestor,
-                    extra_buttons={'silent':'Send as Comment'})
+"""
+            % dict(hostname=t.hostname, first=auth.first_name()),
+            submit="Send to %s" % t.requestor,
+            extra_buttons={"silent": "Send as Comment"},
+        )

@@ -4,4 +4,3 @@ from nose.tools import eq_
 
 from scriptspony import model
 from scriptspony.tests.models import ModelTest
-

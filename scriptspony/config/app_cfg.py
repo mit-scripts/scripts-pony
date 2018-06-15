@@ -17,7 +17,7 @@ from tg.configuration import AppConfig
 
 import scriptspony
 from scriptspony import model
-from scriptspony.lib import app_globals, helpers 
+from scriptspony.lib import app_globals, helpers
 
 from .. import vhosts
 
@@ -26,15 +26,15 @@ base_config.renderers = []
 
 base_config.package = scriptspony
 
-#Set the default renderer
-base_config.default_renderer = 'mako'
-base_config.renderers.append('mako')
+# Set the default renderer
+base_config.default_renderer = "mako"
+base_config.renderers.append("mako")
 # if you want raw speed and have installed chameleon.genshi
 # you should try to use this renderer instead.
 # warning: for the moment chameleon does not handle i18n translations
-#base_config.renderers.append('chameleon_genshi')
+# base_config.renderers.append('chameleon_genshi')
 
-#Configure the base SQLALchemy Setup
+# Configure the base SQLALchemy Setup
 base_config.use_sqlalchemy = True
 base_config.model = scriptspony.model
 base_config.DBSession = scriptspony.model.DBSession

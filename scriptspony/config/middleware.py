@@ -7,10 +7,10 @@ from scriptspony.config.app_cfg import base_config
 from scriptspony.config.environment import load_environment
 
 
-__all__ = ['make_app']
+__all__ = ["make_app"]
 
-# Use base_config to setup the necessary PasteDeploy application factory. 
-# make_base_app will wrap the TG2 app with all the middleware it needs. 
+# Use base_config to setup the necessary PasteDeploy application factory.
+# make_base_app will wrap the TG2 app with all the middleware it needs.
 make_base_app = base_config.setup_tg_wsgi_app(load_environment)
 
 # from /mit/xavid/Public/bazki/lib/bazjunk/middleware/rewrite.py
@@ -21,13 +21,13 @@ class UnrewriteMiddleware(object):
     generate look good.  Takes an app to wrap and a dict like:
 
     {'dispatch.fcgi':'','dispatch.cgi':'dev'}"""
-    
+
     def __init__(self, app, substs):
         self.app = app
         self.substs = substs
-        
+
     def __call__(self, environ, start_response):
-        comps = environ['SCRIPT_NAME'].split('/')
+        comps = environ["SCRIPT_NAME"].split("/")
         for act in self.substs:
             if act in comps:
                 ind = comps.index(act)
@@ -35,10 +35,12 @@ class UnrewriteMiddleware(object):
                     comps[ind] = self.substs[act]
                 else:
                     del comps[ind]
-        environ['SCRIPT_NAME'] = '/'.join(comps)
+        environ["SCRIPT_NAME"] = "/".join(comps)
         return self.app(environ, start_response)
 
+
 from scripts.auth import ScriptsAuthMiddleware
+
 
 def make_app(global_conf, full_stack=True, **app_conf):
     """
@@ -61,12 +63,12 @@ def make_app(global_conf, full_stack=True, **app_conf):
    
     """
     app = make_base_app(global_conf, full_stack=True, **app_conf)
-    
+
     # Wrap your base TurboGears 2 application with custom middleware here
     app = PonyMiddleware(app)
 
-    app = UnrewriteMiddleware(app,{'dispatch.fcgi':''})
+    app = UnrewriteMiddleware(app, {"dispatch.fcgi": ""})
 
     app = ScriptsAuthMiddleware(app)
-    
+
     return app
