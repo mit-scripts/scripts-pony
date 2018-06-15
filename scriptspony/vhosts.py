@@ -1,6 +1,6 @@
 import ldap, ldap.sasl, ldap.filter
 import re
-import subprocess, os, pwd, getpass
+import subprocess, pwd
 import dns, dns.resolver, dns.exception
 import httplib, socket
 import hashlib

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import site, os.path
-
-site.addsitedir(os.path.dirname(__file__))
+import os.path
 
 import urllib2
 

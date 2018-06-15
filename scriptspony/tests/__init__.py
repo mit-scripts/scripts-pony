@@ -2,14 +2,12 @@
 """Unit and functional test suite for ScriptsPony."""
 
 from os import path
-import sys
 
 from tg import config
 from paste.deploy import loadapp
 from paste.script.appinstall import SetupCommand
 from routes import url_for
 from webtest import TestApp
-from nose.tools import eq_
 
 from scriptspony import model
 

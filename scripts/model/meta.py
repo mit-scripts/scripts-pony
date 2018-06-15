@@ -6,19 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 import sqlalchemy.orm
 
 sqlalchemy.orm.ScopedSession = sqlalchemy.orm.scoped_session
-from elixir import (
-    ManyToOne,
-    Entity,
-    Field,
-    OneToMany,
-    using_options,
-    using_table_options,
-    ManyToMany,
-    setup_all,
-    drop_all,
-    create_all,
-    session,
-)
+from elixir import Entity, Field, using_options, using_table_options, setup_all
 import random, hmac, hashlib
 
 

@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 
-import site, os.path
-
-site.addsitedir(os.path.dirname(__file__))
+import os.path
 
 import transaction
 
 from scriptspony.model import queue
-from scriptspony import mail
 from scripts import keytab, log, auth
-from scriptspony.config.environment import load_environment
 
 import email, sys, re
 from email.header import make_header, decode_header

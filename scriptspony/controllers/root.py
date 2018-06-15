@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, url, request, redirect, override_template
+from tg import expose, flash, url, request, redirect
 
 from scriptspony.lib.base import BaseController
-from scriptspony.model import DBSession, metadata
+from scriptspony.model import DBSession
 from scriptspony.model.user import UserInfo
 from scriptspony.controllers.error import ErrorController
 

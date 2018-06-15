@@ -2,11 +2,9 @@
 
 """The base Controller API."""
 
-from tg import TGController, tmpl_context
-from tg.render import render
-import scriptspony.model as model
+from tg import TGController
 
-__all__ = ["Controller", "BaseController"]
+__all__ = ["BaseController"]
 
 
 class BaseController(TGController):

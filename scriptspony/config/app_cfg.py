@@ -16,10 +16,7 @@ convert them into boolean, for example, you should use the
 from tg.configuration import AppConfig
 
 import scriptspony
-from scriptspony import model
-from scriptspony.lib import app_globals, helpers
-
-from .. import vhosts
+import scriptspony.model
 
 base_config = AppConfig()
 base_config.renderers = []

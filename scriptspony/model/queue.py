@@ -12,10 +12,7 @@ from elixir import (
     OneToMany,
     using_options,
     using_table_options,
-    ManyToMany,
     setup_all,
-    drop_all,
-    create_all,
     session,
 )
 import datetime

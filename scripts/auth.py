@@ -17,9 +17,9 @@ def html(s):
     return "<html>" + s
 
 
-# Monkeypatch to prevent webflash from escaping HTML conditionally
 import sys, tg.flash
 
+# Monkeypatch to prevent webflash from escaping HTML conditionally
 sys.modules["tg.flash"].escape = (
     lambda s: s[len("<html>") :] if s.startswith("<html>") else cgi.escape(s)
 )

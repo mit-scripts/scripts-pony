@@ -8,6 +8,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 # from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 
+__all__ = ["user", "queue", "meta"]
+
 # Global session manager: DBSession() returns the Thread-local
 # session object appropriate for the current web request.
 maker = sessionmaker(
