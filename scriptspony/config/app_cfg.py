@@ -41,3 +41,4 @@ base_config.use_sqlalchemy = True
 base_config.model = scriptspony.model
 base_config.DBSession = scriptspony.model.DBSession
 
+base_config.use_toscawidgets = False

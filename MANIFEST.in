@@ -1,4 +1,3 @@
+recursive-include scripts/templates *
 recursive-include scriptspony/public *
-include scriptspony/public/favicon.ico
-recursive-include scriptspony/i18n *
 recursive-include scriptspony/templates *

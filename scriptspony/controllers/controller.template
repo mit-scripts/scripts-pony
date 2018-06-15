@@ -5,10 +5,6 @@
 from tg import expose
 #from tg import redirect, validate, flash
 
-# third party imports
-#from pylons.i18n import ugettext as _
-#from repoze.what import predicates
-
 # project specific imports
 from scriptspony.lib.base import BaseController
 #from scriptspony.model import DBSession, metadata

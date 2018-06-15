@@ -4,8 +4,6 @@
 
 from tg import TGController, tmpl_context
 from tg.render import render
-from pylons.i18n import _, ungettext, N_
-from tw.api import WidgetBunch
 import scriptspony.model as model
 
 __all__ = ['Controller', 'BaseController']
@@ -24,6 +22,6 @@ class BaseController(TGController):
         """Invoke the Controller"""
         # TGController.__call__ dispatches to the Controller method
         # the request is routed to. This routing information is
-        # available in environ['pylons.routes_dict']
+        # available in environ['tg.routes_dict']
 
         return TGController.__call__(self, environ, start_response)

@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <%!
-import pylons
 from socket import gethostname
 from scripts import auth, log
 import os
@@ -155,10 +154,10 @@ else:
 				<div id="hnav">
 				  <ul id="navlist"><li id="pageLogin">
       %if not auth.current_user():
-        <a href="${set_port(pylons.request.application_url,444)}"><span class="fa fa-user"></span> Login with MIT Certificates</a>
+        <a href="${set_port(request.application_url,444)}"><span class="fa fa-user"></span> Login with MIT Certificates</a>
       %else:
         Welcome ${auth.first_name()}.
-        <a href="${set_port(pylons.request.application_url,80)}"><span class="fa fa-sign-out"></span> Logout</a>
+        <a href="${set_port(request.application_url,80)}"><span class="fa fa-sign-out"></span> Logout</a>
       %endif
     </li>
     %if auth.on_scripts_team():

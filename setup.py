@@ -9,34 +9,34 @@ setup(
     author_email='',
     #url='',
     install_requires=[
+        "decorator >= 3.4",
+        "dnspython >= 1.11",
+        "elixir >= 0.7",
+        "mako >= 1.0",
+        "nose >= 1.0",
+        "paste >= 1.7",
+        "routes >= 1.13",
+        "python-ldap >= 2.4",
         "TurboGears2 >= 2.0b7",
-        "Catwalk >= 2.0.2",
-        "Babel >=0.9.4",
-        #can be removed iif use_toscawidgets = False
-        "toscawidgets >= 0.9.7.1",
+        "MySQL-python >= 1.2",
         "zope.sqlalchemy >= 0.4 ",
-        "repoze.tm2 >= 1.0a4",
                         ],
     setup_requires=["PasteScript >= 1.7"],
-    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
+    paster_plugins=['PasteScript', 'TurboGears2', 'tg.devtools'],
     packages=find_packages(),
     include_package_data=True,
     test_suite='nose.collector',
-    tests_require=['WebTest', 'BeautifulSoup'],
-    package_data={'scriptspony': ['i18n/*/LC_MESSAGES/*.mo',
-                                 'templates/*/*',
-                                 'public/*/*']},
-    message_extractors={'scriptspony': [
-            ('**.py', 'python', None),
-            ('templates/**.mako', 'mako', None),
-            ('templates/**.html', 'genshi', None),
-            ('public/**', 'ignore', None)]},
+    tests_require=['WebTest'],
 
-    entry_points="""
-    [paste.app_factory]
-    main = scriptspony.config.middleware:make_app
-
-    [paste.app_install]
-    main = pylons.util:PylonsInstaller
-    """,
+    entry_points={
+        'paste.app_factory': [
+            'main = scriptspony.config.middleware:make_app',
+        ],
+        'paste.app_install': [
+            'main = paste.script.appinstall:Installer',
+        ],
+        'gearbox.plugins': [
+            'turbogears-devtools = tg.devtools',
+        ],
+    },
 )

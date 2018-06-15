@@ -2,8 +2,6 @@
 """Main Controller"""
 
 from tg import expose, flash, require, url, request, redirect, override_template
-from pylons.i18n import ugettext as _, lazy_ugettext as l_
-import pylons
 
 from scriptspony.lib.base import BaseController
 from scriptspony.model import DBSession, metadata
@@ -51,8 +49,8 @@ class RootController(BaseController):
     @expose('scriptspony.templates.index')
     def index(self,locker=None,sudo=False):
         """Handle the front-page."""
-        if locker is not None and pylons.request.response_ext:
-            locker += pylons.request.response_ext
+        if locker is not None and request.response_ext:
+            locker += request.response_ext
         
         olocker = locker
         hosts = None
@@ -102,8 +100,8 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.edit')
     def edit(self,locker,hostname,path=None,token=None,alias=''):
-        if pylons.request.response_ext:
-            hostname += pylons.request.response_ext
+        if request.response_ext:
+            hostname += request.response_ext
         if path is not None:
             if token != auth.token():
                 flash("Invalid token!")
@@ -139,8 +137,8 @@ class RootController(BaseController):
 
     @expose('scriptspony.templates.delete')
     def delete(self,locker,hostname,confirm=False,token=None):
-        if pylons.request.response_ext:
-            hostname += pylons.request.response_ext
+        if request.response_ext:
+            hostname += request.response_ext
         if confirm:
             if token != auth.token():
                 flash("Invalid token!")
@@ -170,8 +168,8 @@ class RootController(BaseController):
             auth.scripts_team_sudo()
         else:
             requestor = None
-        if pylons.request.response_ext:
-            locker += pylons.request.response_ext
+        if request.response_ext:
+            locker += request.response_ext
         if hostname:
             if token != auth.token():
                 flash("Invalid token!")
