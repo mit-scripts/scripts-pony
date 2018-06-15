@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Models relating to tracking information on .mit.edu hostname requests."""
 
-from sqlalchemy import *
+from sqlalchemy import DateTime, Integer, Unicode, UnicodeText
 import sqlalchemy.orm
 
 sqlalchemy.orm.ScopedSession = sqlalchemy.orm.scoped_session

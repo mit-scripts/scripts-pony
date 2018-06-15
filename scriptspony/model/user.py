@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Models relating to tracking information keyed on user."""
 
-from sqlalchemy import *
+from sqlalchemy import Column, PickleType, Unicode
 from sqlalchemy.orm import mapper, relation
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Integer, Unicode, PickleType

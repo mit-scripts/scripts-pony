@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Models relating to tracking information on .mit.edu hostname requests."""
 
-from sqlalchemy import *
+from sqlalchemy import Binary
 from sqlalchemy.orm.exc import NoResultFound
 import sqlalchemy.orm
 
