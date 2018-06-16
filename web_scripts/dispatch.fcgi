@@ -41,7 +41,7 @@ if __name__ == '__main__':
         wsgi_app = loadapp('config:'+webappdir+'/development.ini')
         
         RestartingServer(wsgi_app,restart_file).run()
-    except Exception,e:
+    except Exception as e:
         from traceback import format_exception
         import pwd,socket,sys,os
         tup = sys.exc_info()
