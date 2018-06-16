@@ -18,6 +18,7 @@ setup(
         "routes >= 1.13",
         "python-ldap >= 2.4",
         "TurboGears2 >= 2.0b7",
+        "MySQL-python >= 1.2",
         "zope.sqlalchemy >= 0.4 ",
     ],
     setup_requires=["PasteScript >= 1.7"],
