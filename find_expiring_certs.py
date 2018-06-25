@@ -11,6 +11,7 @@ from scriptspony import vhosts
 def main():
     now = datetime.utcnow()
 
+    vhosts.connect()
     res = vhosts.conn.search_s(
         "ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",
         ldap.SCOPE_ONELEVEL,
