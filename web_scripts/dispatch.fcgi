@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys
+import os
 
 webappdir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + "/..")
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         RestartingServer(wsgi_app, restart_file).run()
     except Exception as e:
         from traceback import format_exception
-        import pwd, socket, sys, os
+        import sys
 
         tup = sys.exc_info()
 
@@ -56,8 +56,6 @@ if __name__ == "__main__":
 
             for l in format_exception(*tup):
                 yield l
-            whoami = pwd.getpwuid(os.getuid())[0]
-            hostname = socket.gethostname()
             yield "To restart: touch %s\n" % os.path.abspath(restart_file)
 
         RestartingServer(errApp, restart_file).run()
