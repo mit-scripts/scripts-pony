@@ -7,7 +7,7 @@ import urllib2
 import transaction
 
 from scriptspony.model import queue
-from scriptspony import mail, vhosts
+from scriptspony import rt, vhosts
 from scripts import hosts, keytab, log, auth
 
 
@@ -84,7 +84,7 @@ http://scripts.mit.edu/
 """ % dict(
                 hostname=t.hostname, locker=t.locker, path=path, sitestatus=sitestatus
             )
-            mail.send_correspondence(subject, body, rtid=t.rtid)
+            rt.call("ticket/%d/comment" % (t.rtid,), Action="correspond", Text=body)
             t.addEvent(
                 type=u"mail",
                 state=u"resolved",

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Models relating to tracking information on .mit.edu hostname requests."""
 
-from sqlalchemy import Binary, Column, Integer
+from sqlalchemy import Binary, Column, Integer, Unicode
 from sqlalchemy.orm.exc import NoResultFound
 
 import random, hmac, hashlib
@@ -17,6 +17,8 @@ class Meta(DeclarativeBase):
 
     # Secret key
     secret = Column(Binary(8), nullable=False)
+    # help.mit.edu password
+    pony_rt_pass = Column(Unicode(255))
 
     def __init__(self):
         self.secret = "".join(chr(random.randint(0, 255)) for x in xrange(8))

@@ -19,7 +19,7 @@ from scripts.auth import (
     is_sudoing,
 )
 from scripts import keytab, log, hosts, auth
-from . import mail
+from . import rt
 from .model import queue
 
 LDAP_SERVERS = ["doppelganger", "alter-ego", "body-double"]
@@ -177,9 +177,11 @@ def request_vhost(locker, hostname, path, user=None, desc=""):
         check_if_already_exists(hostname, locker)
         t = queue.Ticket.create(locker, hostname, path, requestor=user, purpose=desc)
         short = hostname[: -len(".mit.edu")]
-        mail.create_ticket(
-            subject="scripts-vhosts CNAME request: %s" % short,
-            body="""Heyas,
+        out = rt.call(
+            "ticket/new",
+            Queue="Scripts",
+            Subject="scripts-vhosts CNAME request: %s" % short,
+            Text="""Heyas,
 
 %(user)s requested %(hostname)s for locker '%(locker)s' path %(path)s.
 Go to %(url)s to approve it.
@@ -199,9 +201,15 @@ Love,
                 path=path,
                 url=tg.request.host_url + tg.url("/ticket/%s" % t.id),
             ),
-            id=t.id,
-            requestor=user,
+            Requestor=user,
+            AdminCc=rt.ponyaddr(),
         )
+        for line in out.splitlines():
+            if line.startswith("# Ticket ") and line.endswith(" created."):
+                t.rtid = int(line[len("# Ticket ") : -len(" created.")])
+                break
+        else:
+            raise RuntimeError("Could not open an RT ticket")
         message = (
             "We will request the hostname %s; mit.edu hostnames generally take 2-3 business days to become active."
             % hostname

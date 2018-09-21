@@ -15,7 +15,7 @@ import subprocess
 import cgi
 
 from scripts import auth
-from .. import mail, vhosts
+from .. import rt, vhosts
 from ..model import queue
 
 __all__ = ["RootController"]
@@ -258,14 +258,13 @@ class RootController(BaseController):
                 else:
                     if not silent:
                         # Send mail and records it as an event
-                        mail.send_comment(
-                            subject,
-                            body,
-                            t.id,
-                            t.rtid,
-                            auth.current_user(),
-                            "accounts-internal",
+                        rt.call(
+                            "ticket/%d/comment" % (t.rtid,),
+                            Action="comment",
+                            Text=body,
+                            Cc="accounts-internal@mit.edu",
                         )
+
                         t.addEvent(
                             type="mail",
                             state="moira",
@@ -275,12 +274,10 @@ class RootController(BaseController):
                         )
                         flash("Ticket approved; mail sent to accounts-internal.")
                     else:
-                        mail.send_comment(
-                            subject,
-                            "Ticket approved silently.\n\n" + body,
-                            t.id,
-                            t.rtid,
-                            auth.current_user(),
+                        rt.call(
+                            "ticket/%d/comment" % (t.rtid,),
+                            Action="comment",
+                            Text="Ticket approved silently.\n\n" + body,
                         )
                         t.addEvent(type="mail", state="dns", target="us")
                         flash("Ticket approved silently.")
@@ -331,7 +328,9 @@ SIPB Scripts Team
             else:
                 # Send mail and records it as an event
                 if not silent:
-                    mail.send_correspondence(subject, body, t.rtid, auth.current_user())
+                    rt.call(
+                        "ticket/%d/comment" % (t.rtid,), Action="correspond", Text=body
+                    )
                     t.addEvent(
                         type=u"mail",
                         state=u"rejected",
@@ -341,12 +340,10 @@ SIPB Scripts Team
                     )
                     flash("Ticket rejected; mail sent to user.")
                 else:
-                    mail.send_comment(
-                        subject,
-                        "Ticket rejected silently.\n\n" + body,
-                        t.id,
-                        t.rtid,
-                        auth.current_user(),
+                    rt.call(
+                        "ticket/%d/comment" % (t.rtid,),
+                        Action="comment",
+                        Text="Ticket rejected silently.\n\n" + body,
                     )
                     t.addEvent(
                         type=u"mail",
