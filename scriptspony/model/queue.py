@@ -45,6 +45,7 @@ class Ticket(DeclarativeBase):
             purpose=purpose,
         )
         DBSession.add(t)
+        DBSession.flush()
         t.addEvent(type="request", state="open", target="us")
         return t
 
