@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os.path
-
+import posixpath
 import urllib2
 
 import transaction
@@ -27,9 +27,13 @@ def check_dns():
         t = queue.Ticket.get(tid)
 
         if hosts.points_at_scripts(t.hostname):
-            path = "/mit/%s/web_scripts/%s" % (
-                t.locker,
-                vhosts.get_path(t.locker, t.hostname),
+            path = posixpath.normpath(
+                posixpath.join(
+                    "/mit",
+                    t.locker,
+                    "web_scripts",
+                    vhosts.get_path(t.locker, t.hostname),
+                )
             )
             wordpress = (
                 "This site looks like a WordPress blog; for the new URL to work properly, you'll need to access the WordPress admin interface via your old URL, go to General Settings, and change the WordPress address and Blog address to 'http://%s'."
