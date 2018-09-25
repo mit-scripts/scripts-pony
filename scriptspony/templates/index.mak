@@ -37,8 +37,8 @@ from scripts import auth
     
     Paths are relative to the top directory for the 
     appropriate service; for example, 
-    <tt>/mit/${locker}/web_scripts/</tt> for <a href="http://scripts.mit.edu/web/">web scripts</a> or 
-    <tt>/mit/${locker}/Scripts/svn/</tt> for <a href="http://scripts.mit.edu/faq/93/">Subversion</a>.
+    <tt>/mit/${locker}/web_scripts/</tt> for <a href="https://scripts.mit.edu/web/">web scripts</a> or 
+    <tt>/mit/${locker}/Scripts/svn/</tt> for <a href="https://scripts.mit.edu/faq/93/">Subversion</a>.
   </p>
   <p>
     <a href="${tg.url('/new/'+locker)}" class="btn"><span class="fa fa-plus"></span> Request a new hostname</a> for the ${locker} locker
@@ -71,13 +71,13 @@ from scripts import auth
 %elif https:
   <p>You don't seem to be presenting a valid certificate.  You may
     wish to consult
-    the <a href="http://ist.mit.edu/services/certificates/wizard">IS&amp;T
+    the <a href="https://ist.mit.edu/services/certificates/wizard">IS&amp;T
     Certificate Help Wizard</a>.</p> 
 %else:
   <p>
     Welcome to the scripts.mit.edu hostname management tool.  You can
     request short hostnames to refer to your
-  <a href="http://scripts.mit.edu/">scripts.mit.edu</a> pages and
+  <a href="https://scripts.mit.edu/">scripts.mit.edu</a> pages and
   configure the hostnames you already have.  Log in with your MIT
   certificates above.
   </p>

@@ -93,7 +93,7 @@ def validate_locker(locker, team_ok=False, sudo_ok=False):
         except KeyError:
             raise AuthError(
                 html(
-                    """The '%s' locker is not signed up for scripts.mit.edu; <a href="http://scripts.mit.edu/web/">sign it up</a> first."""
+                    """The '%s' locker is not signed up for scripts.mit.edu; <a href="https://scripts.mit.edu/web/">sign it up</a> first."""
                     % cgi.escape(locker)
                 )
             )
@@ -103,7 +103,7 @@ def validate_locker(locker, team_ok=False, sudo_ok=False):
             and not can_admin(locker)
         ):
             raise AuthError(
-                "You cannot administer the '%s' locker! Please see http://scripts.mit.edu/faq/159 for more details."
+                "You cannot administer the '%s' locker! Please see https://scripts.mit.edu/faq/159 for more details."
                 % locker
             )
 

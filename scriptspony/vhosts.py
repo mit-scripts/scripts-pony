@@ -348,7 +348,7 @@ def validate_hostname(hostname, locker):
                 if status.status != httplib.OK:
                     raise UserError(
                         auth.html(
-                            "'%s' does not point at scripts-vhosts. If you want to continue anyway, please create a file called '%s' in the root directory of the site. See <a href='http://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
+                            "'%s' does not point at scripts-vhosts. If you want to continue anyway, please create a file called '%s' in the root directory of the site. See <a href='https://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
                             % (cgi.escape(hostname), cgi.escape(check_file))
                         )
                     )
@@ -357,7 +357,7 @@ def validate_hostname(hostname, locker):
             except (httplib.HTTPException, socket.error):
                 raise UserError(
                     auth.html(
-                        "'%s' does not point at scripts-vhosts, and appears to have no running webserver. Please see <a href='http://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
+                        "'%s' does not point at scripts-vhosts, and appears to have no running webserver. Please see <a href='https://scripts.mit.edu/faq/132/can-i-add-a-vhost-before-i-point-my-domain-at-scripts' target='_blank'>the FAQ</a> for more information."
                         % cgi.escape(hostname)
                     )
                 )

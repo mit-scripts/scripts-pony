@@ -13,7 +13,7 @@ from scripts.auth import token
       to force-submit a request!  Only do this in response to a user request!
       Be careful!</p>
   %endif
-  <p>You about to request a hostname for the <b>${locker}</b> locker. If you purchased a domain and want to associate it with Scripts, your request will be automatically approved. <a href="http://scripts.mit.edu/faq/14/do-cnames-work-with-the-script-service">Our FAQ has details on the process</a>.</p>
+  <p>You about to request a hostname for the <b>${locker}</b> locker. If you purchased a domain and want to associate it with Scripts, your request will be automatically approved. <a href="https://scripts.mit.edu/faq/14/do-cnames-work-with-the-script-service">Our FAQ has details on the process</a>.</p>
   <p>Requests for hostnames ending in ".${locker}.scripts.mit.edu" will also be automatically approved.</p>
   <p>If you want a different hostname ending in ".mit.edu", this will require approval by the Scripts team, get forwarded to IS&T for processing, and then become active after a few business days.</p>
   <ul class="form">

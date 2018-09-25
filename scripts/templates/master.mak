@@ -106,7 +106,7 @@ else:
         white-space: nowrap;
       }
 
-      /* FFS firefox http://stackoverflow.com/questions/8859908/buttons-too-tall-on-firefox */
+      /* FFS firefox https://stackoverflow.com/questions/8859908/buttons-too-tall-on-firefox */
       /* (normalize.css contains this line so it's probably reasonable) */
       input::-moz-focus-inner, button::-moz-focus-inner {
         border: 0;
@@ -163,7 +163,7 @@ else:
     %if auth.on_scripts_team():
       <li><a href="${tg.url('/queue')}"><span class="fa fa-th-list"></span> Admin Queue</a></li>
     %endif    
-    <li><a href="http://scripts.mit.edu/"><span class="fa fa-home"></span> scripts.mit.edu home</a></li>
+    <li><a href="https://scripts.mit.edu/"><span class="fa fa-home"></span> scripts.mit.edu home</a></li>
 </ul>
 
 				</div>
@@ -186,7 +186,7 @@ tg_flash = tg.flash_obj.render('flash', use_js=False)
 
 <p>&nbsp;</p>
 
-<center><small>&copy; 2009-${datetime.now().year}, the SIPB scripts.mit.edu project.<br/>These pages may be reused under either the <a href="/nolink/81/">GFDL 1.2</a> or <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/">CC-BY-SA 3.0</a>.<br/>Questions? Contact <a href="mailto:scripts@mit.edu">scripts@mit.edu</a>.<br/><br/>
+<center><small>&copy; 2009-${datetime.now().year}, the SIPB scripts.mit.edu project.<br/>These pages may be reused under either the <a href="/nolink/81/">GFDL 1.2</a> or <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/us/">CC-BY-SA 3.0</a>.<br/>Questions? Contact <a href="mailto:scripts@mit.edu">scripts@mit.edu</a>.<br/><br/>
 
 You are currently connected to ${scriptshost}.</small></center>
 
@@ -199,7 +199,7 @@ Feel free to contact us with any questions, comments, or suggestions.
 <ul><li><a href="mailto:scripts@mit.edu"><span class="fa fa-envelope"></span> scripts@mit.edu</a></li>
 </ul>
 
-<a class="nobutt" href="http://scripts.mit.edu/faq/45/"><img src="${tg.url('/scripts/media/powered_by-trans.gif')}" alt="powered by scripts.mit.edu"/></a>
+<a class="nobutt" href="https://scripts.mit.edu/faq/45/"><img src="${tg.url('/scripts/media/powered_by-trans.gif')}" alt="powered by scripts.mit.edu"/></a>
 
 					</div>
 <center><a href="${tg.url('/pony')}" style="color:white">(and ponies)</a></center>

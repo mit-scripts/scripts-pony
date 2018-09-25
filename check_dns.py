@@ -56,7 +56,7 @@ def check_dns():
                     sitestatus = wordpress
                 elif e.code == 404:
                     sitestatus = (
-                        "There doesn't seem to be any content currently at %s; make sure that directory exists and has an index.html, index.cgi, or similar, or change this hostname to point somewhere else at http://pony.scripts.mit.edu."
+                        "There doesn't seem to be any content currently at %s; make sure that directory exists and has an index.html, index.cgi, or similar, or change this hostname to point somewhere else at https://pony.scripts.mit.edu."
                         % path
                     )
                 elif e.code == 403:
@@ -82,7 +82,7 @@ Just wanted to let you know that the hostname %(hostname)s is now configured and
 Let us know if you run into any issues.
 
 ~The SIPB Scripts Team
-http://scripts.mit.edu/
+https://scripts.mit.edu/
 
 /set status=resolved
 """ % dict(

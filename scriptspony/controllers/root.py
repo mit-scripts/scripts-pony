@@ -360,7 +360,7 @@ SIPB Scripts Team
             subject="Re: Request for hostname %s" % t.hostname,
             body="""Hello,
 
-Unfortunately, the hostname %(hostname)s is not available.  You can go to http://pony.scripts.mit.edu/ to request a different one.
+Unfortunately, the hostname %(hostname)s is not available.  You can go to https://pony.scripts.mit.edu/ to request a different one.
 
 Sorry for the inconvenience,
 -%(first)s
