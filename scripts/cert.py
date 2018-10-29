@@ -117,5 +117,9 @@ def msg_to_pem(msg):
     if not urls:
         return None
     url, = urls
-    r = requests.get(url)
-    return r.text if r.status_code == 200 else None
+    for retry in range(20):
+        r = requests.get(url)
+        if r.status_code == 200:
+            return r.text
+    r.raise_for_status()
+    raise RuntimeError("Got HTTP status %d" % r.status_code)
