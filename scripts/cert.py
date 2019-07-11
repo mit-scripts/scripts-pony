@@ -27,10 +27,18 @@ def pem_to_chain(data):
         )
     ]
 
-    # Put the chain in the right order, and delete any self-signed root
+    # Find the leaf certificate
     leaf, = [
         c for c in certs if not any(c1.get_issuer() == c.get_subject() for c1 in certs)
     ]
+
+    assert not any(
+        leaf.get_extension(e).get_short_name() == b"basicConstraints"
+        and str(leaf.get_extension(e)) != "CA:FALSE"
+        for e in range(leaf.get_extension_count())
+    ), "certificate is a CA"
+
+    # Put the chain in the right order, and delete any self-signed root
     chain = [leaf]
     count = 1
     while True:
