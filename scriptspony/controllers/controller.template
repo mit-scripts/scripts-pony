@@ -13,5 +13,5 @@ from scriptspony.lib.base import BaseController
 class SampleController(BaseController):
     
     @expose('scriptspony.templates.index')
-    def index(self):
+    def index(self, **kwargs):
         return dict(page='index')

@@ -48,7 +48,7 @@ class RootController(BaseController):
     error = ErrorController()
 
     @expose("scriptspony.templates.index")
-    def index(self, locker=None, sudo=False):
+    def index(self, locker=None, sudo=False, **kwargs):
         """Handle the front-page."""
         if locker is not None and request.response_ext:
             locker += request.response_ext
@@ -101,7 +101,7 @@ class RootController(BaseController):
         return dict(hosts=hosts, locker=locker, user_info=user_info, https=https)
 
     @expose("scriptspony.templates.edit")
-    def edit(self, locker, hostname, path=None, token=None, alias=""):
+    def edit(self, locker, hostname, path=None, token=None, alias="", **kwargs):
         if request.response_ext:
             hostname += request.response_ext
         if path is not None:
@@ -138,7 +138,7 @@ class RootController(BaseController):
         )
 
     @expose("scriptspony.templates.delete")
-    def delete(self, locker, hostname, confirm=False, token=None):
+    def delete(self, locker, hostname, confirm=False, token=None, **kwargs):
         if request.response_ext:
             hostname += request.response_ext
         if confirm:
@@ -172,6 +172,7 @@ class RootController(BaseController):
         confirmed=False,
         personal_ok=False,
         requestor=None,
+        **kwargs
     ):
         personal = locker == auth.current_user()
         if confirmed:
@@ -234,12 +235,12 @@ class RootController(BaseController):
 
     @expose("scriptspony.templates.ticket")
     @scripts_team_only
-    def ticket(self, id):
+    def ticket(self, id, **kwargs):
         return dict(tickets=[queue.Ticket.get(int(id))])
 
     @expose("scriptspony.templates.message")
     @scripts_team_only
-    def approve(self, id, subject=None, body=None, token=None, silent=False):
+    def approve(self, id, subject=None, body=None, token=None, silent=False, **kwargs):
         t = queue.Ticket.get(int(id))
         if t.state != "open":
             flash("This ticket's not open!")
@@ -314,7 +315,7 @@ SIPB Scripts Team
 
     @expose("scriptspony.templates.message")
     @scripts_team_only
-    def reject(self, id, subject=None, body=None, token=None, silent=False):
+    def reject(self, id, subject=None, body=None, token=None, silent=False, **kwargs):
         t = queue.Ticket.get(int(id))
         if t.state != "open":
             flash("This ticket's not open!")
