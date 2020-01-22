@@ -1,26 +1,31 @@
 === Checking Out ===
 
 You can get your own clone of Scripts Pony by doing
-"git clone /mit/pony/scripts-pony.git".  Doing this in 
+"git clone https://github.com/mit-scripts/scripts-pony.git". Doing this in 
 ~/Scripts/turbogears/ is mildly recommended.
 
 === Install ===
 
 To install your own instance of Scripts Pony, make a symbolic link
 from somewhere in your web_scripts directory to your checkout of
-Scripts Pony, and make sure that daemon.scripts can read everything
-in your checkout and write the data directory.
+Scripts Pony, and make sure that daemon.scripts can write in your checkout.
 
 ln -s "$(pwd)/web_scripts" ~/web_scripts/pony
 add consult
-fsr sa . daemon.scripts read
-fsr sa data daemon.scripts write
+fsr sa . daemon.scripts write
+
+You will also need to give daemon.scripts write access to ~/.local/bin and ~/.local/lib:
+mkdir ~/.local/lib
+fs sa ~/.local/lib daemon.scripts write
+mkdir ~/.local/bin
+fs sa ~/,local/bin daemon.scripts write
 
 Pony will try to use your username+scripts-pony database on
 sql.mit.edu.  Go to sql.mit.edu and create this database, and
 be sure the login info in your ~/.my.conf is accurate.
 
-Then ssh into scripts.mit.edu and run:
+Then ssh into scripts.mit.edu, cd into ~/Scripts/turbogears/scripts-pony, and run:
+python setup.py develop --user
 paster setup-app development.ini
 
 === Mail and Cron ===
@@ -30,13 +35,13 @@ mail_scripts and Pony needs the following in ~/mail_scripts/procmailrc:
 
 :0w
 * ^Delivered-To:.*pony\+.*@.*
-| /mit/locker/Scripts/turbogears/ScriptsPony/handle_mail.py
+| /mit/locker/Scripts/turbogears/scripts-pony/handle_mail.py
 
 To periodically check DNS automatically for tickets blocking on DNS,
 you need to be signed up for cron_scripts and load a crontab that
 contains:
 
-2,17,32,49 * * * * /mit/locker/Scripts/turbogears/ScriptsPony/check_dns.py
+2,17,32,49 * * * * /mit/locker/Scripts/turbogears/scripts-pony/check_dns.py
 
 === Authentication and Authorization ===
 
