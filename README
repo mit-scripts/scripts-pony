@@ -18,7 +18,7 @@ You will also need to give daemon.scripts write access to ~/.local/bin and ~/.lo
 mkdir ~/.local/lib
 fs sa ~/.local/lib daemon.scripts write
 mkdir ~/.local/bin
-fs sa ~/,local/bin daemon.scripts write
+fs sa ~/.local/bin daemon.scripts write
 
 Pony will try to use your username+scripts-pony database on
 sql.mit.edu.  Go to sql.mit.edu and create this database, and
@@ -58,6 +58,6 @@ LDAP:
 This assumes that the user in LDAP looks like:
 
 dn: uid=daemon/scripts-pony.mit.edu,ou=People,dc=scripts,dc=mit,dc=edu
-uid: daemon/scropts-pony.mit.edu
+uid: daemon/scripts-pony.mit.edu
 objectClass: account
 objectClass: top
