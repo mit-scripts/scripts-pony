@@ -12,7 +12,10 @@ BLACKLIST = ["scripts.mit.edu", "notfound.example.com"]
 
 @log.exceptions
 def main():
-    msg = email.message_from_file(sys.stdin)
+    if hasattr(sys.stdin, "buffer"):
+        msg = email.message_from_binary_file(sys.stdin.buffer)
+    else:
+        msg = email.message_from_file(sys.stdin)
     pem = cert.msg_to_pem(msg)
     if pem is None:
         log.info("handle_cert_mail.py: No certificate")
