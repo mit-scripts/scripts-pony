@@ -1,5 +1,9 @@
 import base64
 from datetime import datetime
+try:
+    from html.parser import HTMLParser
+except ImportError:
+    from HTMLParser import HTMLParser
 import re
 from OpenSSL import crypto
 import pyasn1.codec.der.decoder as der_decoder
@@ -115,13 +119,35 @@ def chain_should_install(new_chain, old_chain=None):
     return True
 
 
+URL_RE = re.compile(
+    r"https://cert-manager\.com/customer/InCommon/ssl\?action=download&sslId=\d+&format=x509"
+)
+
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self, urls):
+        HTMLParser.__init__(self)
+        self.urls = urls
+
+    def handle_starttag(self, tag, attrs):
+        self.urls.update(url for attr, value in attrs for url in URL_RE.findall(value))
+
+    def handle_data(self, data):
+        self.urls.update(URL_RE.findall(data))
+
+
 def msg_to_pem(msg):
-    urls = set(
-        re.findall(
-            r"https://cert-manager\.com/customer/InCommon/ssl\?action=download&sslId=\d+&format=x509",
-            msg,
-        )
-    )
+    urls = set()
+    for part in msg.walk():
+        payload = part.get_payload(decode=True)
+        if payload is not None:
+            payload_str = payload.decode(part.get_content_charset("us-ascii"))
+            if part.get_content_type() == "text/html":
+                parser = MyHTMLParser(urls)
+                parser.feed(payload_str)
+                parser.close()
+            else:
+                urls.update(URL_RE.findall(payload_str))
     if not urls:
         return None
     url, = urls

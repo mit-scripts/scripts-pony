@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import email
 import sys
 import ldap
 import ldap.filter
@@ -11,7 +12,7 @@ BLACKLIST = ["scripts.mit.edu", "notfound.example.com"]
 
 @log.exceptions
 def main():
-    msg = sys.stdin.read()
+    msg = email.message_from_file(sys.stdin)
     pem = cert.msg_to_pem(msg)
     if pem is None:
         log.info("handle_cert_mail.py: No certificate")
