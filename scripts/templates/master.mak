@@ -105,6 +105,10 @@ else:
       .nbr {
         white-space: nowrap;
       }
+      
+      #flash {
+        color: red;
+      }
 
       /* FFS firefox https://stackoverflow.com/questions/8859908/buttons-too-tall-on-firefox */
       /* (normalize.css contains this line so it's probably reasonable) */
