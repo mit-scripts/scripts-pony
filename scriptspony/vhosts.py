@@ -113,12 +113,13 @@ def get_vhost_info(locker, hostname):
             "(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))",
             [locker, hostname],
         ),
-        ["scriptsVhostDirectory", "scriptsVhostAlias"],
+        ["scriptsVhostDirectory", "scriptsVhostAlias", "scriptsVhostPoolIPv4"],
     )
     try:
         return (
             res[0][1]["scriptsVhostDirectory"][0],
             res[0][1].get("scriptsVhostAlias", []),
+            res[0][1]["scriptsVhostPoolIPv4"][0]
         )
     except IndexError:
         raise UserError(
@@ -150,6 +151,29 @@ def set_path(locker, vhost, path):
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
 
+@sensitive
+@log.exceptions
+@reconnecting
+def set_pool(locker, vhost, pool):
+    """Sets the pool of an existing vhost owned by the locker."""
+    if vhost == locker + ".scripts.mit.edu":
+        raise UserError("You cannot reconfigure " + vhost + "!")
+    locker = locker.encode("utf-8")
+    pool = pool.encode("utf-8")
+    scriptsVhostName = get_vhost_name(locker, vhost)
+    if pool == "unchanged":
+        pass
+    elif pool == "default":
+        conn.modify_s(scriptsVhostName, [(ldap.MOD_DELETE, "scriptsVhostPoolIPv4", None)])
+    else:
+        conn.modify_s(
+            scriptsVhostName, [(ldap.MOD_REPLACE, "scriptsVhostPoolIPv4", [pool])]
+        )
+
+    log.info(
+        "%s set pool for vhost '%s' (locker '%s') to '%s'."
+        % (current_user(), vhost, locker, pool)
+    )
 
 @sensitive
 @log.exceptions

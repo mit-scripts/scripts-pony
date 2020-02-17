@@ -103,21 +103,24 @@ class RootController(BaseController):
         return dict(hosts=hosts, locker=locker, user_info=user_info, https=https)
 
     @expose("scriptspony.templates.edit")
-    def edit(self, locker, hostname, path=None, token=None, alias="", **kwargs):
+    def edit(self, locker, hostname, pool=None, path=None, token=None, alias="", **kwargs):
         if request.response_ext:
             hostname += request.response_ext
-        if path is not None:
+        if path is not None or pool is not None:
             if token != auth.token():
                 flash("Invalid token!")
             else:
                 try:
-                    vhosts.set_path(locker, hostname, path)
+                    if path is not None:
+                        vhosts.set_path(locker, hostname, path)
+                    if pool is not None:
+                        vhosts.set_pool(locker, hostname, pool)
                 except vhosts.UserError as e:
                     flash(e.message)
                 else:
                     flash("Host '%s' reconfigured." % hostname)
                     redirect("/index/" + locker)
-            _, aliases = vhosts.get_vhost_info(locker, hostname)
+            _, aliases, pool = vhosts.get_vhost_info(locker, hostname)
         else:
             if alias:
                 if token != auth.token():
@@ -131,12 +134,14 @@ class RootController(BaseController):
                         flash("Alias '%s' added to hostname '%s'." % (alias, hostname))
                         redirect("/index/" + locker)
             try:
-                path, aliases = vhosts.get_vhost_info(locker, hostname)
+                path, aliases, pool = vhosts.get_vhost_info(locker, hostname)
             except vhosts.UserError as e:
                 flash(e.message)
                 redirect("/index/" + locker)
+        pools = vhosts.list_pools()
+        pool = pools.get(pool, pool)
         return dict(
-            locker=locker, hostname=hostname, path=path, aliases=aliases, alias=alias
+            locker=locker, hostname=hostname, pool=pool, pools=pools, path=path, aliases=aliases, alias=alias
         )
 
     @expose("scriptspony.templates.delete")
@@ -154,10 +159,10 @@ class RootController(BaseController):
                 else:
                     flash("Host '%s' deleted." % hostname)
                     redirect("/index/" + locker)
-            _, aliases = vhosts.get_vhost_info(locker, hostname)
+            _, aliases, _ = vhosts.get_vhost_info(locker, hostname)
         else:
             try:
-                path, aliases = vhosts.get_vhost_info(locker, hostname)
+                path, aliases, _ = vhosts.get_vhost_info(locker, hostname)
             except vhosts.UserError as e:
                 flash(e.message)
                 redirect("/index/" + locker)

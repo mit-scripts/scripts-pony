@@ -4,15 +4,15 @@ import threading
 from datetime import datetime, timedelta
 
 KEYTAB_FILE = None
-principle = None
+principal = None
 
 
 def set(name):
     """Tells the keytab module to look for the daemon/NAME.mit.edu
     keytab in ~/Private/NAME.keytab"""
-    global KEYTAB_FILE, principle
+    global KEYTAB_FILE, principal
     KEYTAB_FILE = os.path.expanduser("~/Private/%s.keytab" % name)
-    principle = "daemon/%s.mit.edu" % name
+    principal = "daemon/%s.mit.edu" % name
 
 
 def exists():
@@ -31,5 +31,5 @@ def auth():
             kinit = "/usr/kerberos/bin/kinit"
         else:
             kinit = "/usr/bin/kinit"
-        subprocess.Popen([kinit, principle, "-k", "-t", KEYTAB_FILE]).wait()
+        subprocess.Popen([kinit, principal, "-k", "-t", KEYTAB_FILE]).wait()
         state.got_tickets = now
