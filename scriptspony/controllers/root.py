@@ -81,6 +81,8 @@ class RootController(BaseController):
             try:
                 hosts = vhosts.list_vhosts(locker)
                 hosts.sort(key=lambda k: k[0])
+                pools = vhosts.list_pools()
+                hosts = [(host,aliases,path,pools.get(ip,ip)) for host,aliases,path,ip in hosts]
             except auth.AuthError as e:
                 flash(e.message)
                 # User has been deauthorized from this locker

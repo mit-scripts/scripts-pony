@@ -9,8 +9,8 @@ from scripts import auth
 
   <p>
     <table border="1">
-      <tr><th>Hostname</th><th>Path</th><th>Edit</th></tr>
-      %for host,aliases,path in hosts:
+      <tr><th>Hostname</th><th>Path</th><th>Fedora Pool</th><th>Edit</th></tr>
+      %for host,aliases,path,ipv4 in hosts:
         <tr>
           <td>
 	  <a href="http://${host}">${host}</a>
@@ -20,6 +20,9 @@ from scripts import auth
 	  </td>
 	  <td>
 	    <small>/mit/${locker}/web_scripts/</small>${path}
+	  </td>
+	  <td>
+	  <big>${ipv4}</big>
 	  </td>
           %if host not in (locker+'.scripts.mit.edu',):
             <td class="nbr">

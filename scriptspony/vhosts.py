@@ -65,17 +65,32 @@ def list_vhosts(locker):
             "(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))",
             [locker],
         ),
-        ["scriptsVhostName", "scriptsVhostDirectory", "scriptsVhostAlias"],
+        ["scriptsVhostName", "scriptsVhostDirectory", "scriptsVhostAlias", "scriptsVhostPoolIPv4"],
     )
     return [
         (
             m["scriptsVhostName"][0],
             m.get("scriptsVhostAlias", []),
             m["scriptsVhostDirectory"][0],
+            m["scriptsVhostPoolIPv4"][0],
         )
-        for i, m in res
+        for _, m in res
     ]
 
+@log.exceptions
+@reconnecting
+def list_pools():
+    """Returns the IP and description for each VhostPool"""
+    res = conn.search_s(
+        "ou=Pools,dc=scripts,dc=mit,dc=edu",
+        ldap.SCOPE_ONELEVEL,
+        "objectClass=scriptsVhostPool",
+        ["scriptsVhostPoolIPv4", "description"],
+    )
+    return {
+      m["scriptsVhostPoolIPv4"][0]: m["description"][0]
+      for _, m in res
+    }
 
 @team_sensitive
 @log.exceptions
