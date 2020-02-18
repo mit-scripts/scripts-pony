@@ -85,10 +85,10 @@ def list_pools():
         "ou=Pools,dc=scripts,dc=mit,dc=edu",
         ldap.SCOPE_ONELEVEL,
         "objectClass=scriptsVhostPool",
-        ["scriptsVhostPoolIPv4", "description"],
+        ["scriptsVhostPoolIPv4", "description", "scriptsVhostPoolUserSelectable"],
     )
     return {
-      m["scriptsVhostPoolIPv4"][0]: m["description"][0]
+            m["scriptsVhostPoolIPv4"][0]: {"description": m["description"][0], "scriptsVhostPoolUserSelectable": m["scriptsVhostPoolUserSelectable"][0]}
       for _, m in res
     }
 
@@ -156,8 +156,6 @@ def set_path(locker, vhost, path):
 @reconnecting
 def set_pool(locker, vhost, pool):
     """Sets the pool of an existing vhost owned by the locker."""
-    if vhost == locker + ".scripts.mit.edu":
-        raise UserError("You cannot reconfigure " + vhost + "!")
     locker = locker.encode("utf-8")
     pool = pool.encode("utf-8")
     scriptsVhostName = get_vhost_name(locker, vhost)
