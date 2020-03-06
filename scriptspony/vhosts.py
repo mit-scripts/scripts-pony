@@ -86,10 +86,21 @@ def list_pools():
         "objectClass=scriptsVhostPool",
         ["scriptsVhostPoolIPv4", "description", "scriptsVhostPoolUserSelectable"],
     )
-    return {
+    pools = {
             m["scriptsVhostPoolIPv4"][0]: {"description": m["description"][0], "scriptsVhostPoolUserSelectable": m["scriptsVhostPoolUserSelectable"][0]}
       for _, m in res
     }
+    res = conn.search_s(
+        "ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",
+        ldap.SCOPE_ONELEVEL,
+        "(&(objectClass=cosTemplate)(scriptsVhostPoolIPv4=*))",
+        ["scriptsVhostPoolIPv4"],
+        )
+    if res:
+        name = res[0][1]["scriptsVhostPoolIPv4"][0]
+        name = pools.get(name, {"description": name})["description"]
+        pools[None] = {"description": "Default (%s)" % (name,), "scriptsVhostPoolUserSelectable": False}
+    return pools
 
 @team_sensitive
 @log.exceptions

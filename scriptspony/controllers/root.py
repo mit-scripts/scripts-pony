@@ -103,7 +103,6 @@ class RootController(BaseController):
             # Only show Pool column if one or more of the vhosts are
             # not on the default pool.
             pools = vhosts.list_pools()
-            pools[None] = {'description': 'Default'}
         return dict(hosts=hosts, locker=locker, user_info=user_info, https=https, pools=pools)
 
     @expose("scriptspony.templates.edit")
@@ -143,7 +142,7 @@ class RootController(BaseController):
             redirect("/index/" + locker)
         pools = vhosts.list_pools()
         pool_choices = []
-        pool_choices.append({"name": 'Default', "value": 'default', "selected": info['poolIPv4'] is None})
+        pool_choices.append({"name": pools[None]["description"], "value": 'default', "selected": info['poolIPv4'] is None})
         for ip, pool in pools.items():
             # TODO: Only show selectable pools
             if pool["scriptsVhostPoolUserSelectable"] == "TRUE":
