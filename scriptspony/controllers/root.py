@@ -99,10 +99,10 @@ class RootController(BaseController):
                     user_info.lockers.sort()
                     DBSession.add(user_info)
                     flash('You can administer the "%s" locker.' % locker)
-        if any(host[3] for host in hosts):
-            # Only show Pool column if one or more of the vhosts are
-            # not on the default pool.
-            pools = vhosts.list_pools()
+            if any(host[3] for host in hosts):
+                # Only show Pool column if one or more of the vhosts are
+                # not on the default pool.
+                pools = vhosts.list_pools()
         return dict(hosts=hosts, locker=locker, user_info=user_info, https=https, pools=pools)
 
     @expose("scriptspony.templates.edit")
