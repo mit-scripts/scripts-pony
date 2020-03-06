@@ -139,6 +139,10 @@ def set_path(locker, vhost, path):
     locker = locker.encode("utf-8")
     scriptsVhostName = get_vhost_name(locker, vhost)
 
+    info = get_vhost_info(locker, vhost)
+    if info['path'] == path:
+        return
+
     conn.modify_s(
         scriptsVhostName, [(ldap.MOD_REPLACE, "scriptsVhostDirectory", [path])]
     )
@@ -159,11 +163,29 @@ def set_pool(locker, vhost, pool):
     locker = locker.encode("utf-8")
     pool = pool.encode("utf-8")
     scriptsVhostName = get_vhost_name(locker, vhost)
+    info = get_vhost_info(locker, vhost)
     if pool == "unchanged":
         pass
     elif pool == "default":
+        if not info['poolIPv4']:
+            return
         conn.modify_s(scriptsVhostName, [(ldap.MOD_DELETE, "scriptsVhostPoolIPv4", None)])
     else:
+        if info['poolIPv4'] == pool:
+            return
+        res = conn.search_s(
+            "ou=Pools,dc=scripts,dc=mit,dc=edu",
+            ldap.SCOPE_ONELEVEL,
+            ldap.filter.filter_format(
+                "(&(objectClass=scriptsVhostPool)(scriptsVhostPoolIPv4=%s))",
+                [pool]),
+            ["description", "scriptsVhostPoolUserSelectable"],
+        )
+        if not res or not res[0][1].get('scriptsVhostPoolUserSelectable'):
+            name = pool
+            if res:
+                name = res[0][1].get('description', name)
+            raise UserError("You cannot switch to the %s pool!" % (name,))
         conn.modify_s(
             scriptsVhostName, [(ldap.MOD_REPLACE, "scriptsVhostPoolIPv4", [pool])]
         )
