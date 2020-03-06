@@ -10,7 +10,7 @@ from scripts import auth
   <p>
     <table border="1">
       <tr><th>Hostname</th><th>Path</th><th>Fedora Pool</th><th>Edit</th></tr>
-      %for host,aliases,path,pool in hosts:
+      %for host,aliases,path,ip in hosts:
         <tr>
           <td>
 	  <a href="http://${host}">${host}</a>
@@ -22,7 +22,11 @@ from scripts import auth
 	    <small>/mit/${locker}/web_scripts/</small>${path}
 	  </td>
 	  <td>
-	  ${pool["description"]}
+	  %if pools.get(ip):
+	  	${pools.get(ip)["description"]}
+	  %else:
+	  	${ip}
+	  %endif 
 	  </td>
             <td class="nbr">
               <a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a>

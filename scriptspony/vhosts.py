@@ -98,7 +98,7 @@ def get_path(locker, hostname):
     """Return a the path for the given hostname.
 
     The directory is relative to web_scripts or Scripts/*/"""
-    return get_vhost_info(locker, hostname)[0]
+    return get_vhost_info(locker, hostname)["path"]
 
 
 @team_sensitive
@@ -113,14 +113,14 @@ def get_vhost_info(locker, hostname):
             "(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))",
             [locker, hostname],
         ),
-        ["scriptsVhostDirectory", "scriptsVhostAlias", "scriptsVhostPoolIPv4"],
     )
     try:
-        return (
-            res[0][1]["scriptsVhostDirectory"][0],
-            res[0][1].get("scriptsVhostAlias", []),
-            res[0][1]["scriptsVhostPoolIPv4"][0]
-        )
+        attrs = res[0][1]
+        return {
+            "path": attrs["scriptsVhostDirectory"][0],
+            "aliases": attrs.get("scriptsVhostAlias", []),
+            "poolIPv4": attrs.get("scriptsVhostPoolIPv4", [None])[0],
+         }
     except IndexError:
         raise UserError(
             "The hostname '%s' does not exist for the '%s' locker." % (hostname, locker)

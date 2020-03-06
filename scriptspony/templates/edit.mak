@@ -10,17 +10,17 @@ from scripts.auth import token
   <ul>
     <li>Hostname: ${hostname}</li>
     <li>Locker: ${locker}</li>
-%if hostname not in [locker + '.scripts.mit.edu']:
+  %if hostname not in [locker + '.scripts.mit.edu']:
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
-    %endif
-    <li>Server Pool: ${pool["description"]} <select name="pool">
-    <option value="unchanged">Unchanged</option>
-    <option value="default">Default</option>
-    %for ip, info in pools.items():
-       %if info["scriptsVhostPoolUserSelectable"] == "TRUE":
-          <option value="${ip}">${info["description"]}</option>
-       %endif
-    %endfor
+  %endif
+    <li>Server Pool: <select name="pool">
+  %for choice in pool_choices:
+    <option value="${choice["value"]}"
+%if choice["selected"]:
+    selected
+%endif
+    >${choice["name"]}</option>
+%endfor
     </select></li>
   </ul>
   <button class="btn"><span class="fa fa-save"></span>Save Changes</button>

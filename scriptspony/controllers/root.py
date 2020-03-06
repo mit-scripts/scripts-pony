@@ -55,6 +55,7 @@ class RootController(BaseController):
 
         olocker = locker
         hosts = None
+        pools = None
         user = auth.current_user()
         https = auth.is_https()
         # Find or create the associated user info object.
@@ -82,7 +83,6 @@ class RootController(BaseController):
                 hosts = vhosts.list_vhosts(locker)
                 hosts.sort(key=lambda k: k[0])
                 pools = vhosts.list_pools()
-                hosts = [(host,aliases,path,pools.get(ip,ip)) for host,aliases,path,ip in hosts]
             except auth.AuthError as e:
                 flash(e.message)
                 # User has been deauthorized from this locker
@@ -100,7 +100,7 @@ class RootController(BaseController):
                     user_info.lockers.sort()
                     DBSession.add(user_info)
                     flash('You can administer the "%s" locker.' % locker)
-        return dict(hosts=hosts, locker=locker, user_info=user_info, https=https)
+        return dict(hosts=hosts, locker=locker, user_info=user_info, https=https, pools=pools)
 
     @expose("scriptspony.templates.edit")
     def edit(self, locker, hostname, pool=None, path=None, token=None, alias="", **kwargs):
@@ -120,7 +120,6 @@ class RootController(BaseController):
                 else:
                     flash("Host '%s' reconfigured." % hostname)
                     redirect("/index/" + locker)
-            _, aliases, pool = vhosts.get_vhost_info(locker, hostname)
         else:
             if alias:
                 if token != auth.token():
@@ -133,15 +132,23 @@ class RootController(BaseController):
                     else:
                         flash("Alias '%s' added to hostname '%s'." % (alias, hostname))
                         redirect("/index/" + locker)
-            try:
-                path, aliases, pool = vhosts.get_vhost_info(locker, hostname)
-            except vhosts.UserError as e:
-                flash(e.message)
-                redirect("/index/" + locker)
+        try:
+            info = vhosts.get_vhost_info(locker, hostname)
+        except vhosts.UserError as e:
+            flash(e.message)
+            redirect("/index/" + locker)
         pools = vhosts.list_pools()
-        pool = pools.get(pool, pool)
+        pool_choices = []
+        pool_choices.append({"name": 'Default', "value": 'DEFAULT', "selected": info['poolIPv4'] is None})
+        for ip, pool in pools.items():
+            # TODO: Only show selectable pools
+            if pool["scriptsVhostPoolUserSelectable"] == "TRUE":
+               pool_choices.append({"name": pool["description"], "value": ip, "selected": info['poolIPv4'] == ip})
+        if not any(choice["selected"] for choice in pool_choices):
+            name = pools.get(info['poolIPv4'], {"description": info['poolIPv4']})["description"]
+            pool_choices.insert(0, {"name": "Unchanged (%s)" % (name,), "value": "", "selected": True})
         return dict(
-            locker=locker, hostname=hostname, pool=pool, pools=pools, path=path, aliases=aliases, alias=alias
+            locker=locker, hostname=hostname, path=info["path"], aliases=info["aliases"], alias=alias, pool_choices=pool_choices,
         )
 
     @expose("scriptspony.templates.delete")
@@ -159,14 +166,12 @@ class RootController(BaseController):
                 else:
                     flash("Host '%s' deleted." % hostname)
                     redirect("/index/" + locker)
-            _, aliases, _ = vhosts.get_vhost_info(locker, hostname)
-        else:
-            try:
-                path, aliases, _ = vhosts.get_vhost_info(locker, hostname)
-            except vhosts.UserError as e:
-                flash(e.message)
-                redirect("/index/" + locker)
-        return dict(locker=locker, hostname=hostname, path=path, aliases=aliases)
+        try:
+            info = vhosts.get_vhost_info(locker, hostname)
+        except vhosts.UserError as e:
+            flash(e.message)
+            redirect("/index/" + locker)
+        return dict(locker=locker, hostname=hostname, path=info["path"], aliases=info["aliases"])
 
     @expose("scriptspony.templates.new")
     def new(
