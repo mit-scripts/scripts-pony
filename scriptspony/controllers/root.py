@@ -143,14 +143,14 @@ class RootController(BaseController):
             redirect("/index/" + locker)
         pools = vhosts.list_pools()
         pool_choices = []
-        pool_choices.append({"name": 'Default', "value": 'DEFAULT', "selected": info['poolIPv4'] is None})
+        pool_choices.append({"name": 'Default', "value": 'default', "selected": info['poolIPv4'] is None})
         for ip, pool in pools.items():
             # TODO: Only show selectable pools
             if pool["scriptsVhostPoolUserSelectable"] == "TRUE":
                pool_choices.append({"name": pool["description"], "value": ip, "selected": info['poolIPv4'] == ip})
         if not any(choice["selected"] for choice in pool_choices):
             name = pools.get(info['poolIPv4'], {"description": info['poolIPv4']})["description"]
-            pool_choices.insert(0, {"name": "Unchanged (%s)" % (name,), "value": "", "selected": True})
+            pool_choices.insert(0, {"name": "Unchanged (%s)" % (name,), "value": "unchanged", "selected": True})
         return dict(
             locker=locker, hostname=hostname, path=info["path"], aliases=info["aliases"], alias=alias, pool_choices=pool_choices,
         )
