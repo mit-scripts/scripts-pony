@@ -82,7 +82,6 @@ class RootController(BaseController):
             try:
                 hosts = vhosts.list_vhosts(locker)
                 hosts.sort(key=lambda k: k[0])
-                pools = vhosts.list_pools()
             except auth.AuthError as e:
                 flash(e.message)
                 # User has been deauthorized from this locker
@@ -92,7 +91,7 @@ class RootController(BaseController):
                 if olocker is not None:
                     return self.index()
                 else:
-                    return dict(hosts={}, locker=locker, user_info=user_info)
+                    return dict(hosts={}, locker=locker, user_info=user_info, pools=None)
             else:
                 # Append locker to the list in user_info if it's not there
                 if not locker in user_info.lockers:
@@ -100,6 +99,11 @@ class RootController(BaseController):
                     user_info.lockers.sort()
                     DBSession.add(user_info)
                     flash('You can administer the "%s" locker.' % locker)
+        if any(host[3] for host in hosts):
+            # Only show Pool column if one or more of the vhosts are
+            # not on the default pool.
+            pools = vhosts.list_pools()
+            pools[None] = {'description': 'Default'}
         return dict(hosts=hosts, locker=locker, user_info=user_info, https=https, pools=pools)
 
     @expose("scriptspony.templates.edit")

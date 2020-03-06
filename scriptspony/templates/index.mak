@@ -9,7 +9,11 @@ from scripts import auth
 
   <p>
     <table border="1">
-      <tr><th>Hostname</th><th>Path</th><th>Fedora Pool</th><th>Edit</th></tr>
+      <tr><th>Hostname</th><th>Path</th>
+      %if pools:
+      <th>Server Pool</th>
+      %endif
+      <th>Edit</th></tr>
       %for host,aliases,path,ip in hosts:
         <tr>
           <td>
@@ -21,13 +25,15 @@ from scripts import auth
 	  <td>
 	    <small>/mit/${locker}/web_scripts/</small>${path}
 	  </td>
-	  <td>
-	  %if pools.get(ip):
+	  %if pools:
+	    <td>
+	    %if pools.get(ip):
 	  	${pools.get(ip)["description"]}
-	  %else:
+	    %else:
 	  	${ip}
-	  %endif 
-	  </td>
+	    %endif
+	    </td>
+	  %endif
             <td class="nbr">
               <a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a>
               %if host.lower().endswith('.'+locker+'.scripts.mit.edu') or not host.lower().endswith('.mit.edu'):

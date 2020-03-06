@@ -65,14 +65,13 @@ def list_vhosts(locker):
             "(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))",
             [locker],
         ),
-        ["scriptsVhostName", "scriptsVhostDirectory", "scriptsVhostAlias", "scriptsVhostPoolIPv4"],
     )
     return [
         (
             m["scriptsVhostName"][0],
             m.get("scriptsVhostAlias", []),
             m["scriptsVhostDirectory"][0],
-            m["scriptsVhostPoolIPv4"][0],
+            m.get("scriptsVhostPoolIPv4", [None])[0],
         )
         for _, m in res
     ]
