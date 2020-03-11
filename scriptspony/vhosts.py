@@ -361,13 +361,18 @@ def validate_hostname(hostname, locker):
             raise UserError(".mit.edu hostnames cannot end with a dash.")
         if "_" in hostname:
             raise UserError(".mit.edu hostnames cannot contain an underscore.")
+        exists = False
         try:
-            dns.resolver.query(hostname + ".", 0)
+            dns.resolver.query(hostname + ".", 'A')
+            exists = True
         except dns.resolver.NXDOMAIN:
             pass
         except dns.exception.Timeout:
             raise
-        except dns.exception.DNSException:
+        except dns.resolver.NoAnswer:
+            # A record doesn't exist, but other records do
+            exists = True
+        if exists:
             if hosts.points_at_scripts(hostname) and is_sudoing():
                 # It was manually transfered to scripts; if it's not an
                 # existing vhost, we good.
@@ -377,8 +382,6 @@ def validate_hostname(hostname, locker):
                     "'%s' already exists. Please choose another name or contact scripts@mit.edu if you wish to transfer the hostname to scripts."
                     % hostname
                 )
-        else:
-            raise RuntimeError("DNS query should never return successfully!")
         stella_cmd = subprocess.Popen(
             ["/usr/bin/stella", "-u", "-noauth", hostname],
             stdout=subprocess.PIPE,
