@@ -490,6 +490,8 @@ def actually_create_vhost(locker, hostname, path):
     path = path.encode("utf-8")
 
     check_if_already_exists(hostname, locker)
+    # new vhosts should be in the same pool as locker.scripts.mit.edu is
+    default_vhost_pool = get_vhost_info(locker, locker + ".scripts.mit.edu")["poolIPv4"]
     scriptsVhostName = ldap.filter.filter_format(
         "scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu", [hostname]
     )
@@ -506,6 +508,7 @@ def actually_create_vhost(locker, hostname, path):
         scriptsVhostName,
         [("objectClass", ["scriptsVhost", "top"]), ("scriptsVhostName", [hostname])]
         + ([("scriptsVhostAlias", alias)] if alias else [])
+        + ([("scriptsVhostPoolIPv4", [default_vhost_pool])] if default_vhost_pool else [])
         + [("scriptsVhostAccount", [account]), ("scriptsVhostDirectory", [path])],
     )
 
