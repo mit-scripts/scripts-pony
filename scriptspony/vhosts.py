@@ -65,17 +65,42 @@ def list_vhosts(locker):
             "(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu))",
             [locker],
         ),
-        ["scriptsVhostName", "scriptsVhostDirectory", "scriptsVhostAlias"],
     )
     return [
         (
             m["scriptsVhostName"][0],
             m.get("scriptsVhostAlias", []),
             m["scriptsVhostDirectory"][0],
+            m.get("scriptsVhostPoolIPv4", [None])[0],
         )
-        for i, m in res
+        for _, m in res
     ]
 
+@log.exceptions
+@reconnecting
+def list_pools():
+    """Returns the IP and description for each VhostPool"""
+    res = conn.search_s(
+        "ou=Pools,dc=scripts,dc=mit,dc=edu",
+        ldap.SCOPE_ONELEVEL,
+        "objectClass=scriptsVhostPool",
+        ["scriptsVhostPoolIPv4", "description", "scriptsVhostPoolUserSelectable"],
+    )
+    pools = {
+            m["scriptsVhostPoolIPv4"][0]: {"description": m["description"][0], "scriptsVhostPoolUserSelectable": m["scriptsVhostPoolUserSelectable"][0]}
+      for _, m in res
+    }
+    res = conn.search_s(
+        "ou=VirtualHosts,dc=scripts,dc=mit,dc=edu",
+        ldap.SCOPE_ONELEVEL,
+        "(&(objectClass=cosTemplate)(scriptsVhostPoolIPv4=*))",
+        ["scriptsVhostPoolIPv4"],
+        )
+    if res:
+        name = res[0][1]["scriptsVhostPoolIPv4"][0]
+        name = pools.get(name, {"description": name})["description"]
+        pools[None] = {"description": "Default (%s)" % (name,), "scriptsVhostPoolUserSelectable": False}
+    return pools
 
 @team_sensitive
 @log.exceptions
@@ -83,7 +108,7 @@ def get_path(locker, hostname):
     """Return a the path for the given hostname.
 
     The directory is relative to web_scripts or Scripts/*/"""
-    return get_vhost_info(locker, hostname)[0]
+    return get_vhost_info(locker, hostname)["path"]
 
 
 @team_sensitive
@@ -98,13 +123,14 @@ def get_vhost_info(locker, hostname):
             "(&(objectClass=scriptsVhost)(scriptsVhostAccount=uid=%s,ou=People,dc=scripts,dc=mit,dc=edu)(scriptsVhostName=%s))",
             [locker, hostname],
         ),
-        ["scriptsVhostDirectory", "scriptsVhostAlias"],
     )
     try:
-        return (
-            res[0][1]["scriptsVhostDirectory"][0],
-            res[0][1].get("scriptsVhostAlias", []),
-        )
+        attrs = res[0][1]
+        return {
+            "path": attrs["scriptsVhostDirectory"][0],
+            "aliases": attrs.get("scriptsVhostAlias", []),
+            "poolIPv4": attrs.get("scriptsVhostPoolIPv4", [None])[0],
+         }
     except IndexError:
         raise UserError(
             "The hostname '%s' does not exist for the '%s' locker." % (hostname, locker)
@@ -123,6 +149,10 @@ def set_path(locker, vhost, path):
     locker = locker.encode("utf-8")
     scriptsVhostName = get_vhost_name(locker, vhost)
 
+    info = get_vhost_info(locker, vhost)
+    if info['path'] == path:
+        return
+
     conn.modify_s(
         scriptsVhostName, [(ldap.MOD_REPLACE, "scriptsVhostDirectory", [path])]
     )
@@ -135,6 +165,45 @@ def set_path(locker, vhost, path):
     #       doesn't exist
     # TODO: also check for index files or .htaccess and warn if none are there
 
+@sensitive
+@log.exceptions
+@reconnecting
+def set_pool(locker, vhost, pool):
+    """Sets the pool of an existing vhost owned by the locker."""
+    locker = locker.encode("utf-8")
+    pool = pool.encode("utf-8")
+    scriptsVhostName = get_vhost_name(locker, vhost)
+    info = get_vhost_info(locker, vhost)
+    if pool == "unchanged":
+        pass
+    elif pool == "default":
+        if not info['poolIPv4']:
+            return
+        conn.modify_s(scriptsVhostName, [(ldap.MOD_DELETE, "scriptsVhostPoolIPv4", None)])
+    else:
+        if info['poolIPv4'] == pool:
+            return
+        res = conn.search_s(
+            "ou=Pools,dc=scripts,dc=mit,dc=edu",
+            ldap.SCOPE_ONELEVEL,
+            ldap.filter.filter_format(
+                "(&(objectClass=scriptsVhostPool)(scriptsVhostPoolIPv4=%s))",
+                [pool]),
+            ["description", "scriptsVhostPoolUserSelectable"],
+        )
+        if not res or not res[0][1].get('scriptsVhostPoolUserSelectable'):
+            name = pool
+            if res:
+                name = res[0][1].get('description', name)
+            raise UserError("You cannot switch to the %s pool!" % (name,))
+        conn.modify_s(
+            scriptsVhostName, [(ldap.MOD_REPLACE, "scriptsVhostPoolIPv4", [pool])]
+        )
+
+    log.info(
+        "%s set pool for vhost '%s' (locker '%s') to '%s'."
+        % (current_user(), vhost, locker, pool)
+    )
 
 @sensitive
 @log.exceptions
@@ -421,6 +490,8 @@ def actually_create_vhost(locker, hostname, path):
     path = path.encode("utf-8")
 
     check_if_already_exists(hostname, locker)
+    # new vhosts should be in the same pool as locker.scripts.mit.edu is
+    default_vhost_pool = get_vhost_info(locker, locker + ".scripts.mit.edu")["poolIPv4"]
     scriptsVhostName = ldap.filter.filter_format(
         "scriptsVhostName=%s,ou=VirtualHosts,dc=scripts,dc=mit,dc=edu", [hostname]
     )
@@ -437,6 +508,7 @@ def actually_create_vhost(locker, hostname, path):
         scriptsVhostName,
         [("objectClass", ["scriptsVhost", "top"]), ("scriptsVhostName", [hostname])]
         + ([("scriptsVhostAlias", alias)] if alias else [])
+        + ([("scriptsVhostPoolIPv4", [default_vhost_pool])] if default_vhost_pool else [])
         + [("scriptsVhostAccount", [account]), ("scriptsVhostDirectory", [path])],
     )
 

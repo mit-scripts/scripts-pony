@@ -9,8 +9,12 @@ from scripts import auth
 
   <p>
     <table border="1">
-      <tr><th>Hostname</th><th>Path</th><th>Edit</th></tr>
-      %for host,aliases,path in hosts:
+      <tr><th>Hostname</th><th>Path</th>
+      %if pools:
+      <th>Server Pool</th>
+      %endif
+      <th>Edit</th></tr>
+      %for host,aliases,path,ip in hosts:
         <tr>
           <td>
 	  <a href="http://${host}">${host}</a>
@@ -21,16 +25,21 @@ from scripts import auth
 	  <td>
 	    <small>/mit/${locker}/web_scripts/</small>${path}
 	  </td>
-          %if host not in (locker+'.scripts.mit.edu',):
+	  %if pools:
+	    <td>
+	    %if pools.get(ip):
+	  	${pools.get(ip)["description"]}
+	    %else:
+	  	${ip}
+	    %endif
+	    </td>
+	  %endif
             <td class="nbr">
               <a href="${tg.url('/edit/'+locker+'/'+host)}" class="btn sm-btn" aria-label="Edit"><span class="fa fa-pencil" aria-hidden="true"></span></a>
               %if host.lower().endswith('.'+locker+'.scripts.mit.edu') or not host.lower().endswith('.mit.edu'):
                 <a href="${tg.url('/delete/'+locker+'/'+host)}" class="btn btn-danger sm-btn" aria-label="Delete"><span class="fa fa-times-circle" aria-hidden="true"></span></a>
               %endif
             </td>
-          %else:
-            <td><span class="edit-btn-disabled"><span class="fa fa-ban"></span></span></td>
-          %endif
         </tr>
       %endfor
     </table>

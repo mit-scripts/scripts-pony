@@ -3,19 +3,23 @@ import subprocess
 import threading
 from datetime import datetime, timedelta
 
+from tg import config
+
 KEYTAB_FILE = None
-principle = None
+principal = None
 
 
-def set(name):
-    """Tells the keytab module to look for the daemon/NAME.mit.edu
-    keytab in ~/Private/NAME.keytab"""
-    global KEYTAB_FILE, principle
-    KEYTAB_FILE = os.path.expanduser("~/Private/%s.keytab" % name)
-    principle = "daemon/%s.mit.edu" % name
+def set(keytab_file, k5principal):
+    """Tells the keytab module to look for the k5principal
+    keytab in keytab_file"""
+    global KEYTAB_FILE, principal
+    KEYTAB_FILE = os.path.expanduser(keytab_file)
+    principal = k5principal
 
 
 def exists():
+    if not KEYTAB_FILE:
+        set(config.get('keytab'), config.get('principal'))
     return os.path.exists(KEYTAB_FILE)
 
 
@@ -31,5 +35,5 @@ def auth():
             kinit = "/usr/kerberos/bin/kinit"
         else:
             kinit = "/usr/bin/kinit"
-        subprocess.Popen([kinit, principle, "-k", "-t", KEYTAB_FILE]).wait()
+        subprocess.Popen([kinit, principal, "-k", "-t", KEYTAB_FILE]).wait()
         state.got_tickets = now

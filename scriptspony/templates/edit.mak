@@ -10,9 +10,20 @@ from scripts.auth import token
   <ul>
     <li>Hostname: ${hostname}</li>
     <li>Locker: ${locker}</li>
+  %if hostname not in [locker + '.scripts.mit.edu']:
     <li>Path: /mit/${locker}/web_scripts/<input type="text" name="path" value="${path}" /></li>
+  %endif
+    <li>Server Pool: <select name="pool">
+  %for choice in pool_choices:
+    <option value="${choice["value"]}"
+%if choice["selected"]:
+    selected
+%endif
+    >${choice["name"]}</option>
+%endfor
+    </select><a class="btn btn-danger" href="https://scripts.mit.edu/upgrade/" target="_blank"><span class="fa fa-exclamation-circle"></span> ALPHA - READ ME FIRST</a></li>
   </ul>
-  <button class="btn"><span class="fa fa-save"></span> Save Path</button>
+  <button class="btn"><span class="fa fa-save"></span>Save Changes</button>
   %if hostname.lower().endswith('.'+locker+'.scripts.mit.edu') or not hostname.lower().endswith('.mit.edu'):
     <a class="btn btn-danger" href="${tg.url('/delete/'+locker+'/'+hostname)}"><span class="fa fa-times-circle"></span> Delete</a>
   %endif
