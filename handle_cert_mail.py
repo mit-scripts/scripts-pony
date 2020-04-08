@@ -4,7 +4,7 @@ import email
 import sys
 import ldap
 import ldap.filter
-from scripts import cert, log
+from scripts import cert, log, auth
 from scriptspony import vhosts
 
 BLACKLIST = ["scripts.mit.edu", "notfound.example.com"]
@@ -81,4 +81,5 @@ def main():
 
 
 if __name__ == "__main__":
+    auth.set_user_from_parent_process()
     main()
