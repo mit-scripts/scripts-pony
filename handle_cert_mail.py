@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import email
+import os.path
 import sys
 import ldap
 import ldap.filter
@@ -82,4 +83,7 @@ def main():
 
 if __name__ == "__main__":
     auth.set_user_from_parent_process()
+    from paste.deploy import loadapp
+
+    loadapp("config:development.ini", relative_to=os.path.dirname(__file__))
     main()
