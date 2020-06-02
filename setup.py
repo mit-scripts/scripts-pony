@@ -17,7 +17,10 @@ setup(
         "routes >= 1.13",
         "python-ldap >= 2.4",
         "TurboGears2 >= 2.0b7",
-        "MySQL-python >= 1.2",
+        # MySQL-python was renamed to mysqlclient between F20 and F30;
+        # since setuptools doesn't allow a boolean dependency, we key on Fedora's python version
+        "MySQL-python >= 1.2; python_full_version < '2.7.18'",
+        "mysqlclient >= 1.2; python_full_version >= '2.7.18'",
         "zope.sqlalchemy >= 0.4 ",
     ],
     setup_requires=["PasteScript >= 1.7"],
