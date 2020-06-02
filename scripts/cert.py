@@ -21,8 +21,8 @@ Wh/U2tDLIzO+mzBR1mrkk+gs8XGC919jFXQzBqDNrmUmrtT6YrSAHwIDAQAB
 )
 
 
-def pem_to_chain(data):
-    certs = [
+def pem_to_certs(data):
+    return [
         crypto.load_certificate(crypto.FILETYPE_PEM, m.group(0))
         for m in re.finditer(
             b"-----BEGIN CERTIFICATE-----\r?\n.+?\r?\n-----END CERTIFICATE-----",
@@ -31,6 +31,9 @@ def pem_to_chain(data):
         )
     ]
 
+
+def pem_to_chain(data):
+    certs = pem_to_certs(data)
     # Find the leaf certificate
     leaf, = [
         c for c in certs if not any(c1.get_issuer() == c.get_subject() for c1 in certs)
