@@ -15,6 +15,7 @@ from scriptspony.config.environment import load_environment
 
 NON_SCRIPTS_VHOSTS_ALIAS = ["sipb.mit.edu"]
 
+
 def get_expiring_certs():
     """
     Most of this function is from find_expiring_certs.py
@@ -53,7 +54,9 @@ def get_expiring_certs():
 def renew_expiring_mit_certs():
     expiring = get_expiring_certs()
     for _, uid, hostnames in expiring:
-        mit_hostnames = [h for h in hostnames if not ('.' in h and not 'mit.edu' in h)]
+        mit_hostnames = [
+            h for h in hostnames if '.' not in h or h.endswith('.mit.edu')
+        ]
         if 'mit.edu' in hostnames[0]:
             try:
                 hostnames = request_cert(uid, mit_hostnames)
