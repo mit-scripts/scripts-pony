@@ -13,6 +13,7 @@ from scripts import cert
 from scriptspony import vhosts
 from scriptspony.config.environment import load_environment
 
+NON_SCRIPTS_VHOSTS_ALIAS = ["sipb.mit.edu"]
 
 def get_expiring_certs():
     """
@@ -52,12 +53,13 @@ def get_expiring_certs():
 def renew_expiring_mit_certs():
     expiring = get_expiring_certs()
     for _, uid, hostnames in expiring:
+        mit_hostnames = [h for h in hostnames if not ('.' in h and not 'mit.edu' in h)]
         if 'mit.edu' in hostnames[0]:
             try:
-                hostnames = request_cert(uid, hostnames)
+                hostnames = request_cert(uid, mit_hostnames)
                 print("CSR sent for " + ", ".join(hostnames))
-            except (OSError, AssertionError) as err:
-                print("failed to send CSR for " + ", ".join(hostnames) + ": " +
+            except (AssertionError, IOError, OSError) as err:
+                print("failed to send CSR for " + ", ".join(hostnames) + ": ",
                       err)
 
 
@@ -70,7 +72,8 @@ def request_cert(locker, hostnames):
         if not hostname.endswith(".mit.edu"):
             hostname += ".mit.edu"
         assert hostname.endswith(".mit.edu"), hostname
-        assert socket.gethostbyname(hostname) == "18.4.86.46", hostname
+        if hostname not in NON_SCRIPTS_VHOSTS_ALIAS:
+            assert socket.gethostbyname(hostname) == "18.4.86.46", hostname
         hostnames[i] = hostname
     hostnames = list(set(hostnames))
     csr = subprocess.check_output(
