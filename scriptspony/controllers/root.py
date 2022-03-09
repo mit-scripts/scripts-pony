@@ -300,12 +300,8 @@ class RootController(BaseController):
                     redirect("/queue")
         short = t.hostname[: -len(".mit.edu")]
         assert t.hostname[0] != "-"
-        stella = subprocess.Popen(
-            ["/usr/bin/stella", t.hostname],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        out, err = stella.communicate()
+        out = "You need to check this yourself!"
+        err = "Pony can't check this anymore!"
         return dict(
             tickets=[t],
             action=url("/approve/%s" % id),

@@ -382,22 +382,6 @@ def validate_hostname(hostname, locker):
                     "'%s' already exists. Please choose another name or contact scripts@mit.edu if you wish to transfer the hostname to scripts."
                     % hostname
                 )
-        stella_cmd = subprocess.Popen(
-            ["/usr/bin/stella", "-u", "-noauth", hostname],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        out, err = stella_cmd.communicate()
-        if stella_cmd.returncode != 1:
-            # Then its reserved, deleted, etc.
-            status = "Unknown"
-            for line in out.split("\n"):
-                if "Status:" in line:
-                    status = line.split(" ")[-2]
-            raise UserError(
-                "'%s' is not available; it currently has status %s. Please choose another name or contact scripts@mit.edu if you wish to transfer the hostname to scripts."
-                % (hostname, status)
-            )
 
     else:
         reqtype = "external"
