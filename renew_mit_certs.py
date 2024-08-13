@@ -15,13 +15,12 @@ from scriptspony.config.environment import load_environment
 
 NON_SCRIPTS_VHOSTS_ALIAS = ["sipb.mit.edu"]
 
-
 def get_expiring_certs():
     """
     Most of this function is from find_expiring_certs.py
     """
     # load turbogears config, required for vhosts.connect to work
-    config = appconfig('config:' + os.path.abspath('development.ini'))
+    config = appconfig('config:' + os.path.abspath(os.path.dirname(__file__) + '/development.ini'))
     load_environment(config.global_conf, config.local_conf)
 
     now = datetime.utcnow()
