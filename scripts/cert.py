@@ -9,7 +9,19 @@ from OpenSSL import crypto
 import pyasn1.codec.der.decoder as der_decoder
 from pyasn1_modules.rfc2459 import SubjectAltName
 import requests
+import urllib
+import zipfile
+import io
 
+# msg_to_pem needs to make web requests to deal with certificate emails from
+# CERTInext, but us.certinext.io uses a "Kubernetes Ingress Controller Fake
+# Certificate" when no TLS SNI value is set, which we can't verify.  Since old
+# versions of Python 2 do not have SNI support, we use a workaround that uses
+# PyOpenSSL.
+import urllib3.contrib.pyopenssl
+urllib3.contrib.pyopenssl.inject_into_urllib3()
+
+        
 SCRIPTS_PUBKEY = base64.b64decode(
     """\
 MIIBDQIBAAKCAQEAxJo8HD63ei1mpkNGQVv3wXXGrQUiDON1FhsJ6iYiCFmxmOKNvFssPlQ48uIB
@@ -30,7 +42,6 @@ def pem_to_certs(data):
             re.DOTALL,
         )
     ]
-
 
 def pem_to_chain(data):
     certs = pem_to_certs(data)
@@ -123,7 +134,7 @@ def chain_should_install(new_chain, old_chain=None):
 
 
 URL_RE = re.compile(
-    r"https://cert-manager\.com/customer/InCommon/ssl\?action=download&sslId=\d+&format=x509"
+    r"https://us\.certinext\.io/emSign-Subscriber/downloadCertificate\?x=(?:%2F|%2B|%3D|[a-zA-Z0-9])+" # URL-encoded base64 identifier
 )
 
 
@@ -137,7 +148,6 @@ class MyHTMLParser(HTMLParser):
 
     def handle_data(self, data):
         self.urls.update(URL_RE.findall(data))
-
 
 def msg_to_pem(msg):
     urls = set()
@@ -154,9 +164,23 @@ def msg_to_pem(msg):
     if not urls:
         return None
     url, = urls
+    _, certinext_x = url.split('=', 1)
+    certinext_x = urllib.unquote(certinext_x)
     for retry in range(20):
-        r = requests.get(url)
+        # Two requests seem to be necessary for CERTInext. I assume the first
+        # gives you cookies, and the second gives you what you actually want...
+        s = requests.Session()
+        r = s.get(url, verify=True)
         if r.status_code == 200:
-            return r.text
+            r = s.post('https://us.certinext.io/downloadSubscriberCertificate', data={'x': certinext_x}, verify=True)
+            if r.status_code == 200:
+                # ...as a zip file, of course.
+                with zipfile.ZipFile(io.BytesIO(r.content)) as certzip:
+                    fullchains = [ name for name in certzip.namelist() if name.endswith(u'_fullchain.pem') ]
+                    if fullchains:
+                        with certzip.open(fullchains[0]) as pem:
+                            return pem.read()
+                    else:
+                        raise RuntimeError('No fullchain file found in zip from certinext.')
     r.raise_for_status()
     raise RuntimeError("Got HTTP status %d" % r.status_code)
