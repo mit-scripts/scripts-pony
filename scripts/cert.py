@@ -154,7 +154,11 @@ def msg_to_pem(msg):
     for part in msg.walk():
         payload = part.get_payload(decode=True)
         if payload is not None:
-            payload_str = payload.decode(part.get_content_charset("us-ascii"))
+            try:
+                payload_str = payload.decode(part.get_content_charset("us-ascii"))
+            except:
+                # Skip if this part of the email isn't text, e.g. an image.
+                continue
             if part.get_content_type() == "text/html":
                 parser = MyHTMLParser(urls)
                 parser.feed(payload_str)
